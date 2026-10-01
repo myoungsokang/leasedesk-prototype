@@ -1,0 +1,1522 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LeaseDesk · Prototype</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+:root{
+  --bg:#f5f5f2;--surface:#fff;--ink:#121212;--ink2:#4f4d48;--muted:#8b8881;--line:#e6e4de;--line2:#efeee9;
+  --accent:#2a78d6;--accent-2:#1f5fb0;--accent-soft:#e8f1fc;--series-2:#eb6834;
+  --warn:#946000;--warn-soft:#fdf3dc;--danger:#c23b3a;--danger-soft:#fbe9e8;--ok:#1d7a52;--ok-soft:#e3f4ec;
+  --r:14px;--ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Pretendard Variable',Pretendard,-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer;color:inherit}
+input,select,textarea{font:inherit;color:inherit}
+img{display:block}
+
+/* ---------- motion ---------- */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes slideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes grow{from{width:0}}
+@keyframes rise{from{height:0}}
+@keyframes draw{from{stroke-dashoffset:var(--len,600)}to{stroke-dashoffset:0}}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(42,120,214,.45)}70%{box-shadow:0 0 0 6px rgba(42,120,214,0)}100%{box-shadow:0 0 0 0 rgba(42,120,214,0)}}
+.anim .a{animation:fadeUp .45s var(--ease) both;animation-delay:calc(var(--i,0) * 45ms)}
+.anim.view{animation:fadeIn .3s ease both}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ---------- top ---------- */
+.top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:18px;padding:10px 20px;background:rgba(245,245,242,.82);backdrop-filter:saturate(1.4) blur(14px);border-bottom:1px solid var(--line)}
+.logo{font-weight:800;letter-spacing:-.04em;font-size:17px}
+.logo i{font-style:normal;color:var(--accent)}
+.seg{display:inline-flex;background:#e9e8e3;border-radius:10px;padding:3px;gap:2px}
+.seg button{border:0;background:transparent;padding:6px 12px;border-radius:8px;color:var(--ink2);font-weight:500;transition:background .25s var(--ease),color .2s,box-shadow .25s}
+.seg button:hover{color:var(--ink)}
+.seg button.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.seg.sm button{padding:4px 9px;font-size:12.5px}
+.tools{display:flex;align-items:center;gap:4px;margin-left:auto}
+.today{font-weight:700;font-variant-numeric:tabular-nums;padding:0 8px}
+
+/* ---------- buttons / chips ---------- */
+.btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;font-weight:600;transition:transform .15s var(--ease),background .2s,border-color .2s,box-shadow .2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn:hover{border-color:#d2cfc6;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+.btn.pri:hover{background:#2b2b2b}
+.btn.blue{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--ink2)}
+.btn.ghost:hover{background:#e9e8e3;box-shadow:none}
+.btn.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+.btn.xs{padding:3px 8px;font-size:12px;border-radius:7px}
+.btn.danger{color:var(--danger)}
+.btn.icon{padding:6px 9px}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:999px;background:#efeee9;color:var(--ink2);white-space:nowrap}
+.chip.blue{background:var(--accent-soft);color:var(--accent-2)}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.red{background:var(--danger-soft);color:var(--danger)}
+.chip.dark{background:var(--ink);color:#fff}
+.chip.line{background:#fff;border:1px solid var(--line)}
+.ndot{background:var(--danger);color:#fff;font-size:11px;border-radius:999px;padding:1px 7px;font-weight:700}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 57px)}
+.side{padding:22px 12px;border-right:1px solid var(--line);position:sticky;top:57px;height:calc(100vh - 57px)}
+.me{padding:0 12px 16px;margin-bottom:12px;border-bottom:1px solid var(--line)}
+.me b{display:block;font-size:15px}.me span{color:var(--muted);font-size:12.5px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{border:0;background:transparent;text-align:left;padding:9px 12px;border-radius:10px;color:var(--ink2);font-weight:500;display:flex;justify-content:space-between;align-items:center;transition:background .2s}
+.nav button:hover{background:#e9e8e3}
+.nav button.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.main{padding:28px 34px 100px;max-width:1220px;width:100%}
+h1{font-size:23px;margin:0;letter-spacing:-.035em}
+.head{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.sp{flex:1}
+.sub{color:var(--muted);font-size:12.5px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.empty{padding:60px 0;text-align:center;color:var(--muted)}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.card.hov{cursor:pointer}
+.card.hov:hover,.card.lift:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(0,0,0,.08)}
+.card .ph{aspect-ratio:16/9;background:#e9e8e3 center/cover;position:relative}
+.card .ph .tags{position:absolute;left:10px;top:10px;display:flex;gap:5px}
+.card .ph .tags .chip{backdrop-filter:blur(8px);background:rgba(255,255,255,.88)}
+.card .ph .tags .chip.red{background:rgba(251,233,232,.95)}
+.card .ph .tags .chip.warn{background:rgba(253,243,220,.95)}
+.card .ph .tags .chip.dark{background:rgba(18,18,18,.85)}
+.card .bd{padding:14px 16px 12px}
+.card .t{font-weight:700;font-size:15.5px;letter-spacing:-.03em}
+.card .ad{color:var(--muted);font-size:12.5px;margin-top:2px}
+.kv{display:flex;gap:16px;margin-top:12px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.kv b{display:block;color:var(--ink);font-weight:600;font-size:13.5px;margin-top:1px}
+.ft{display:flex;align-items:center;gap:4px;padding:8px 10px;border-top:1px solid var(--line2)}
+.card.dim{opacity:.55}
+
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;margin-bottom:14px}
+.panel h3{margin:0 0 16px;font-size:14.5px;display:flex;align-items:center;gap:8px;letter-spacing:-.02em}
+.panel.internal{background:#fffaf0;border-color:#f0dfb6}
+.f{display:flex;flex-direction:column;gap:6px;min-width:0}
+.f>label{font-size:12px;color:var(--muted);font-weight:600}
+.in{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;outline:none;transition:border-color .2s,box-shadow .2s;width:100%}
+.in:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea.in{resize:vertical;min-height:64px}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.ui{position:relative}.ui span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12.5px;pointer-events:none}
+.ui .in{padding-right:46px}
+.price-row{display:grid;grid-template-columns:90px auto 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line2)}
+.price-row:last-child{border-bottom:0}
+.price-row>b{font-size:13px;font-weight:600}
+.sticky-foot{position:sticky;bottom:0;display:flex;gap:8px;justify-content:flex-end;padding:14px 0;background:linear-gradient(transparent,var(--bg) 30%)}
+
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.thumb{width:110px;aspect-ratio:4/3;border-radius:10px;background:#eee center/cover;position:relative;border:1px solid var(--line);overflow:hidden;animation:pop .3s var(--ease)}
+.thumb.plan{background-color:#fff;background-size:contain;background-repeat:no-repeat}
+.thumb button{position:absolute;right:4px;top:4px;border:0;background:rgba(0,0,0,.6);color:#fff;width:20px;height:20px;border-radius:50%;font-size:11px;line-height:20px;padding:0;opacity:0;transition:opacity .2s}
+.thumb:hover button{opacity:1}
+.thumb em{position:absolute;left:6px;bottom:5px;font-style:normal;font-size:11px;background:rgba(255,255,255,.9);padding:1px 6px;border-radius:6px}
+.add-tile{width:110px;aspect-ratio:4/3;border-radius:10px;border:1.5px dashed #cfccc3;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;transition:border-color .2s,color .2s;font-size:12.5px;position:relative}
+.add-tile:hover{border-color:var(--accent);color:var(--accent)}
+.add-tile input{position:absolute;inset:0;opacity:0;cursor:pointer}
+
+.fl-row{display:grid;grid-template-columns:54px auto 170px auto 1fr;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line2)}
+.fl-row:last-child{border-bottom:0}
+.fl-row .fn{font-weight:700;font-variant-numeric:tabular-nums}
+
+.search-res{border:1px solid var(--line);border-radius:12px;margin-top:6px;overflow:hidden;animation:pop .2s var(--ease)}
+.search-res button{display:flex;width:100%;border:0;background:#fff;padding:10px 14px;text-align:left;gap:10px;align-items:center;border-bottom:1px solid var(--line2);transition:background .15s}
+.search-res button:hover{background:#f7f7f4}
+.bcard{display:flex;gap:16px;align-items:center;padding:14px 16px;border-radius:12px;background:#f7f7f4;margin-top:10px;animation:pop .3s var(--ease)}
+.bcard .kv{margin-top:4px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);font-size:12px;padding:8px 10px;border-bottom:1px solid var(--line)}
+.tbl td{padding:10px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl tr.ended td{color:var(--muted)}
+.tbl tr.ended td.tn{text-decoration:line-through}
+
+/* modal */
+#modal-root .back{position:fixed;inset:0;background:rgba(18,18,18,.38);backdrop-filter:blur(3px);z-index:50;display:flex;align-items:center;justify-content:center;padding:30px;animation:fadeIn .2s ease}
+.modal{background:#fff;border-radius:18px;width:min(640px,100%);max-height:calc(100vh - 60px);overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.25);animation:pop .32s var(--ease)}
+.modal.wide{width:min(1120px,100%)}
+.modal.full{width:min(1200px,100%);height:calc(100vh - 60px);background:var(--bg)}
+.mh{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line2);position:sticky;top:0;background:inherit;z-index:2}
+.mh b{font-size:15.5px}
+.mb{padding:18px 20px}
+.pick{display:flex;align-items:center;gap:12px;padding:10px;border-radius:12px;transition:background .15s}
+.pick:hover{background:#f7f7f4}
+.pick .pi{width:64px;height:44px;border-radius:8px;background:#eee center/cover;flex:none}
+
+/* toast */
+#toasts{position:fixed;right:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:80}
+.toast{background:var(--ink);color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;box-shadow:0 10px 30px rgba(0,0,0,.2);animation:slideIn .35s var(--ease);max-width:360px;transition:opacity .3s,transform .3s}
+.toast.out{opacity:0;transform:translateY(8px)}
+.toast small{display:block;color:#b9b7b0;margin-top:2px}
+
+/* guide */
+.guide{position:fixed;right:16px;top:66px;width:300px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 20px 50px rgba(0,0,0,.14);z-index:40;padding:16px 18px;animation:pop .3s var(--ease);max-height:calc(100vh - 90px);overflow:auto}
+.guide h4{margin:12px 0 6px;font-size:12px;color:var(--muted)}
+.guide h4:first-child{margin-top:0}
+.guide ol{margin:0;padding-left:18px;font-size:13px;line-height:1.75}
+
+/* notifications / log */
+.list .li{display:flex;gap:12px;align-items:flex-start;padding:14px 4px;border-bottom:1px solid var(--line2)}
+.list .li .d{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px;flex:none;animation:pulse 1.8s infinite}
+.list .li .d.read{background:#d6d4cd;animation:none}
+.list .li time{color:var(--muted);font-size:12px;margin-left:auto;white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.stat span{color:var(--muted);font-size:12px;font-weight:600}
+.stat b{display:block;font-size:28px;letter-spacing:-.04em;margin-top:4px;font-variant-numeric:tabular-nums}
+.conf{display:flex;gap:14px;align-items:center;padding:14px 16px;border:1px solid #f0dfb6;background:#fffaf0;border-radius:12px;margin-bottom:8px}
+
+/* poly editor */
+.stage{position:relative;cursor:crosshair;user-select:none;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.stage img{width:100%}
+.stage svg,.planv svg{position:absolute;inset:0;width:100%;height:100%}
+.stage .pt{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:#fff;border:2.5px solid var(--accent);animation:pop .2s var(--ease)}
+.stage .pt.first{background:var(--accent)}
+.poly{fill:rgba(42,120,214,.24);stroke:var(--accent);stroke-width:2.5;stroke-linejoin:round}
+.poly.all{fill:rgba(42,120,214,.13);stroke-dasharray:6 4}
+
+/* ---------- client page ---------- */
+.cp{background:#fbfbf9;min-height:100%}
+.cp-bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:12px 28px;background:rgba(251,251,249,.86);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.cp-bar{top:57px}.modal .cp-bar{top:53px}
+.cp-brand{font-weight:800;letter-spacing:-.03em}
+.cp-brand span{color:var(--muted);font-weight:500;margin-left:8px;font-size:12.5px}
+.cp-wrap{max-width:1040px;margin:0 auto;padding:40px 28px 80px}
+.hero{display:grid;grid-template-columns:1fr auto;gap:30px;align-items:end;padding-bottom:30px;border-bottom:1px solid var(--line);margin-bottom:34px}
+.hero .eyebrow{color:var(--accent);font-weight:700;font-size:12.5px;letter-spacing:.04em}
+.hero h1{font-size:40px;letter-spacing:-.05em;margin:8px 0 14px;line-height:1.1}
+.need{display:flex;gap:8px;flex-wrap:wrap}
+.need span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px}
+.need span em{font-style:normal;color:var(--muted);margin-right:6px}
+.bk{text-align:right;font-size:13px;color:var(--ink2);line-height:1.6}
+.bk b{font-size:15px;color:var(--ink)}
+.sec-t{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.03em;margin:0 0 12px}
+.cmp{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:auto;margin-bottom:44px}
+.cmp .tbl td{padding:12px}
+.cmp tr.go{cursor:pointer;transition:background .15s}
+.cmp tr.go:hover{background:#f7f7f4}
+.it{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;margin-bottom:26px}
+.it.ended{background:#f3f3f0;filter:grayscale(1)}
+.it-h{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.inum{font-size:13px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;padding-top:6px}
+.it h2{margin:0;font-size:24px;letter-spacing:-.04em}
+.gal{display:grid;grid-template-columns:2fr 1fr;grid-auto-rows:160px;gap:8px;border-radius:14px;overflow:hidden;margin-bottom:22px}
+.gal div{background:#ddd center/cover;transition:transform .6s var(--ease);position:relative}
+.gal .more{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.38);color:#fff;font-weight:700;font-size:20px}
+.gal div:first-child{grid-row:span 2}
+.gal div:hover{transform:scale(1.02)}
+.gal.n1{grid-template-columns:1fr;grid-auto-rows:320px}
+.gal.n2{grid-template-columns:1fr 1fr;grid-auto-rows:300px}.gal.n2 div:first-child{grid-row:auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+.box{border:1px solid var(--line2);border-radius:14px;padding:16px 18px;background:#fcfcfa}
+.box h4{margin:0 0 10px;font-size:12px;color:var(--muted);letter-spacing:.03em}
+.dl{display:grid;grid-template-columns:96px 1fr;row-gap:9px;font-size:13.5px}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;font-weight:600}
+.dl dd .fx{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.dl dd .per{font-weight:500;color:var(--muted);font-size:12px;margin-left:6px}
+.dl dd .soft{color:var(--ink2);font-weight:500}
+.upd{display:inline-block;font-style:normal;font-size:10.5px;font-weight:700;color:var(--accent-2);background:var(--accent-soft);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:1px;animation:pulse 2s infinite}
+.cm{border-left:3px solid var(--accent);padding:6px 0 6px 14px;margin:0 0 20px;color:var(--ink2);font-size:14px;line-height:1.6}
+.cm b{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+.note{font-size:13px;color:var(--ink2);margin:-4px 0 18px}
+.plans{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory;margin-bottom:6px}
+.planv{flex:0 0 min(560px,88%);scroll-snap-align:start;border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:#fff;position:relative}
+.planv .pw{position:relative}
+.planv .pw img{width:100%}
+.planv .cap{display:flex;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line2);font-size:13px}
+.planv .cap b{font-variant-numeric:tabular-nums}
+.ended-box{display:flex;align-items:center;justify-content:center;height:90px;border-radius:14px;border:1.5px dashed #c9c7bf;color:var(--muted);font-weight:600}
+details.area{margin-top:18px;border:1px solid var(--line2);border-radius:14px;background:#fcfcfa}
+details.area summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;align-items:center;gap:10px;font-weight:700}
+details.area summary::-webkit-details-marker{display:none}
+details.area summary .chev{margin-left:auto;transition:transform .3s var(--ease);color:var(--muted)}
+details.area[open] summary .chev{transform:rotate(180deg)}
+.area-b{padding:4px 18px 18px;animation:fadeUp .4s var(--ease)}
+.insight{background:#fff;border:1px solid var(--line2);border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.6;margin-bottom:14px}
+.insight b{color:var(--accent-2)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.sec .tile,.sec .chart,.sec .insight{background:#fcfcfa}
+.tile{background:#fff;border:1px solid var(--line2);border-radius:12px;padding:12px 14px}
+.tile span{font-size:12px;color:var(--muted)}
+.tile b{display:block;font-size:20px;letter-spacing:-.03em;margin-top:2px;font-variant-numeric:tabular-nums}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chart{background:#fff;border:1px solid var(--line2);border-radius:12px;padding:14px 16px}
+.chart h5{margin:0 0 12px;font-size:12.5px;color:var(--ink2)}
+.cols{display:flex;align-items:flex-end;gap:6px;height:130px}
+.cols .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px}
+.cols .bar{width:100%;max-width:34px;background:#bcd3ef;border-radius:4px 4px 0 0;height:var(--h);animation:rise .8s var(--ease) both;animation-delay:calc(var(--i)*60ms);transition:background .2s}
+.cols .c:hover .bar{background:var(--accent)}
+.cols .c.peak .bar{background:var(--accent)}
+.cols .v{font-size:11px;font-weight:700;min-height:14px;font-variant-numeric:tabular-nums}
+.cols .k{font-size:10.5px;color:var(--muted);white-space:nowrap}
+.hb{display:flex;flex-direction:column;gap:7px}
+.hb .r{display:grid;grid-template-columns:78px 1fr 74px;gap:8px;align-items:center;font-size:12px}
+.hb .r span:first-child{color:var(--ink2)}
+.hb .tr{height:12px;background:#f1f0ec;border-radius:3px;overflow:hidden}
+.hb .b{display:block;height:100%;width:var(--w);background:var(--accent);border-radius:0 4px 4px 0;animation:grow .9s var(--ease) both;animation-delay:calc(var(--i)*60ms)}
+.hb .r:hover .b{background:var(--accent-2)}
+.hb .r span:last-child{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.line path.l{fill:none;stroke:var(--accent);stroke-width:2;stroke-dasharray:var(--len);animation:draw 1.2s var(--ease) both}
+.stack{display:flex;height:14px;border-radius:4px;overflow:hidden;gap:2px;margin:6px 0 8px}
+.stack i{display:block;height:100%;animation:grow .9s var(--ease) both}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--ink2)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:-0px}
+.cp-foot{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;line-height:1.8}
+.print-stamp{display:none}
+.kv2{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;margin-top:14px}
+.kv2 div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kv2 span{font-size:11.5px;color:var(--muted)}
+.kv2 b{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl-row{grid-template-columns:54px 112px 130px 170px auto 1fr!important}
+.fl-head{font-size:11.5px;color:var(--muted);font-weight:600;padding:0 0 6px!important}
+.totals{display:flex;gap:28px;justify-content:flex-end;padding-top:14px;margin-top:6px;border-top:1px solid var(--line)}
+.totals div{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.totals span{font-size:11.5px;color:var(--muted)}
+.totals b{font-size:18px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+/* proposal tabs */
+.cp-bar{flex-wrap:wrap;row-gap:10px}
+.ptabs{flex-basis:100%;display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.ptab{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:5px 12px 5px 5px;white-space:nowrap;font-size:13px;color:var(--ink2);transition:all .25s var(--ease)}
+.ptab:hover{border-color:#cfccc3;color:var(--ink)}
+.ptab.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.ptab.ended span:last-child{text-decoration:line-through;opacity:.6}
+.pt-ph{width:30px;height:30px;border-radius:8px;background:#ddd center/cover;flex:none}
+.pt-cover{width:30px;height:30px;border-radius:8px;background:#efeee9;color:var(--ink2);display:flex;align-items:center;justify-content:center;font-weight:700}
+.ptab.on .pt-cover{background:#333;color:#fff}
+@keyframes inR{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes inL{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+.pg.in-r{animation:inR .45s var(--ease) both}.pg.in-l{animation:inL .45s var(--ease) both}
+.pnav{display:flex;align-items:center;justify-content:space-between;margin-top:30px;padding-top:20px;border-top:1px solid var(--line)}
+.pnav span{color:var(--muted);font-variant-numeric:tabular-nums;font-weight:600}
+/* cover */
+.need{display:grid;grid-template-columns:repeat(3,auto);gap:10px 28px;margin-top:6px}
+.need div{display:flex;flex-direction:column;gap:3px}
+.need span{font-size:12px;color:var(--muted);background:none;border:0;padding:0}
+.need b{font-size:15px;font-weight:600}
+.bk{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.bk span{font-size:12px;color:var(--muted)}
+.bk small{font-size:13px;color:var(--ink2)}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:40px}
+.pk{border:1px solid var(--line);background:#fff;border-radius:16px;overflow:hidden;text-align:left;padding:0;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.pk:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(0,0,0,.08)}
+.pk.ended{filter:grayscale(1);opacity:.6}
+.pk-ph{aspect-ratio:16/10;background:#ddd center/cover;position:relative}
+.pk-ph .pk-n{position:absolute;left:10px;top:10px;background:rgba(255,255,255,.92);border-radius:8px;padding:2px 8px;font-weight:800;font-size:12px;color:var(--accent)}
+.pk-ph .chip{position:absolute;right:10px;top:10px}
+.pk-b{padding:12px 14px 14px;display:flex;flex-direction:column;gap:2px}
+.pk-b>b{font-size:15px;letter-spacing:-.02em}
+.pk-b>small{color:var(--muted);font-size:12px}
+.pk-kv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line2)}
+.pk-kv div{display:flex;flex-direction:column;gap:2px}
+.pk-kv span{font-size:11px;color:var(--muted)}
+.pk-kv b{font-size:13px;font-weight:600;white-space:nowrap}
+/* listing page */
+.lp-h .eyebrow{color:var(--accent);font-weight:800;font-size:12.5px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.lp-h h2{font-size:34px;letter-spacing:-.045em;margin:6px 0 4px}
+.lp-h .addr{color:var(--ink2);font-size:14px}
+.lp .gal{margin:22px 0}
+.lp.ended .ended-box{margin-top:24px;height:140px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:22px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:3px}
+.kpi span{font-size:12px;color:var(--muted);font-weight:600}
+.kpi b{font-size:22px;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.kpi small{font-size:12px;color:var(--muted);min-height:15px}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.specs .sec:last-child{grid-column:1/-1}
+.sec{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+.specs .sec{margin-bottom:0}
+.specs{margin-bottom:14px}
+.sec-h{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.sec-h h3{margin:0;font-size:15px;letter-spacing:-.02em}
+.spec-r{display:grid;grid-template-columns:110px 1fr;gap:12px;padding:11px 0;border-bottom:1px solid var(--line2);align-items:start}
+.spec-r:last-child{border-bottom:0}
+.spec-r .lbl{color:var(--muted);font-size:13px;padding-top:1px}
+.val{display:flex;flex-direction:column;gap:2px}
+.val b{font-size:14.5px;font-weight:600;font-variant-numeric:tabular-nums}
+.val b.soft{color:var(--ink2);font-weight:500}
+.val small{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ftbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.ftbl th{font-size:12px;color:var(--muted);font-weight:600;text-align:left;padding:0 0 8px;border-bottom:1px solid var(--line)}
+.ftbl td{padding:10px 0;border-bottom:1px solid var(--line2);vertical-align:top}
+.ftbl .num{text-align:right}.ftbl .num .val{align-items:flex-end}
+.ftbl tr.sum td{border-top:1px solid var(--ink);border-bottom:0;font-weight:700;padding-top:12px}
+.lp .note{margin:12px 0 0;font-size:13px;color:var(--ink2);background:#f7f7f4;border-radius:10px;padding:10px 12px}
+.lp .cm{margin:0 0 22px;background:var(--accent-soft);border-left:0;border-radius:14px;padding:14px 16px;color:var(--ink)}
+.lp .cm b{color:var(--accent-2)}
+.charts{grid-template-columns:1fr 1fr}
+.pick-kv{display:flex;gap:14px;margin-top:4px;font-size:12px;color:var(--muted)}.pick-kv b{color:var(--ink);font-weight:600;margin-left:3px}
+.pbreak{break-before:page;page-break-before:always}
+
+.gate{min-height:calc(100vh - 57px);display:flex;align-items:center;justify-content:center;padding:30px}
+.gate .card{width:380px;padding:34px 30px;text-align:center}
+.gate .lock{width:52px;height:52px;border-radius:16px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px}
+.pin{display:flex;gap:10px;justify-content:center;margin:20px 0 16px}
+.pin input{width:52px;height:60px;text-align:center;font-size:24px;font-weight:700;border:1.5px solid var(--line);border-radius:12px;outline:none;transition:border-color .2s,box-shadow .2s}
+.pin input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.shake{animation:shake .4s}
+.mail{display:flex;gap:14px;padding:16px;border-radius:14px;background:#fff;border:1px solid var(--line);margin-bottom:10px;cursor:pointer;transition:transform .25s var(--ease),box-shadow .25s}
+.mail:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.07)}
+.mail .av{width:40px;height:40px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.mail .url{font-family:ui-monospace,Menlo,monospace;font-size:12px;color:var(--accent-2);margin-top:6px}
+
+@media print{
+  body{background:#fff}
+  .noprint,.top,.cp-bar,#toasts,.guide{display:none!important}
+  .cp-wrap{padding:0;max-width:none}
+  .print-stamp{display:block;font-size:11px;color:#555;border-bottom:1px solid #ccc;padding-bottom:6px;margin-bottom:18px}
+  .it{break-inside:avoid-page;border-color:#ddd}
+  .anim .a,.bar,.b,.stack i,path.l{animation:none!important}
+  details.area .area-b{display:block}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div id="toasts"></div>
+<script>
+/* =========================================================
+   LeaseDesk prototype — single file, in-memory + localStorage
+   ========================================================= */
+const KEY = 'leasedesk-proto-v2';
+const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = p => p + Math.random().toString(36).slice(2, 8);
+const mkToken = () => Array.from({length: 12}, () => 'abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 55)]).join('');
+const nf = (v, d = 0) => Number(v).toLocaleString('ko-KR', {maximumFractionDigits: d});
+const clone = o => JSON.parse(JSON.stringify(o));
+const addDays = (d, n) => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getUTCDate() + n); return t.toISOString().slice(0, 10); };
+const diffDays = (a, b) => Math.round((new Date(a + 'T00:00:00Z') - new Date(b + 'T00:00:00Z')) / 864e5);
+const fmtDate = d => d ? d.replace(/-/g, '.') : '';
+const fmtStamp = s => s ? s.slice(5, 10).replace('-', '.') + ' ' + s.slice(11, 16) : '';
+const DOW = ['일','월','화','수','목','금','토'];
+const stamp = () => S.today + 'T' + new Date().toTimeString().slice(0, 8);
+
+/* ---------- media ---------- */
+const IMG = id => `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=1400&q=70`;
+const PH = {
+  seoulStreet: IMG('1517154421773-0529f29ea451'), seoulNeon: IMG('1538485399081-7191377e8241'), cheonggye: IMG('1601621915196-2621bfb0cd6e'),
+  arcade: IMG('1481437156560-3205f6a55735'), openSign: IMG('1472851294608-062f824d29cc'),
+  apparel: IMG('1441984904996-e0b6ba687e04'), apparel2: IMG('1555529771-835f59fc5efe'), apparel3: IMG('1567401893414-76b7b1e5a7a5'),
+  cafeBar: IMG('1554118811-1e0d58224f24'), cafeSign: IMG('1501339847302-ac426a4a7cbb'), terrace: IMG('1559925393-8be0ec4767c8'), garden: IMG('1600093463592-8e36ae95ef56'),
+  shopFront: IMG('1528698827591-e19ccd7bc23d'), shopIn: IMG('1441986300917-64674bd600d8'), cafe: IMG('1555396273-367ea4eb4db5'),
+  shopLoft: IMG('1600508774634-4e11d34730e2'), brick: IMG('1538688525198-9b88f6f53126'), mall: IMG('1519567241046-7f570eee3ce6'),
+  site: IMG('1541888946425-d81bb19240f5'), towerA: IMG('1486406146926-c627a92ad1ab'),
+};
+const SAMPLE_PHOTOS = [PH.shopFront, PH.shopLoft, PH.cafeBar, PH.apparel, PH.terrace, PH.brick, PH.site, PH.garden];
+
+function svgURL(s) { return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s); }
+
+/* realistic office core-type floor plan */
+function officePlan(title, sub) {
+  const X0 = 70, Y0 = 84, W = 860, H = 440, nx = 8, ny = 4, bx = W / nx, by = H / ny;
+  const k = '#1b1b1b', g = '#8d8d8d';
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" font-family="Helvetica,Arial,sans-serif">
+  <defs><pattern id="h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#9c9c9c" stroke-width=".8"/></pattern></defs>
+  <rect width="1000" height="640" fill="#fff"/>`;
+  for (let i = 0; i <= nx; i++) { const x = X0 + i * bx;
+    s += `<line x1="${x}" y1="${Y0 - 36}" x2="${x}" y2="${Y0 + H + 16}" stroke="#cfcfcf" stroke-width=".6" stroke-dasharray="8 3 1.5 3"/><circle cx="${x}" cy="${Y0 - 46}" r="9" fill="#fff" stroke="${g}" stroke-width=".8"/><text x="${x}" y="${Y0 - 42.6}" font-size="8.5" text-anchor="middle" fill="#555">X${i + 1}</text>`; }
+  for (let j = 0; j <= ny; j++) { const y = Y0 + j * by;
+    s += `<line x1="${X0 - 36}" y1="${y}" x2="${X0 + W + 16}" y2="${y}" stroke="#cfcfcf" stroke-width=".6" stroke-dasharray="8 3 1.5 3"/><circle cx="${X0 - 46}" cy="${y}" r="9" fill="#fff" stroke="${g}" stroke-width=".8"/><text x="${X0 - 46}" y="${y + 3}" font-size="8.5" text-anchor="middle" fill="#555">Y${j + 1}</text>`; }
+  // dimensions
+  const dy = Y0 - 20;
+  s += `<line x1="${X0}" y1="${dy}" x2="${X0 + W}" y2="${dy}" stroke="#777" stroke-width=".6"/>`;
+  for (let i = 0; i <= nx; i++) { const x = X0 + i * bx; s += `<line x1="${x - 3}" y1="${dy + 3}" x2="${x + 3}" y2="${dy - 3}" stroke="#444" stroke-width="1"/>`; if (i < nx) s += `<text x="${x + bx / 2}" y="${dy - 4}" font-size="8" text-anchor="middle" fill="#666">8,400</text>`; }
+  const dx = X0 + W + 30;
+  s += `<line x1="${dx}" y1="${Y0}" x2="${dx}" y2="${Y0 + H}" stroke="#777" stroke-width=".6"/>`;
+  for (let j = 0; j <= ny; j++) { const y = Y0 + j * by; s += `<line x1="${dx - 3}" y1="${y + 3}" x2="${dx + 3}" y2="${y - 3}" stroke="#444"/>`; if (j < ny) s += `<text x="${dx + 6}" y="${y + by / 2 + 3}" font-size="8" fill="#666">8,100</text>`; }
+  // curtain wall
+  s += `<rect x="${X0}" y="${Y0}" width="${W}" height="${H}" fill="none" stroke="${k}" stroke-width="4.5"/><rect x="${X0 + 5}" y="${Y0 + 5}" width="${W - 10}" height="${H - 10}" fill="none" stroke="#999" stroke-width=".6"/>`;
+  for (let x = X0; x <= X0 + W + .1; x += bx / 4) s += `<line x1="${x}" y1="${Y0 - 2}" x2="${x}" y2="${Y0 + 6}" stroke="${k}" stroke-width="1.2"/><line x1="${x}" y1="${Y0 + H - 6}" x2="${x}" y2="${Y0 + H + 2}" stroke="${k}" stroke-width="1.2"/>`;
+  for (let y = Y0; y <= Y0 + H + .1; y += by / 3) s += `<line x1="${X0 - 2}" y1="${y}" x2="${X0 + 6}" y2="${y}" stroke="${k}" stroke-width="1.2"/><line x1="${X0 + W - 6}" y1="${y}" x2="${X0 + W + 2}" y2="${y}" stroke="${k}" stroke-width="1.2"/>`;
+  // core
+  const cx = X0 + 3 * bx, cy = Y0 + by, cw = 2 * bx, ch = 2 * by;
+  s += `<rect x="${cx}" y="${cy}" width="${cw}" height="${ch}" fill="#f3f3f1" stroke="${k}" stroke-width="3.2"/>`;
+  const stair = (x, y, w, h) => { let t = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="${k}" stroke-width="1.6"/><line x1="${x + w / 2}" y1="${y + 8}" x2="${x + w / 2}" y2="${y + h - 8}" stroke="${k}" stroke-width="1"/>`;
+    for (let yy = y + 14; yy < y + h - 10; yy += 7) t += `<line x1="${x + 3}" y1="${yy}" x2="${x + w - 3}" y2="${yy}" stroke="#666" stroke-width=".6"/>`;
+    return t + `<path d="M${x + w / 4} ${y + h - 14} V${y + 18} l-3 6 m3 -6 l3 6" fill="none" stroke="${k}" stroke-width=".8"/><text x="${x + w / 2}" y="${y + h + 11}" font-size="7.5" text-anchor="middle" fill="#555">계단실</text>`; };
+  s += stair(cx + 6, cy + 6, 50, 98) + stair(cx + cw - 56, cy + ch - 112, 50, 98);
+  for (let i = 0; i < 3; i++) { const ex = cx + 66 + i * 38, ey = cy + 8;
+    s += `<rect x="${ex}" y="${ey}" width="34" height="34" fill="#fff" stroke="${k}" stroke-width="1.3"/><line x1="${ex}" y1="${ey}" x2="${ex + 34}" y2="${ey + 34}" stroke="#777" stroke-width=".6"/><line x1="${ex + 34}" y1="${ey}" x2="${ex}" y2="${ey + 34}" stroke="#777" stroke-width=".6"/><line x1="${ex + 8}" y1="${ey + 36}" x2="${ex + 26}" y2="${ey + 36}" stroke="${k}" stroke-width="2"/>`; }
+  s += `<text x="${cx + 123}" y="${cy + 64}" font-size="8" text-anchor="middle" fill="#555">E/V 홀</text>`;
+  // toilets
+  const tx = cx + 6, ty = cy + ch - 104;
+  s += `<rect x="${tx}" y="${ty}" width="74" height="46" fill="#fff" stroke="${k}" stroke-width="1.3"/><rect x="${tx}" y="${ty + 52}" width="74" height="46" fill="#fff" stroke="${k}" stroke-width="1.3"/>`;
+  for (let i = 0; i < 4; i++) { s += `<rect x="${tx + 4 + i * 17}" y="${ty + 3}" width="14" height="16" fill="none" stroke="#777" stroke-width=".6"/><ellipse cx="${tx + 11 + i * 17}" cy="${ty + 10}" rx="3.5" ry="4.5" fill="none" stroke="#777" stroke-width=".6"/>`;
+    s += `<rect x="${tx + 4 + i * 17}" y="${ty + 79}" width="14" height="16" fill="none" stroke="#777" stroke-width=".6"/><ellipse cx="${tx + 11 + i * 17}" cy="${ty + 88}" rx="3.5" ry="4.5" fill="none" stroke="#777" stroke-width=".6"/>`; }
+  s += `<text x="${tx + 37}" y="${ty + 35}" font-size="7.5" text-anchor="middle" fill="#555">남자화장실</text><text x="${tx + 37}" y="${ty + 72}" font-size="7.5" text-anchor="middle" fill="#555">여자화장실</text>`;
+  s += `<path d="M${tx + 74} ${ty + 30} a14 14 0 0 1 14 14" fill="none" stroke="#777" stroke-width=".6"/><path d="M${tx + 74} ${ty + 82} a14 14 0 0 0 14 -14" fill="none" stroke="#777" stroke-width=".6"/>`;
+  // shafts
+  [['EPS', cx + 96, cy + ch - 46], ['TPS', cx + 126, cy + ch - 46], ['PS', cx + 96, cy + ch - 76], ['AD', cx + 126, cy + ch - 76]].forEach(([l, x, y]) => {
+    s += `<rect x="${x}" y="${y}" width="26" height="24" fill="url(#h)" stroke="${k}" stroke-width="1"/><text x="${x + 13}" y="${y + 15}" font-size="7" text-anchor="middle" fill="#333" font-weight="700">${l}</text>`; });
+  s += `<rect x="${cx + 6}" y="${cy + 112}" width="54" height="30" fill="#fff" stroke="${k}" stroke-width="1"/><text x="${cx + 33}" y="${cy + 130}" font-size="7.5" text-anchor="middle" fill="#555">탕비실</text>`;
+  // columns
+  for (let i = 0; i <= nx; i++) for (let j = 0; j <= ny; j++) s += `<rect x="${X0 + i * bx - 7}" y="${Y0 + j * by - 7}" width="14" height="14" fill="${k}"/>`;
+  // labels
+  s += `<text x="${X0 + 1.5 * bx}" y="${Y0 + H / 2 + 4}" font-size="12" text-anchor="middle" fill="#a3a3a3" letter-spacing="3">OFFICE</text><text x="${X0 + 6.5 * bx}" y="${Y0 + H / 2 + 4}" font-size="12" text-anchor="middle" fill="#a3a3a3" letter-spacing="3">OFFICE</text>`;
+  // north + scale + title
+  s += `<g transform="translate(952,48)"><circle r="14" fill="none" stroke="#555" stroke-width=".8"/><path d="M0 -12 L5 6 L0 2 L-5 6Z" fill="${k}"/><text y="-17" font-size="8" text-anchor="middle" font-weight="700">N</text></g>`;
+  s += `<g transform="translate(${X0},585)"><rect width="40" height="5" fill="${k}"/><rect x="40" width="40" height="5" fill="#fff" stroke="${k}" stroke-width=".8"/><rect x="80" width="80" height="5" fill="${k}"/><text y="17" font-size="8" fill="#555">0</text><text x="40" y="17" font-size="8" fill="#555" text-anchor="middle">5</text><text x="80" y="17" font-size="8" fill="#555" text-anchor="middle">10</text><text x="160" y="17" font-size="8" fill="#555" text-anchor="middle">20m</text></g>`;
+  s += `<g transform="translate(700,566)"><rect width="230" height="46" fill="#fff" stroke="${k}" stroke-width="1"/><line x1="0" y1="26" x2="230" y2="26" stroke="${k}" stroke-width=".6"/><text x="10" y="18" font-size="11" font-weight="700">${esc(title)}</text><text x="10" y="39" font-size="8.5" fill="#555">${esc(sub)}</text><text x="220" y="39" font-size="8.5" fill="#555" text-anchor="end">S=1/400</text></g>`;
+  return svgURL(s + '</svg>');
+}
+
+/* realistic street-front retail plan */
+function retailPlan(title, sub, street, upper) {
+  const X0 = 140, Y0 = 70, W = 720, H = 380, k = '#1b1b1b';
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" font-family="Helvetica,Arial,sans-serif">
+  <defs><pattern id="h" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="5" stroke="#9c9c9c" stroke-width=".8"/></pattern></defs>
+  <rect width="1000" height="640" fill="#fff"/>`;
+  // party walls (hatched) + rear wall
+  s += `<rect x="${X0 - 14}" y="${Y0 - 14}" width="${W + 28}" height="14" fill="url(#h)" stroke="${k}" stroke-width="1.2"/>`;
+  s += `<rect x="${X0 - 14}" y="${Y0}" width="14" height="${H}" fill="url(#h)" stroke="${k}" stroke-width="1.2"/><rect x="${X0 + W}" y="${Y0}" width="14" height="${H}" fill="url(#h)" stroke="${k}" stroke-width="1.2"/>`;
+  const gy = Y0 + H, ex = X0 + W / 2 - 40;
+  if (upper) {
+    s += `<rect x="${X0 - 14}" y="${gy}" width="${W + 28}" height="10" fill="url(#h)" stroke="${k}" stroke-width="1.2"/>`;
+    for (let x = X0 + 40; x < X0 + W - 60; x += 110) s += `<rect x="${x}" y="${gy + 2}" width="70" height="6" fill="#fff" stroke="${k}" stroke-width=".8"/><line x1="${x}" y1="${gy + 5}" x2="${x + 70}" y2="${gy + 5}" stroke="#777" stroke-width=".5"/>`;
+    s += `<text x="${X0 + W / 2}" y="${gy + 30}" font-size="8" text-anchor="middle" fill="#999">도로 측 창호</text>`;
+  } else {
+  s += `<line x1="${X0}" y1="${gy}" x2="${ex}" y2="${gy}" stroke="${k}" stroke-width="1"/><line x1="${X0}" y1="${gy + 4}" x2="${ex}" y2="${gy + 4}" stroke="${k}" stroke-width="1"/><line x1="${ex + 80}" y1="${gy}" x2="${X0 + W}" y2="${gy}" stroke="${k}" stroke-width="1"/><line x1="${ex + 80}" y1="${gy + 4}" x2="${X0 + W}" y2="${gy + 4}" stroke="${k}" stroke-width="1"/>`;
+  for (let x = X0; x <= X0 + W; x += 48) if (x < ex || x > ex + 80) s += `<rect x="${x - 2}" y="${gy - 1}" width="4" height="6" fill="${k}"/>`;
+  s += `<path d="M${ex} ${gy} a40 40 0 0 0 40 -40 M${ex} ${gy} l40 -40" fill="none" stroke="#666" stroke-width=".7"/><path d="M${ex + 80} ${gy} a40 40 0 0 1 -40 -40 M${ex + 80} ${gy} l-40 -40" fill="none" stroke="#666" stroke-width=".7"/>`;
+  s += `<text x="${ex + 40}" y="${gy + 20}" font-size="8.5" text-anchor="middle" fill="#333" font-weight="700">주출입구</text>`;
+  // sidewalk / street
+  s += `<line x1="60" y1="${gy + 44}" x2="940" y2="${gy + 44}" stroke="#999" stroke-width="1"/><line x1="60" y1="${gy + 100}" x2="940" y2="${gy + 100}" stroke="#999" stroke-width=".6" stroke-dasharray="14 10"/><text x="500" y="${gy + 78}" font-size="11" text-anchor="middle" fill="#888" letter-spacing="4">${esc(street)}</text><text x="80" y="${gy + 34}" font-size="8" fill="#999">보도</text>`;
+  }
+  // rear service: stair, wc, back door
+  const sx = X0 + 8, sy = Y0 + 8;
+  s += `<rect x="${sx}" y="${sy}" width="62" height="120" fill="#fff" stroke="${k}" stroke-width="1.6"/><line x1="${sx + 31}" y1="${sy + 8}" x2="${sx + 31}" y2="${sy + 112}" stroke="${k}"/>`;
+  for (let y = sy + 14; y < sy + 110; y += 7) s += `<line x1="${sx + 3}" y1="${y}" x2="${sx + 59}" y2="${y}" stroke="#666" stroke-width=".6"/>`;
+  s += `<text x="${sx + 31}" y="${sy + 134}" font-size="7.5" text-anchor="middle" fill="#555">계단 (2F↑)</text>`;
+  s += `<rect x="${sx + 70}" y="${sy}" width="64" height="62" fill="#fff" stroke="${k}" stroke-width="1.3"/><ellipse cx="${sx + 90}" cy="${sy + 18}" rx="7" ry="9" fill="none" stroke="#777" stroke-width=".7"/><rect x="${sx + 110}" y="${sy + 6}" width="18" height="12" rx="3" fill="none" stroke="#777" stroke-width=".7"/><text x="${sx + 102}" y="${sy + 48}" font-size="7.5" text-anchor="middle" fill="#555">화장실</text>`;
+  s += `<path d="M${sx + 134} ${sy + 40} a20 20 0 0 1 20 20" fill="none" stroke="#777" stroke-width=".6"/>`;
+  s += `<rect x="${X0 + W - 70}" y="${Y0 - 14}" width="44" height="14" fill="#fff"/><path d="M${X0 + W - 70} ${Y0} a44 44 0 0 0 44 44 M${X0 + W - 70} ${Y0} l44 44" fill="none" stroke="#666" stroke-width=".7" transform="translate(0,0)"/><text x="${X0 + W - 48}" y="${Y0 + 60}" font-size="8" text-anchor="middle" fill="#555">후면출입</text>`;
+  // columns
+  [0.33, 0.66].forEach(fx => [0.38, 0.75].forEach(fy => { s += `<rect x="${X0 + W * fx - 8}" y="${Y0 + H * fy - 8}" width="16" height="16" fill="${k}"/>`; }));
+  s += `<text x="${X0 + W / 2 + 40}" y="${Y0 + H / 2}" font-size="13" text-anchor="middle" fill="#a3a3a3" letter-spacing="4">매 장</text>`;
+  // dims
+  s += `<line x1="${X0}" y1="${Y0 - 34}" x2="${X0 + W}" y2="${Y0 - 34}" stroke="#777" stroke-width=".6"/><text x="${X0 + W / 2}" y="${Y0 - 38}" font-size="8.5" text-anchor="middle" fill="#666">21,600</text><line x1="${X0 - 3}" y1="${Y0 - 31}" x2="${X0 + 3}" y2="${Y0 - 37}" stroke="#444"/><line x1="${X0 + W - 3}" y1="${Y0 - 31}" x2="${X0 + W + 3}" y2="${Y0 - 37}" stroke="#444"/>`;
+  s += `<line x1="${X0 - 40}" y1="${Y0}" x2="${X0 - 40}" y2="${Y0 + H}" stroke="#777" stroke-width=".6"/><text x="${X0 - 46}" y="${Y0 + H / 2}" font-size="8.5" text-anchor="middle" fill="#666" transform="rotate(-90 ${X0 - 46} ${Y0 + H / 2})">11,400</text>`;
+  s += `<g transform="translate(952,48)"><circle r="14" fill="none" stroke="#555" stroke-width=".8"/><path d="M0 -12 L5 6 L0 2 L-5 6Z" fill="${k}"/><text y="-17" font-size="8" text-anchor="middle" font-weight="700">N</text></g>`;
+  s += `<g transform="translate(700,580)"><rect width="230" height="46" fill="#fff" stroke="${k}" stroke-width="1"/><line x1="0" y1="26" x2="230" y2="26" stroke="${k}" stroke-width=".6"/><text x="10" y="18" font-size="11" font-weight="700">${esc(title)}</text><text x="10" y="39" font-size="8.5" fill="#555">${esc(sub)}</text><text x="220" y="39" font-size="8.5" fill="#555" text-anchor="end">S=1/200</text></g>`;
+  return svgURL(s + '</svg>');
+}
+
+/* ---------- public data (mock APIs) ---------- */
+const REGISTRY = [
+  {pnu: '1168010700105320001', address: '서울 강남구 압구정로10길 24', name: '가로수 24', use: '제2종 근린생활시설', above: 4, below: 1, gfa: 1120, year: 2014, status: '준공', area: 'sinsa'},
+  {pnu: '1120011400106450002', address: '서울 성동구 연무장길 45', name: '연무장 45', use: '제2종 근린생활시설', above: 5, below: 1, gfa: 2380, year: 2016, status: '준공', area: 'seongsu'},
+  {pnu: '1117013100107340003', address: '서울 용산구 이태원로 234', name: '한남 234', use: '제1종 근린생활시설', above: 3, below: 1, gfa: 690, year: 2018, status: '준공', area: 'hannam'},
+  {pnu: '1114012200100170004', address: '서울 중구 명동8길 17', name: '명동 17', use: '판매시설', above: 6, below: 2, gfa: 2960, year: 2009, status: '준공', area: 'myeongdong'},
+  {pnu: '1165010800104370005', address: '서울 서초구 강남대로 437', name: '강남대로 437', use: '판매시설', above: 12, below: 4, gfa: 9840, year: 2012, status: '준공', area: 'gangnam'},
+  {pnu: '1120011500100180006', address: '서울 성동구 성수이로7길 18', name: '성수 7길 18', use: '제2종 근린생활시설', above: 6, below: 2, gfa: 1980, year: null, status: '인허가', area: 'seongsu', final: {gfa: 2015, year: 2026, at: '2026-10-20'}},
+  {pnu: '1114014500102120007', address: '서울 중구 을지로 157', name: '', use: '', above: null, below: null, gfa: null, year: null, status: '정보없음', area: 'euljiro'},
+  {pnu: '4113510900106660008', address: '경기 성남시 분당구 판교역로 166', name: '판교 166', use: '판매시설', above: 8, below: 5, gfa: 18400, year: 2015, status: '준공', area: null},
+  {pnu: '1120011400100130009', address: '서울 성동구 성수이로 113', name: '성수 S타워', use: '업무시설', above: 10, below: 2, gfa: 15420, year: 2019, status: '준공', area: 'seongsu'},
+];
+
+/* mock 상권 data (서울시 상권분석서비스 형태, 예시 값) */
+const AREAS = {
+  seongsu: {name: '성수동 카페거리', kind: '발달상권', q: '2026년 2분기',
+    pop: [['상주 인구', 18400], ['직장 인구', 52300], ['유동 인구', 98700]],
+    hourly: [['00–06', 3], ['06–11', 11], ['11–14', 19], ['14–17', 23], ['17–21', 29], ['21–24', 15]],
+    sales: [['25.3Q', 742], ['25.4Q', 768], ['26.1Q', 731], ['26.2Q', 812]],
+    salesHourly: [['00–06', 2], ['06–11', 8], ['11–14', 24], ['14–17', 22], ['17–21', 31], ['21–24', 13]],
+    age: [['10대', 8], ['20대', 36], ['30대', 29], ['40대', 15], ['50대', 8], ['60+', 4]],
+    dow: [['월', 11], ['화', 11], ['수', 12], ['목', 13], ['금', 15], ['토', 20], ['일', 18]],
+    week: [56, 44], stores: [['카페·디저트', 31], ['음식점', 24], ['패션·잡화', 18], ['기타', 10], ['뷰티', 9], ['생활서비스', 8]]},
+  sinsa: {name: '가로수길', kind: '발달상권', q: '2026년 2분기',
+    pop: [['상주 인구', 8200], ['직장 인구', 38500], ['유동 인구', 112000]],
+    hourly: [['00–06', 2], ['06–11', 9], ['11–14', 18], ['14–17', 25], ['17–21', 31], ['21–24', 15]],
+    sales: [['25.3Q', 486], ['25.4Q', 512], ['26.1Q', 478], ['26.2Q', 534]],
+    salesHourly: [['00–06', 1], ['06–11', 6], ['11–14', 21], ['14–17', 28], ['17–21', 32], ['21–24', 12]],
+    age: [['10대', 7], ['20대', 34], ['30대', 28], ['40대', 16], ['50대', 9], ['60+', 6]],
+    dow: [['월', 11], ['화', 11], ['수', 12], ['목', 13], ['금', 16], ['토', 20], ['일', 17]],
+    week: [49, 51], stores: [['패션·잡화', 34], ['카페·디저트', 21], ['음식점', 18], ['뷰티', 14], ['기타', 8], ['생활서비스', 5]]},
+  hannam: {name: '한남동 이태원로', kind: '발달상권', q: '2026년 2분기',
+    pop: [['상주 인구', 14200], ['직장 인구', 21800], ['유동 인구', 64300]],
+    hourly: [['00–06', 4], ['06–11', 8], ['11–14', 16], ['14–17', 22], ['17–21', 32], ['21–24', 18]],
+    sales: [['25.3Q', 392], ['25.4Q', 418], ['26.1Q', 401], ['26.2Q', 437]],
+    salesHourly: [['00–06', 3], ['06–11', 5], ['11–14', 20], ['14–17', 24], ['17–21', 33], ['21–24', 15]],
+    age: [['10대', 5], ['20대', 31], ['30대', 32], ['40대', 18], ['50대', 9], ['60+', 5]],
+    dow: [['월', 10], ['화', 10], ['수', 11], ['목', 13], ['금', 17], ['토', 21], ['일', 18]],
+    week: [47, 53], stores: [['음식점', 33], ['카페·디저트', 22], ['패션·잡화', 19], ['기타', 9], ['갤러리·문화', 9], ['뷰티', 8]]},
+  myeongdong: {name: '명동', kind: '관광특구', q: '2026년 2분기',
+    pop: [['상주 인구', 3100], ['직장 인구', 67000], ['유동 인구', 241000]],
+    hourly: [['00–06', 3], ['06–11', 12], ['11–14', 22], ['14–17', 24], ['17–21', 27], ['21–24', 12]],
+    sales: [['25.3Q', 1388], ['25.4Q', 1462], ['26.1Q', 1301], ['26.2Q', 1520]],
+    salesHourly: [['00–06', 1], ['06–11', 9], ['11–14', 23], ['14–17', 27], ['17–21', 30], ['21–24', 10]],
+    age: [['10대', 12], ['20대', 33], ['30대', 24], ['40대', 15], ['50대', 10], ['60+', 6]],
+    dow: [['월', 13], ['화', 13], ['수', 13], ['목', 14], ['금', 16], ['토', 17], ['일', 14]],
+    week: [61, 39], stores: [['화장품', 29], ['음식점', 24], ['패션·잡화', 21], ['카페·디저트', 9], ['환전·관광', 9], ['기타', 8]]},
+  gangnam: {name: '강남역', kind: '발달상권', q: '2026년 2분기',
+    pop: [['상주 인구', 9800], ['직장 인구', 148000], ['유동 인구', 172000]],
+    hourly: [['00–06', 2], ['06–11', 21], ['11–14', 27], ['14–17', 18], ['17–21', 24], ['21–24', 8]],
+    sales: [['25.3Q', 1912], ['25.4Q', 2034], ['26.1Q', 1876], ['26.2Q', 1958]],
+    salesHourly: [['00–06', 1], ['06–11', 12], ['11–14', 33], ['14–17', 16], ['17–21', 29], ['21–24', 9]],
+    age: [['10대', 9], ['20대', 35], ['30대', 27], ['40대', 15], ['50대', 9], ['60+', 5]],
+    dow: [['월', 14], ['화', 14], ['수', 15], ['목', 15], ['금', 17], ['토', 14], ['일', 11]],
+    week: [78, 22], stores: [['음식점', 38], ['기타', 16], ['카페·디저트', 14], ['병·의원', 12], ['생활서비스', 11], ['학원', 9]]},
+  euljiro: {name: '을지로3가', kind: '골목상권', q: '2026년 2분기',
+    pop: [['상주 인구', 7400], ['직장 인구', 61000], ['유동 인구', 88000]],
+    hourly: [['00–06', 4], ['06–11', 13], ['11–14', 21], ['14–17', 16], ['17–21', 30], ['21–24', 16]],
+    sales: [['25.3Q', 604], ['25.4Q', 655], ['26.1Q', 612], ['26.2Q', 671]],
+    salesHourly: [['00–06', 3], ['06–11', 7], ['11–14', 26], ['14–17', 12], ['17–21', 36], ['21–24', 16]],
+    age: [['10대', 5], ['20대', 27], ['30대', 25], ['40대', 19], ['50대', 14], ['60+', 10]],
+    dow: [['월', 13], ['화', 14], ['수', 14], ['목', 15], ['금', 18], ['토', 15], ['일', 11]],
+    week: [61, 39], stores: [['음식점', 36], ['주점', 18], ['인쇄·제조', 15], ['카페·디저트', 13], ['기타', 10], ['생활서비스', 8]]},
+};
+
+const FX_BASE = {USD: 1372.4, JPY: 9.31, CNY: 192.6, EUR: 1528.1, GBP: 1836.5};
+function prevMonth(d) { const [y, m] = d.split('-').map(Number); const pm = m === 1 ? 12 : m - 1, py = m === 1 ? y - 1 : y; return `${py}-${String(pm).padStart(2, '0')}`; }
+function fxFor(month) {
+  if (month === '2026-09') return {...FX_BASE};
+  let h = 0; for (const c of month) h = (h * 31 + c.charCodeAt(0)) % 997;
+  const f = 1 + ((h % 41) - 20) / 1000, r = {};
+  for (const k in FX_BASE) r[k] = +(FX_BASE[k] * f).toFixed(k === 'JPY' ? 2 : 1);
+  return r;
+}
+const CUR = [['KRW', '₩'], ['USD', '$'], ['JPY', '¥'], ['CNY', '元'], ['EUR', '€'], ['GBP', '£']];
+
+/* ---------- people ---------- */
+const USERS = {
+  brokerA: {name: '김민준', short: '브로커A', title: '이사 · 임차자문팀', phone: '010-2481-1032', email: 'minjun.kim@cw-advisory.kr'},
+  brokerB: {name: '이서연', short: '브로커B', title: '차장 · 임차자문팀', phone: '010-7730-5521', email: 'seoyeon.lee@cw-advisory.kr'},
+  admin: {name: '박정호', short: '관리자', title: '상무 · 임차자문 총괄'},
+};
+const CLIENTS = {clientA: '모먼트커피'};
+const ROLES = [['brokerA', '브로커A'], ['brokerB', '브로커B'], ['admin', '관리자'], ['clientA', '클라이언트A']];
+
+/* ---------- seed ---------- */
+function P(s, v) { return v === undefined ? {s} : {s, v}; }
+function seed() {
+  const b = REGISTRY.filter(r => r.status !== '인허가').map((r, i) => ({id: 'B' + (i + 1), ...clone(r)}));
+  const B = pnu => b.find(x => x.pnu === pnu).id;
+  const pl = (id, name, src) => ({id, name, src});
+  const rightHalf = [[.5, .11], [.86, .11], [.86, .703], [.5, .703]];
+  const frontLeft = [[.14, .38], [.47, .38], [.47, .703], [.14, .703]];
+  const F = (floor, area, planId, scope = '전체', poly = null) => ({floor, area, scope, planId, poly});
+  const L = [
+    {id: 'L1', buildingId: B('1168010700105320001'), ownerId: 'brokerA', visibility: 'shared', status: 'active', leaseType: 'partial',
+      floors: [F(1, 165, 'p1a'), F(2, 172, 'p1b')],
+      plans: [pl('p1a', '1층', retailPlan('가로수 24 1층 평면도', '1F · 임대 165㎡', '압 구 정 로 10 길')), pl('p1b', '2층', retailPlan('가로수 24 2층 평면도', '2F · 임대 172㎡', '', true))],
+      photos: [PH.shopFront, PH.apparel, PH.apparel2, PH.shopLoft],
+      exclArea: null, deposit: P('v', 300000000), rent: P('v', 28000000), mgmt: P('v', 1800000), keyMoney: P('nego'), handover: P('v', '2027-01-02'),
+      note: '가로수길 메인 동선 코너 · 전면 폭 11m', mStart: '2026-07-01', mEnd: '2027-06-30',
+      internal: {landlord: '가로수24㈜', phone: '02-3445-0024', fee: '임대료 1개월분', floor: '월 2,600만원', memo: '현 임차인(편집숍) 권리금 1.5억 희망'},
+      upd: {rent: '2026-09-28T15:20:00'}, grants: [], createdAt: '2026-07-03T09:00:00'},
+    {id: 'L2', buildingId: B('1120011400106450002'), ownerId: 'brokerA', visibility: 'private', status: 'active', leaseType: 'whole',
+      floors: [F(-1, 380, 'p2u'), F(1, 412, 'p2a'), F(2, 405, 'p2u'), F(3, 405, 'p2u'), F(4, 380, 'p2u'), F(5, 300, 'p2u')],
+      plans: [pl('p2a', '1층', retailPlan('연무장 45 1층 평면도', '1F · 임대 412㎡', '연 무 장 길')), pl('p2u', '2–5층', retailPlan('연무장 45 2–5층 평면도', '층별 300–405㎡', '', true))],
+      photos: [PH.brick, PH.seoulStreet, PH.shopLoft, PH.cafe],
+      exclArea: null, deposit: P('nego'), rent: P('v', 38000000), mgmt: P('tbd'), keyMoney: P('nego'), handover: P('now'),
+      note: '플래그십 스토어 선호 · 외벽 사인 가능', mStart: '2026-04-13', mEnd: '2026-10-12',
+      internal: {landlord: '개인 (정○○)', phone: '010-5521-0098', fee: '임대료 1개월분', floor: '월 3,500만원', memo: '보증금 5억 이하 시 임대료 조정 의향'},
+      upd: {}, grants: [], createdAt: '2026-04-14T10:00:00'},
+    {id: 'L3', buildingId: B('1117013100107340003'), ownerId: 'brokerB', visibility: 'shared', status: 'active', leaseType: 'partial',
+      floors: [F(1, 118, 'p3a', '일부', frontLeft), F(2, 142, 'p3b')],
+      plans: [pl('p3a', '1층', retailPlan('한남 234 1층 평면도', '1F 일부 · 임대 118㎡', '이 태 원 로')), pl('p3b', '2층', retailPlan('한남 234 2층 평면도', '2F · 임대 142㎡', '', true))],
+      photos: [PH.terrace, PH.cafeBar, PH.garden],
+      exclArea: 221, deposit: P('v', 200000000), rent: P('v', 16500000), mgmt: P('v', 900000), keyMoney: P('v', 100000000), handover: P('nego'),
+      note: '전면 테라스 사용 가능', mStart: '2026-06-01', mEnd: '2027-03-31',
+      internal: {landlord: '한남234 주식회사', phone: '02-794-2340', fee: '중개보수 0.9%', floor: '월 1,500만원', memo: 'F&B 선호, 주류 판매 가능'},
+      upd: {}, grants: [], createdAt: '2026-06-02T09:00:00'},
+    {id: 'L4', buildingId: B('1120011400106450002'), ownerId: 'brokerB', visibility: 'private', status: 'active', leaseType: 'partial',
+      floors: [F(1, 165, 'p4', '일부', rightHalf)], plans: [pl('p4', '1층', retailPlan('연무장 45 1층 평면도', '1F · 임대 412㎡', '연 무 장 길'))],
+      photos: [PH.shopFront, PH.cafe], exclArea: 148,
+      deposit: P('v', 100000000), rent: P('v', 9500000), mgmt: P('v', 800000), keyMoney: P('v', 150000000), handover: P('nego'),
+      note: '', mStart: '2026-09-01', mEnd: '2027-02-28',
+      internal: {landlord: '개인 (정○○)', phone: '010-5521-0098', fee: '중개보수 0.9%', floor: '', memo: '기존 임차인 권리금 협상 중'},
+      upd: {}, grants: [], createdAt: '2026-09-02T11:00:00'},
+    {id: 'L5', buildingId: B('1114012200100170004'), ownerId: 'brokerA', visibility: 'private', status: 'active', leaseType: 'partial',
+      floors: [F(1, 210, 'p5a'), F(2, 198, 'p5u'), F(3, 198, 'p5u')],
+      plans: [pl('p5a', '1층', retailPlan('명동 17 1층 평면도', '1F · 임대 210㎡', '명 동 8 길')), pl('p5u', '2–3층', retailPlan('명동 17 2–3층 평면도', '층별 198㎡', '', true))],
+      photos: [PH.seoulNeon, PH.arcade, PH.shopIn, PH.apparel3],
+      exclArea: null, deposit: P('v', 1500000000), rent: P('v', 95000000), mgmt: P('v', 6000000), keyMoney: P('none'), handover: P('tbd'),
+      note: '명동 중앙로 가시성 · 외국인 관광객 동선', mStart: '2026-08-01', mEnd: '2027-01-31',
+      internal: {landlord: '명동17PFV', phone: '02-776-1700', fee: '임대료 1개월분', floor: '', memo: ''},
+      upd: {}, grants: [], createdAt: '2026-08-02T09:00:00'},
+    {id: 'L6', buildingId: B('1114014500102120007'), ownerId: 'brokerA', visibility: 'shared', status: 'expired', leaseType: 'partial',
+      manual: {name: '을지로 157', use: '근린생활시설', above: 4, gfa: 820},
+      floors: [F(1, 95, 'p6')], plans: [pl('p6', '1층', retailPlan('을지로 157 1층 평면도', '1F · 임대 95㎡', '을 지 로'))],
+      photos: [PH.cheonggye, PH.openSign], exclArea: 82,
+      deposit: P('v', 60000000), rent: P('v', 6200000), mgmt: P('v', 350000), keyMoney: P('v', 30000000), handover: P('now'),
+      note: '', mStart: '2026-03-16', mEnd: '2026-09-15',
+      internal: {landlord: '을지로157㈜', phone: '02-2265-1570', fee: '', floor: '', memo: '용역 재계약 불발'},
+      upd: {}, grants: [], createdAt: '2026-03-17T09:00:00'},
+    {id: 'L7', buildingId: B('1168010700105320001'), ownerId: 'brokerB', visibility: 'private', status: 'active', leaseType: 'partial',
+      floors: [F(-1, 210, 'p7')], plans: [pl('p7', 'B1', retailPlan('가로수 24 지하1층 평면도', 'B1 · 임대 210㎡', '', true))],
+      photos: [PH.cafeSign, PH.shopLoft], exclArea: null,
+      deposit: P('v', 80000000), rent: P('v', 7500000), mgmt: P('v', 1100000), keyMoney: P('none'), handover: P('v', '2026-11-15'),
+      note: '', mStart: '2026-09-10', mEnd: '2027-03-09',
+      internal: {landlord: '가로수24㈜', phone: '02-3445-0024', fee: '임대료 1개월분', floor: '', memo: ''},
+      upd: {}, grants: [], createdAt: '2026-09-10T09:00:00'},
+    {id: 'L8', buildingId: B('4113510900106660008'), ownerId: 'brokerB', visibility: 'shared', status: 'active', leaseType: 'partial',
+      floors: [F(1, 245, 'p8')], plans: [pl('p8', '1층', retailPlan('판교 166 1층 평면도', '1F · 임대 245㎡', '판 교 역 로'))],
+      photos: [PH.mall, PH.shopIn], exclArea: null,
+      deposit: P('v', 250000000), rent: P('v', 18000000), mgmt: P('v', 2400000), keyMoney: P('none'), handover: P('v', '2027-02-01'),
+      note: '판교역 지하 연결 동선', mStart: '2026-08-15', mEnd: '2027-02-14',
+      internal: {landlord: '판교166PFV', phone: '031-8017-1660', fee: '임대료 1개월분', floor: '', memo: ''},
+      upd: {}, grants: [], createdAt: '2026-08-15T09:00:00'},
+  ];
+  L.forEach(l => l.leaseArea = sumArea(l.floors));
+  const tok = mkToken();
+  const props = [{id: 'P1', ownerId: 'brokerA', clientId: 'clientA', clientName: '모먼트커피',
+    cover: {region: '성수 · 가로수길 · 한남 · 명동', size: '1층 100㎡ 이상 · 총 250–2,300㎡', moveIn: '2027년 상반기'},
+    items: [
+      {listingId: 'L1', comment: '가로수길 메인 동선 코너 자리로 1층 전면 폭이 11m입니다. 2층은 로스터리 쇼룸으로 쓸 수 있습니다.', addedAt: '2026-09-20T10:00:00'},
+      {listingId: 'L3', comment: '전면 테라스가 있는 한남동 F&B 입지입니다. 주말 매출 비중이 높아 브랜드 체험형 매장에 적합합니다.', addedAt: '2026-09-20T10:00:00'},
+      {listingId: 'L5', comment: '관광객 유동이 가장 많은 대안입니다. 해외 고객 대상 플래그십으로 검토해 보시길 권합니다.', addedAt: '2026-09-20T10:00:00'},
+      {listingId: 'L2', comment: '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 모을 수 있습니다.', addedAt: '2026-09-20T10:00:00'},
+    ],
+    pin: '4821', token: tok, oldTokens: ['Qm7xV2kPz9Ra'], views: [{at: '2026-09-21T09:12:00'}, {at: '2026-09-21T14:40:00'}, {at: '2026-09-29T10:05:00'}],
+    snap: null, genAt: null, createdAt: '2026-09-18T17:00:00'}];
+  return {
+    today: '2026-10-01', buildings: b, listings: L, proposals: props, log: [],
+    fx: {month: '2026-09', rates: fxFor('2026-09')},
+    notes: [
+      {to: 'brokerB', text: '김민준님이 <b>한남 234 · 1F 일부 · 2F</b>를 모먼트커피 제안서에 추가했습니다', at: '2026-09-20T10:00:00', read: false},
+      {to: 'brokerA', text: '<b>연무장 45</b> 용역 만료 D-14', at: '2026-09-28T09:00:00', read: false},
+    ],
+    msgs: [
+      {client: 'clientA', pid: 'P1', from: 'brokerA', token: 'Qm7xV2kPz9Ra', at: '2026-09-18T17:05:00', text: '요청하신 후보지를 보내드립니다.'},
+      {client: 'clientA', pid: 'P1', from: 'brokerA', token: tok, at: '2026-09-20T10:10:00', text: '링크가 바뀌었습니다. 이 링크로 접속해 주세요.'},
+    ],
+  };
+}
+
+/* ---------- state ---------- */
+let S;
+try { S = JSON.parse(store.getItem(KEY)); } catch (e) { S = null; }
+const U = {role: store.getItem(KEY + '-role') || 'brokerA', tab: {brokerA: 'mine', brokerB: 'mine', admin: 'over', clientA: 'inbox'},
+  prop: null, modal: null, client: {pid: null, token: null, ok: false}, unit: 'sqm', cur: 'KRW', guide: false, open: {}, page: 0, pgAnim: 0, printAll: false};
+let D = null; // listing draft
+let lastView = '';
+
+function save() {
+  try { store.setItem(KEY, JSON.stringify(S)); store.setItem(KEY + '-role', U.role); }
+  catch (e) { toast('브라우저 저장 공간 초과', '새로고침 시 일부 변경 유실'); }
+}
+const getL = id => S.listings.find(x => x.id === id);
+const getB = id => S.buildings.find(x => x.id === id);
+const getP = id => S.proposals.find(x => x.id === id);
+const me = () => U.role;
+
+function bInfo(L) {
+  const B = getB(L.buildingId), m = L.manual || {};
+  const unk = B.status === '정보없음';
+  return {B, name: (unk ? m.name : B.name) || B.address.split(' ').slice(-2).join(' '), use: unk ? m.use : B.use,
+    above: unk ? m.above : B.above, below: unk ? m.below : B.below, gfa: unk ? m.gfa : B.gfa, year: B.year, address: B.address};
+}
+const fmtF = f => f < 0 ? `B${-f}` : `${f}F`;
+const nextF = f => f === -1 ? 1 : f + 1;
+function parseFl(v) { v = String(v ?? '').trim().toUpperCase().replace(/F$/, ''); const m = v.match(/^B(\d+)$/); if (m) return -(+m[1]); const n = parseInt(v, 10); return isNaN(n) || n === 0 ? null : n; }
+function sumArea(fs) { return fs.reduce((s, f) => s + (+f.area || 0), 0); }
+function area1F(fs) { const f = fs.find(x => x.floor === 1); return f ? +f.area || 0 : null; }
+function floorLabel(floors, type) {
+  if (!floors?.length) return '–';
+  const fs = [...floors].sort((a, b) => a.floor - b.floor);
+  if (type === 'whole') return `통임대 · ${fmtF(fs[0].floor)}–${fmtF(fs[fs.length - 1].floor)}`;
+  const parts = []; let i = 0;
+  while (i < fs.length) {
+    let j = i;
+    while (j + 1 < fs.length && fs[j + 1].floor === nextF(fs[j].floor) && fs[j + 1].scope === fs[i].scope) j++;
+    parts.push((i === j ? fmtF(fs[i].floor) : `${fmtF(fs[i].floor)}–${fmtF(fs[j].floor)}`) + (fs[i].scope === '일부' ? ' 일부' : ''));
+    i = j + 1;
+  }
+  return parts.join(' · ');
+}
+const live = (L, ownerId) => L.status === 'active' && (L.ownerId === ownerId || L.visibility === 'shared');
+
+/* ---------- projection: what the static client page contains ---------- */
+const PUB = ['leaseType', 'floors', 'plans', 'photos', 'leaseArea', 'exclArea', 'deposit', 'rent', 'mgmt', 'keyMoney', 'handover', 'note', 'manual'];
+function projItem(L, it, ownerId) {
+  const I = bInfo(L);
+  const base = {id: L.id, title: I.name, address: I.address, floorsTxt: floorLabel(L.floors, L.leaseType), photos: L.photos.slice(0, 1)};
+  if (!live(L, ownerId)) return {...base, ended: true};
+  return {...base, use: I.use, above: I.above, below: I.below, gfa: I.gfa, year: I.year, leaseType: L.leaseType,
+    floors: L.floors.map(f => ({floor: f.floor, area: f.area, scope: f.scope, plan: (L.plans.find(p => p.id === f.planId) || {}).src || null, poly: f.scope === '일부' ? f.poly : null})),
+    leaseArea: L.leaseArea, area1: area1F(L.floors), exclArea: L.exclArea, deposit: L.deposit, rent: L.rent, mgmt: L.mgmt, keyMoney: L.keyMoney, handover: L.handover,
+    note: L.note, photos: L.photos, area: I.B.area ? AREAS[I.B.area] : null, comment: it ? it.comment : '',
+    changed: it ? Object.entries(L.upd || {}).filter(([k, t]) => t > it.addedAt && diffDays(S.today, t.slice(0, 10)) <= 14).map(([k]) => k) : []};
+}
+function project(p) {
+  const u = USERS[p.ownerId];
+  return {client: p.clientName, cover: p.cover, broker: {name: u.name, title: u.title, phone: u.phone, email: u.email},
+    fx: S.fx, items: p.items.map(it => projItem(getL(it.listingId), it, p.ownerId))};
+}
+function commitSilent(reason) {
+  let n = 0;
+  for (const p of S.proposals) {
+    const j = JSON.stringify(project(p));
+    if (j !== p.snap) { const first = !p.snap; p.snap = j; p.genAt = stamp(); n++; S.log.unshift({at: p.genAt, pid: p.id, owner: p.ownerId, client: p.clientName, reason: first ? '최초 발행' : reason}); }
+  }
+  return n;
+}
+function commit(reason) { const n = commitSilent(reason); save(); render(); return n; }
+function note(to, text) { S.notes.unshift({to, text, at: stamp(), read: false}); if (to === me()) toast('알림', text.replace(/<[^>]+>/g, '')); }
+
+/* ---------- daily batch ---------- */
+function advance(n) {
+  const reasons = new Set();
+  for (let i = 0; i < n; i++) {
+    const prev = S.today; S.today = addDays(S.today, 1);
+    for (const L of S.listings) {
+      if (L.status !== 'active') continue;
+      const left = diffDays(L.mEnd, S.today), t = bInfo(L).name;
+      if (left === 14) note(L.ownerId, `<b>${esc(t)}</b> 용역 만료 D-14`);
+      if (left < 0) { L.status = 'expired'; L.upd.status = stamp(); note(L.ownerId, `<b>${esc(t)}</b> 용역 만료 → 자동 종료`); reasons.add('용역 만료'); }
+    }
+    for (const B of S.buildings) {
+      const r = REGISTRY.find(x => x.pnu === B.pnu);
+      if (B.status === '인허가' && r.final && S.today >= r.final.at) {
+        const old = B.gfa; Object.assign(B, {status: '준공', gfa: r.final.gfa, year: r.final.year});
+        S.listings.filter(L => L.buildingId === B.id).forEach(L => note(L.ownerId, `<b>${esc(B.name)}</b> 건축물대장 등록 · 연면적 ${nf(old)} → ${nf(B.gfa)}㎡`));
+        reasons.add('건축물대장 반영');
+      }
+    }
+    if (S.today.slice(0, 7) !== prev.slice(0, 7)) {
+      const m = prevMonth(S.today); S.fx = {month: m, rates: fxFor(m)};
+      reasons.add('환율 갱신');
+      ['brokerA', 'brokerB', 'admin'].forEach(u => note(u, `참고 환율 갱신 · ${m.replace('-', '년 ')}월 평균`));
+    }
+  }
+  const c = commit([...reasons].join(' · ') || '배지 기간 경과');
+  toast(`${fmtDate(S.today)} (${DOW[new Date(S.today).getDay()]})`, c ? `제안서 ${c}건 재생성` : '변경 없음');
+}
+
+/* ---------- formatting ---------- */
+function krw(v) {
+  v = Math.round(v);
+  if (v >= 1e8) { const e = Math.floor(v / 1e8), m = Math.round((v % 1e8) / 1e4); return `${nf(e)}억${m ? ' ' + nf(m) + '만' : ''}원`; }
+  if (v >= 1e4) return `${nf(v / 1e4, 1)}만원`;
+  return nf(v) + '원';
+}
+function fxTxt(v, fx) {
+  if (U.cur === 'KRW') return '';
+  const r = (fx || S.fx).rates[U.cur];
+  return '≈ ' + new Intl.NumberFormat('en-US', {style: 'currency', currency: U.cur, maximumFractionDigits: 0, currencyDisplay: U.cur === 'CNY' ? 'code' : 'symbol'}).format(v / r);
+}
+function areaTxt(m2) {
+  if (m2 == null || m2 === '') return '–';
+  if (U.unit === 'py') return `${nf(m2 * 0.3025, 1)}평`;
+  if (U.unit === 'sqft') return `${nf(m2 * 10.7639)} sq ft`;
+  return `${nf(m2)}㎡ <span class="per">${nf(m2 * 0.3025, 1)}평</span>`;
+}
+function perArea(v, m2) {
+  if (!m2) return '';
+  const [d, l] = U.unit === 'py' ? [m2 * 0.3025, '평당'] : U.unit === 'sqft' ? [m2 * 10.7639, 'sq ft당'] : [m2, '㎡당'];
+  return `${l} ${krw(v / d)}`;
+}
+function priceTxt(p, fx, area) {
+  if (!p) return '–';
+  if (p.s === 'nego') return '<span class="soft">협의</span>';
+  if (p.s === 'tbd') return '<span class="soft">추후 안내</span>';
+  if (p.s === 'none') return '<span class="soft">없음</span>';
+  if (p.s === 'now') return '즉시';
+  if (typeof p.v === 'string') return fmtDate(p.v);
+  return `${krw(p.v)}${area ? `<span class="per">${perArea(p.v, area)}</span>` : ''}${U.cur !== 'KRW' ? `<span class="fx">${fxTxt(p.v, fx)}</span>` : ''}`;
+}
+function priceShort(p) {
+  if (!p) return '–';
+  return {nego: '협의', tbd: '추후', none: '없음', now: '즉시'}[p.s] || (typeof p.v === 'string' ? fmtDate(p.v).slice(2) : krw(p.v));
+}
+
+/* ---------- charts (single hue, peak emphasised, labels in ink) ---------- */
+function cols(rows, unit) {
+  const max = Math.max(...rows.map(r => r[1])), pk = rows.findIndex(r => r[1] === max);
+  return `<div class="cols">${rows.map(([k, v], i) => `<div class="c ${i === pk ? 'peak' : ''}" title="${k} · ${v}${unit}"><span class="v">${i === pk ? v + unit : ''}</span><span class="bar" style="--h:${(v / max) * 100}%;--i:${i}"></span><span class="k">${k}</span></div>`).join('')}</div>`;
+}
+function hbars(rows, fmt) {
+  const max = Math.max(...rows.map(r => r[1]));
+  return `<div class="hb">${rows.map(([k, v], i) => `<div class="r" title="${k} · ${fmt(v)}"><span>${k}</span><span class="tr"><span class="b" style="--w:${(v / max) * 100}%;--i:${i}"></span></span><span>${fmt(v)}</span></div>`).join('')}</div>`;
+}
+function lineChart(rows, unit) {
+  const W = 300, H = 120, pad = 22, vs = rows.map(r => r[1]), mn = Math.min(...vs) * .9, mx = Math.max(...vs) * 1.04;
+  const pts = rows.map(([k, v], i) => [pad + i * (W - pad * 2) / (rows.length - 1), H - 22 - (v - mn) / (mx - mn) * (H - 40)]);
+  const d = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  let len = 0; for (let i = 1; i < pts.length; i++) len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+  const last = pts[pts.length - 1];
+  return `<svg class="line" viewBox="0 0 ${W} ${H}" width="100%" style="--len:${len.toFixed(0)}">
+    <line x1="${pad}" x2="${W - pad}" y1="${H - 22}" y2="${H - 22}" stroke="#e6e4de"/>
+    <path class="l" d="${d}"/>
+    ${pts.map((p, i) => `<g><title>${rows[i][0]} · ${nf(rows[i][1])}${unit}</title><circle cx="${p[0]}" cy="${p[1]}" r="9" fill="transparent"/><circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#fff" stroke="var(--accent)" stroke-width="2"/></g><text x="${p[0]}" y="${H - 6}" font-size="10" text-anchor="middle" fill="#8b8881">${rows[i][0]}</text>`).join('')}
+    <text x="${last[0]}" y="${last[1] - 10}" font-size="11" font-weight="700" text-anchor="end" fill="#121212">${nf(rows[rows.length - 1][1])}${unit}</text>
+  </svg>`;
+}
+function areaInsight(a) {
+  const res = a.pop[0][1] + a.pop[1][1], fl = a.pop[2][1], r = fl / res;
+  const type = r >= 1.1 ? '유동형' : r <= 0.9 ? '상주형' : '균형형';
+  const pk = a.hourly.reduce((m, x) => x[1] > m[1] ? x : m);
+  const sp = a.salesHourly.reduce((m, x) => x[1] > m[1] ? x : m);
+  const t1 = type === '유동형' ? '상주 인구보다 방문 인구가 많아 <b>짧은 방문·체류형 업종</b>에 유리합니다.'
+    : type === '상주형' ? '직장·거주 인구 비중이 높아 <b>반복 이용 수요</b>가 안정적입니다.' : '상주와 유동 인구가 비슷해 <b>업종 선택 폭</b>이 넓습니다.';
+  const t2 = a.week[1] >= 40 ? `주말 매출이 ${a.week[1]}%로 <b>여가·소비 수요</b>가 강합니다.` : `평일 매출이 ${a.week[0]}%로 <b>직장인 수요 중심</b>입니다.`;
+  return {type, html: `<b>${type} 상권</b> · ${t1} 유동 인구는 <b>${pk[0]}시</b>, 매출은 <b>${sp[0]}시</b>에 가장 많습니다. ${t2}`};
+}
+function areaBlock(a) {
+  const ins = areaInsight(a);
+  return `<section class="sec"><div class="sec-h"><h3>상권 분석</h3><span class="chip blue">${esc(a.name)}</span><span class="chip">${a.kind}</span><span class="chip line">예시 데이터</span><div class="sp"></div><span class="sub">${a.q} 기준</span></div>
+    <div class="insight">${ins.html}</div>
+    <div class="tiles">
+      <div class="tile"><span>상권 유형</span><b>${ins.type}</b></div>
+      <div class="tile"><span>일평균 유동 인구</span><b>${nf(a.pop[2][1])}명</b></div>
+      <div class="tile"><span>분기 추정 매출</span><b>${nf(a.sales[a.sales.length - 1][1])}억원</b></div>
+      <div class="tile"><span>주말 매출 비중</span><b>${a.week[1]}%</b></div>
+    </div>
+    <div class="charts">
+      <div class="chart"><h5>인구 구성</h5>${hbars(a.pop, v => nf(v) + '명')}</div>
+      <div class="chart"><h5>분기 매출 추이 (억원)</h5>${lineChart(a.sales, '억')}</div>
+      <div class="chart"><h5>시간대별 유동 인구 (%)</h5>${cols(a.hourly, '%')}</div>
+      <div class="chart"><h5>시간대별 매출 (%)</h5>${cols(a.salesHourly, '%')}</div>
+      <div class="chart"><h5>연령대별 유동 인구 (%)</h5>${cols(a.age, '%')}</div>
+      <div class="chart"><h5>요일별 매출 (%)</h5>${cols(a.dow, '%')}</div>
+      <div class="chart"><h5>평일 · 주말 매출</h5>
+        <div class="stack"><i style="width:${a.week[0]}%;background:var(--accent)" title="평일 ${a.week[0]}%"></i><i style="width:${a.week[1]}%;background:var(--series-2)" title="주말 ${a.week[1]}%"></i></div>
+        <div class="legend"><span><i style="background:var(--accent)"></i>평일 ${a.week[0]}%</span><span><i style="background:var(--series-2)"></i>주말 ${a.week[1]}%</span></div></div>
+      <div class="chart"><h5>점포 구성 (%)</h5>${hbars(a.stores, v => v + '%')}</div>
+    </div></section>`;
+}
+
+/* ---------- client page (renders ONLY the static snapshot) ---------- */
+function planView(f, cap) {
+  const poly = f.poly ? `<svg viewBox="0 0 1 1" preserveAspectRatio="none"><polygon class="poly" vector-effect="non-scaling-stroke" points="${f.poly.map(p => p.join(',')).join(' ')}"/></svg>` : '';
+  return `<div class="planv"><div class="pw"><img src="${f.plan}" alt="">${poly}</div><div class="cap"><b>${cap}</b>${f.scope === '일부' ? '<span class="chip blue">표시 영역</span>' : '<span class="chip">층 전체</span>'}</div></div>`;
+}
+function groupPlans(floors) {
+  const out = []; const fs = floors.filter(f => f.plan).sort((a, b) => a.floor - b.floor);
+  for (const f of fs) {
+    const last = out[out.length - 1];
+    if (last && !f.poly && !last.f.poly && last.f.plan === f.plan && last.to === f.floor - 1 && last.f.scope === f.scope) last.to = f.floor;
+    else out.push({f, from: f.floor, to: f.floor});
+  }
+  return out.map(g => planView(g.f, g.from === g.to ? `${g.from}F` : `${g.from}–${g.to}F`)).join('');
+}
+const pad2 = n => String(n).padStart(2, '0');
+function areaMain(m2) { if (m2 == null || m2 === '') return '–'; return U.unit === 'py' ? `${nf(m2 * 0.3025, 1)}평` : U.unit === 'sqft' ? `${nf(m2 * 10.7639)} sq ft` : `${nf(m2)}㎡`; }
+function areaSub(m2) { return U.unit === 'sqm' && m2 ? `${nf(m2 * 0.3025, 1)}평` : ''; }
+function valCell(main, ...subs) { return `<div class="val"><b>${main}</b>${subs.filter(Boolean).map(x => `<small>${x}</small>`).join('')}</div>`; }
+function priceCell(p, fx, area) {
+  if (!p) return valCell('–');
+  const lbl = {nego: '협의', tbd: '추후 안내', none: '없음', now: '즉시'}[p.s];
+  if (lbl) return `<div class="val"><b class="soft">${lbl}</b></div>`;
+  if (typeof p.v === 'string') return valCell(fmtDate(p.v));
+  return valCell(krw(p.v), area ? perArea(p.v, area) : '', U.cur !== 'KRW' ? fxTxt(p.v, fx) : '');
+}
+function specRow(label, cell, changed) { return `<div class="spec-r"><span class="lbl">${label}${changed ? '<i class="upd">업데이트</i>' : ''}</span>${cell}</div>`; }
+function listingPage(x, i, n, fx) {
+  const hd = `<div class="lp-h"><div class="eyebrow">${n ? `${pad2(i + 1)} / ${pad2(n)}` : '매물'}</div><h2>${esc(x.title)}</h2><div class="addr">${esc(x.address)}</div>`;
+  if (x.ended) return `<article class="lp ended">${hd}<div class="row" style="margin-top:12px"><span class="chip dark">제안 종료</span></div></div><div class="ended-box">더 이상 제안이 유효하지 않은 물건입니다</div></article>`;
+  const ch = k => x.changed?.includes(k);
+  const ph = x.photos.slice(0, 3), more = x.photos.length - 3;
+  const fs = [...x.floors].sort((a, b) => a.floor - b.floor);
+  return `<article class="lp">${hd}<div class="row" style="margin-top:12px"><span class="chip ${x.leaseType === 'whole' ? 'dark' : 'blue'}">${x.leaseType === 'whole' ? '통임대' : '부분임대'}</span>${x.use ? `<span class="chip line">${esc(x.use)}</span>` : ''}</div></div>
+    ${ph.length ? `<div class="gal n${ph.length}">${ph.map((p, j) => `<div style="background-image:url('${p}')">${j === 2 && more > 0 ? `<span class="more">+${more}</span>` : ''}</div>`).join('')}</div>` : ''}
+    <div class="kpis">
+      <div class="kpi"><span>1층 임대면적</span><b>${x.area1 != null ? areaMain(x.area1) : '–'}</b><small>${x.area1 != null ? areaSub(x.area1) : '1층 미포함'}</small></div>
+      <div class="kpi"><span>전체 임대면적</span><b>${areaMain(x.leaseArea)}</b><small>${areaSub(x.leaseArea)}</small></div>
+      <div class="kpi"><span>월 임대료</span><b>${x.rent.s === 'v' ? krw(x.rent.v) : {nego: '협의', tbd: '추후 안내'}[x.rent.s]}</b><small>${x.rent.s === 'v' ? perArea(x.rent.v, x.leaseArea) : ''}</small>${x.rent.s === 'v' && U.cur !== 'KRW' ? `<small>${fxTxt(x.rent.v, fx)}</small>` : ''}</div>
+      <div class="kpi"><span>보증금</span><b>${x.deposit.s === 'v' ? krw(x.deposit.v) : {nego: '협의', tbd: '추후 안내'}[x.deposit.s]}</b><small>${x.deposit.s === 'v' && U.cur !== 'KRW' ? fxTxt(x.deposit.v, fx) : ''}</small></div>
+    </div>
+    ${x.comment ? `<div class="cm"><b>담당 코멘트</b>${esc(x.comment)}</div>` : ''}
+    <div class="specs">
+      <section class="sec"><div class="sec-h"><h3>임대 조건</h3></div><div class="spec">
+        ${specRow('보증금', priceCell(x.deposit, fx), ch('deposit'))}
+        ${specRow('월 임대료', priceCell(x.rent, fx, x.leaseArea), ch('rent'))}
+        ${specRow('월 관리비', priceCell(x.mgmt, fx, x.leaseArea), ch('mgmt'))}
+        ${specRow('권리금', priceCell(x.keyMoney, fx), ch('keyMoney'))}
+        ${specRow('인도일', priceCell(x.handover, fx), ch('handover'))}
+      </div>${x.note ? `<p class="note">${esc(x.note)}</p>` : ''}</section>
+      <section class="sec"><div class="sec-h"><h3>층별 임대면적</h3>${ch('floors') ? '<i class="upd">업데이트</i>' : ''}</div>
+        <table class="ftbl"><thead><tr><th>층</th><th>범위</th><th class="num">임대면적</th></tr></thead><tbody>
+        ${fs.map(f => `<tr><td><b>${fmtF(f.floor)}</b></td><td>${f.scope === '일부' ? '<span class="chip blue">일부</span>' : '<span class="chip">전체</span>'}</td><td class="num">${valCell(areaMain(f.area), areaSub(f.area))}</td></tr>`).join('')}
+        <tr class="sum"><td colspan="2">합계</td><td class="num">${valCell(areaMain(x.leaseArea), areaSub(x.leaseArea))}</td></tr>
+        ${x.exclArea ? `<tr><td colspan="2" class="sub">전용면적</td><td class="num">${valCell(areaMain(x.exclArea), areaSub(x.exclArea))}</td></tr>` : ''}
+        </tbody></table></section>
+      <section class="sec"><div class="sec-h"><h3>건물 정보</h3></div><div class="spec">
+        ${specRow('주소', valCell(esc(x.address)))}
+        ${specRow('용도', valCell(esc(x.use || '–')))}
+        ${specRow('지상', valCell((x.above ?? '–') + '층'))}
+        ${x.below ? specRow('지하', valCell(x.below + '층')) : ''}
+        ${specRow('연면적', valCell(areaMain(x.gfa), areaSub(x.gfa)))}
+        ${x.year ? specRow('준공', valCell(x.year + '년')) : ''}
+      </div></section>
+    </div>
+    ${fs.some(f => f.plan) ? `<section class="sec"><div class="sec-h"><h3>도면</h3><span class="sub">파란 영역이 임대 범위</span></div><div class="plans">${groupPlans(x.floors)}</div></section>` : ''}
+    ${x.area ? areaBlock(x.area) : ''}
+  </article>`;
+}
+function unitBar() {
+  return `<div class="seg sm">${[['sqm', '㎡'], ['py', '평'], ['sqft', 'sq ft']].map(([k, l]) => `<button class="${U.unit === k ? 'on' : ''}" onclick="U.unit='${k}';rerenderClient()">${l}</button>`).join('')}</div>
+  <div class="seg sm">${CUR.map(([k, l]) => `<button class="${U.cur === k ? 'on' : ''}" title="${k}" onclick="U.cur='${k}';rerenderClient()">${l}</button>`).join('')}</div>`;
+}
+function coverPage(P) {
+  const short = p => !p ? '–' : ({nego: '협의', tbd: '추후', none: '없음', now: '즉시'}[p.s] || (typeof p.v === 'string' ? fmtDate(p.v) : krw(p.v)));
+  return `<div class="hero"><div><div class="eyebrow">임차 후보지 제안</div><h1>${esc(P.client)} 귀중</h1>
+      <div class="need"><div><span>희망 지역</span><b>${esc(P.cover.region)}</b></div><div><span>면적</span><b>${esc(P.cover.size)}</b></div><div><span>입주 시기</span><b>${esc(P.cover.moveIn)}</b></div></div></div>
+      <div class="bk"><span>담당</span><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><small>${esc(P.broker.phone)}</small><small>${esc(P.broker.email)}</small></div></div>
+    <h3 class="sec-t">후보 물건 ${P.items.length}</h3>
+    <div class="picks">${P.items.map((x, i) => `<button class="pk ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})">
+      <div class="pk-ph" style="background-image:url('${x.photos?.[0] || ''}')"><span class="pk-n">${pad2(i + 1)}</span>${x.ended ? '<span class="chip dark">제안 종료</span>' : ''}</div>
+      <div class="pk-b"><b>${esc(x.title)}</b><small>${esc(x.floorsTxt)}</small>
+      ${x.ended ? '' : `<div class="pk-kv"><div><span>1층</span><b>${x.area1 != null ? areaMain(x.area1) : '–'}</b></div><div><span>전체</span><b>${areaMain(x.leaseArea)}</b></div><div><span>임대료</span><b>${short(x.rent)}</b></div></div>`}</div></button>`).join('')}</div>
+    <h3 class="sec-t">조건 비교</h3>
+    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th>범위</th><th class="num">1층</th><th class="num">전체</th><th class="num">보증금</th><th class="num">임대료</th><th class="num">관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
+    ${P.items.map((x, i) => x.ended
+      ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b></td><td>${esc(x.floorsTxt)}</td><td colspan="7"><span class="chip dark">제안 종료</span></td></tr>`
+      : `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b></td><td>${esc(x.floorsTxt)}</td><td class="num">${x.area1 != null ? areaMain(x.area1) : '–'}</td><td class="num">${areaMain(x.leaseArea)}</td><td class="num">${short(x.deposit)}</td><td class="num">${short(x.rent)}</td><td class="num">${short(x.mgmt)}</td><td class="num">${short(x.keyMoney)}</td><td class="num">${short(x.handover)}</td></tr>`).join('')}
+    </tbody></table></div>`;
+}
+function clientPage(snap, genAt, link) {
+  const P = JSON.parse(snap), fx = P.fx, n = P.items.length, pg = Math.min(U.page, n);
+  const tabs = `<button class="ptab ${pg === 0 ? 'on' : ''}" onclick="goPage(0)"><span class="pt-cover">≡</span><span>표지</span></button>` + P.items.map((x, i) => `<button class="ptab ${pg === i + 1 ? 'on' : ''} ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})"><span class="pt-ph" style="background-image:url('${x.photos?.[0] || ''}')"></span><span><b>${pad2(i + 1)}</b> ${esc(x.title)}</span></button>`).join('');
+  const pages = U.printAll
+    ? [coverPage(P), ...P.items.map((x, i) => listingPage(x, i, n, fx))].map((h, i) => `<div class="${i ? 'pbreak' : ''}">${h}</div>`).join('')
+    : `<div class="pg ${U.pgAnim > 0 ? 'in-r' : U.pgAnim < 0 ? 'in-l' : ''}">${pg === 0 ? coverPage(P) : listingPage(P.items[pg - 1], pg - 1, n, fx)}</div>`;
+  const fxNote = U.cur === 'KRW' ? '' : `참고 환율 1 ${U.cur} = ${nf(fx.rates[U.cur], 2)}원 (${fx.month.replace('-', '년 ')}월 평균) · `;
+  return `<div class="cp">
+    <div class="cp-bar noprint"><div class="cp-brand">C&amp;W Advisory<span>업데이트 ${fmtStamp(genAt)}</span></div><div class="sp"></div>${unitBar()}<button class="btn sm" onclick="printPDF()">PDF</button>
+      <nav class="ptabs">${tabs}</nav></div>
+    <div class="cp-wrap">
+      <div class="print-stamp">${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 링크에서 확인하세요 ${link ? '· ' + esc(link) : ''}</div>
+      ${pages}
+      ${U.printAll ? '' : `<div class="pnav noprint"><button class="btn" ${pg === 0 ? 'disabled' : ''} onclick="goPage(${pg - 1})">← 이전</button><span>${pg === 0 ? '표지' : pad2(pg)} / ${pad2(n)}</span><button class="btn" ${pg === n ? 'disabled' : ''} onclick="goPage(${pg + 1})">다음 →</button></div>`}
+      <div class="cp-foot">${fxNote}금액은 부가세 별도이며, 조건은 임대인과의 협의에 따라 바뀔 수 있습니다.<br>이 페이지는 항상 최신 정보를 보여줍니다. 북마크해 두세요.</div>
+    </div></div>`;
+}
+function goPage(i) {
+  U.pgAnim = i > U.page ? 1 : -1; U.page = i; rerenderClient(); U.pgAnim = 0;
+  const m = document.querySelector('.modal.full'); if (m) m.scrollTo({top: 0}); else window.scrollTo({top: 0});
+}
+function printPDF() { U.printAll = true; rerenderClient(); setTimeout(() => { window.print(); U.printAll = false; rerenderClient(); }, 120); }
+function rerenderClient() { if (U.modal) renderModal(); else render(); }
+
+/* =========================================================
+   VIEWS
+   ========================================================= */
+function topbar() {
+  const d = new Date(S.today + 'T00:00:00');
+  return `<header class="top noprint"><div class="logo">Lease<i>Desk</i></div>
+    <div class="seg">${ROLES.map(([id, l]) => `<button class="${U.role === id ? 'on' : ''}" onclick="setRole('${id}')">${l}</button>`).join('')}</div>
+    <div class="tools"><span class="today">${fmtDate(S.today)} (${DOW[d.getDay()]})</span>
+      <button class="btn sm ghost" onclick="advance(1)">+1일</button><button class="btn sm ghost" onclick="advance(7)">+7일</button><button class="btn sm ghost" onclick="advance(30)">+30일</button>
+      <button class="btn sm ghost icon" title="초기화" onclick="resetAll()">↺</button><button class="btn sm ghost icon" title="시나리오" onclick="U.guide=!U.guide;render()">?</button></div></header>`;
+}
+function guide() {
+  if (!U.guide) return '';
+  return `<div class="guide"><div class="row" style="margin-bottom:8px"><b>시나리오</b><div class="sp"></div><button class="btn xs ghost" onclick="U.guide=false;render()">✕</button></div>
+  <h4>브로커A</h4><ol><li>매물 카드 클릭 → 제안서 미리보기</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
+  <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
+  <h4>관리자</h4><ol><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
+  <h4>클라이언트A</h4><ol><li>최신 링크 · PIN 4821</li><li>매물 탭 이동 · 단위 · 통화 · PDF</li><li>이전 링크 → 차단</li></ol></div>`;
+}
+function setRole(r) { U.role = r; U.prop = null; D = null; U.modal = null; U.client = {pid: null, token: null, ok: false}; save(); render(); renderModal(); window.scrollTo({top: 0}); }
+function setTab(t) { U.tab[U.role] = t; U.prop = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
+function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); commitSilent('최초 발행'); D = null; U.prop = null; save(); render(); toast('초기화 완료'); }
+
+function render() {
+  const role = U.role, tab = U.tab[role];
+  const key = [role, tab, D ? 'edit' : '', U.prop, U.client.pid, U.client.ok, U.client.token, U.page].join('|');
+  const anim = key !== lastView; lastView = key;
+  let body;
+  if (role === 'clientA') body = clientView();
+  else body = `<div class="layout"><aside class="side noprint">${sideNav()}</aside><main class="main">${role === 'admin' ? adminView() : brokerView()}</main></div>`;
+  $('#app').innerHTML = topbar() + `<div class="${anim ? 'anim view' : ''}">${body}</div>` + guide();
+}
+
+function sideNav() {
+  const u = USERS[me()], unread = S.notes.filter(n => n.to === me() && !n.read).length;
+  const items = me() === 'admin'
+    ? [['over', '개요'], ['bld', '건물 · 매물'], ['handover', '이관'], ['views', '열람'], ['log', '발행 로그']]
+    : [['mine', '내 매물'], ['shared', '공유 매물'], ['props', '제안서'], ['notes', '알림'], ['log', '발행 로그']];
+  return `<div class="me"><b>${u.name}</b><span>${u.title}</span></div><nav class="nav">${items.map(([k, l]) => `<button class="${U.tab[me()] === k && !D && !U.prop ? 'on' : ''}" onclick="setTab('${k}')">${l}${k === 'notes' && unread ? `<span class="ndot">${unread}</span>` : ''}</button>`).join('')}</nav>`;
+}
+
+/* ---------- broker ---------- */
+function brokerView() {
+  if (D) return listingForm();
+  if (U.prop) return propEditor(getP(U.prop));
+  const t = U.tab[me()];
+  if (t === 'mine') return mineView();
+  if (t === 'shared') return sharedView();
+  if (t === 'props') return propsView();
+  if (t === 'notes') return notesView();
+  if (t === 'log') return logView();
+}
+const STATUS = {active: ['진행', 'ok'], done: ['거래완료', 'dark'], withdrawn: ['철회', ''], expired: ['만료', 'red']};
+function listingCard(L, i, own) {
+  const I = bInfo(L), [sl, sc] = STATUS[L.status], left = diffDays(L.mEnd, S.today), a1 = area1F(L.floors);
+  const dd = L.status === 'active' && left <= 30 ? `<span class="chip ${left <= 14 ? 'warn' : ''}">D-${left}</span>` : '';
+  const vis = `<span class="chip">${L.visibility === 'shared' ? '공유' : '🔒 나만'}</span>`;
+  const actions = own
+    ? `<button class="btn sm ghost" onclick="editListing('${L.id}')">수정</button>
+       <button class="btn sm ghost" onclick="toggleVis('${L.id}')">${L.visibility === 'shared' ? '공유 해제' : '공유'}</button><div class="sp"></div>
+       ${L.status === 'active' ? `<button class="btn sm ghost" onclick="setStatus('${L.id}','done')">완료</button><button class="btn sm ghost danger" onclick="setStatus('${L.id}','withdrawn')">철회</button>` : (L.mEnd >= S.today ? `<button class="btn sm ghost" onclick="setStatus('${L.id}','active')">재개</button>` : '')}`
+    : `<span class="sub">${USERS[L.ownerId].name}</span><div class="sp"></div><button class="btn sm" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>`;
+  return `<div class="card hov a ${L.status !== 'active' ? 'dim' : ''}" style="--i:${i}" onclick="openModal({type:'detail',lid:'${L.id}'})">
+    <div class="ph" style="background-image:url('${L.photos[0] || ''}')"><div class="tags"><span class="chip ${sc}">${sl}</span>${vis}${dd}</div></div>
+    <div class="bd"><div class="t">${esc(I.name)}</div><div class="ad">${esc(I.address)}</div>
+      <div class="kv2">
+        <div><span>임대 범위</span><b>${esc(floorLabel(L.floors, L.leaseType))}</b></div>
+        <div><span>월 임대료</span><b>${priceShort(L.rent)}</b></div>
+        <div><span>1층 면적</span><b>${a1 != null ? nf(a1) + '㎡' : '–'}</b></div>
+        <div><span>전체 면적</span><b>${nf(L.leaseArea)}㎡</b></div>
+      </div></div>
+    <div class="ft" onclick="event.stopPropagation()">${actions}</div></div>`;
+}
+function mineView() {
+  const order = {active: 0, expired: 1, done: 2, withdrawn: 3};
+  const ls = S.listings.filter(L => L.ownerId === me()).sort((a, b) => order[a.status] - order[b.status]);
+  return `<div class="head"><h1>내 매물</h1><span class="sub">${ls.filter(l => l.status === 'active').length}건 진행</span><div class="sp"></div><button class="btn pri" onclick="newListing()">+ 등록</button></div>
+    <div class="grid">${ls.map((L, i) => listingCard(L, i, true)).join('') || '<div class="empty">매물 없음</div>'}</div>`;
+}
+function sharedView() {
+  const ls = S.listings.filter(L => L.ownerId !== me() && L.visibility === 'shared' && L.status === 'active');
+  return `<div class="head"><h1>공유 매물</h1><span class="sub">${ls.length}건</span></div>
+    <div class="grid">${ls.map((L, i) => listingCard(L, i, false)).join('') || '<div class="empty">공유된 매물 없음</div>'}</div>`;
+}
+function toggleVis(id) {
+  const L = getL(id); L.visibility = L.visibility === 'shared' ? 'private' : 'shared';
+  const n = commit(L.visibility === 'shared' ? '공유 설정' : '공유 해제');
+  toast(L.visibility === 'shared' ? '전체 공유' : '나만 보기', n ? `제안서 ${n}건 갱신` : '');
+}
+function setStatus(id, s) {
+  const L = getL(id); L.status = s; L.upd.status = stamp();
+  const n = commit({done: '거래완료', withdrawn: '철회', active: '재개'}[s]);
+  toast(STATUS[s][0], n ? `제안서 ${n}건 갱신` : '');
+}
+
+/* ---------- listing form ---------- */
+function blankDraft() {
+  return {id: null, pnu: null, manual: null, leaseType: 'partial', floors: [], plans: [], photos: [], exclArea: '',
+    deposit: P('v', ''), rent: P('v', ''), mgmt: P('v', ''), keyMoney: P('none'), handover: P('tbd'), note: '',
+    visibility: 'private', mStart: S.today, mEnd: addDays(S.today, 182), internal: {landlord: '', phone: '', fee: '', floor: '', memo: ''}, upd: {}, q: '', range: {from: '', to: ''}};
+}
+function newListing() { D = blankDraft(); render(); window.scrollTo({top: 0}); }
+function editListing(id) {
+  const L = getL(id); D = {...clone(L), pnu: getB(L.buildingId).pnu, q: ''};
+  const fs = L.floors.map(f => f.floor); D.range = {from: fmtF(Math.min(...fs)), to: fmtF(Math.max(...fs))};
+  render(); window.scrollTo({top: 0});
+}
+function draftReg() { return D.pnu ? REGISTRY.find(r => r.pnu === D.pnu) : null; }
+function draftAbove() { const r = draftReg(); if (!r) return null; return r.status === '정보없음' ? +(D.manual?.above || 0) : (S.buildings.find(b => b.pnu === r.pnu)?.above ?? r.above); }
+function pickReg(pnu) {
+  D.pnu = pnu; D.q = '';
+  const r = draftReg(); D.manual = r.status === '정보없음' ? (D.manual || {name: '', use: '', above: '', gfa: ''}) : null;
+  if (D.leaseType === 'whole') wholeFloors();
+  render();
+}
+function draftBelow() { const r = draftReg(); if (!r || r.status === '정보없음') return 0; return S.buildings.find(b => b.pnu === r.pnu)?.below ?? r.below ?? 0; }
+function mkFloor(f) { return D.floors.find(x => x.floor === f) || {floor: f, area: '', scope: '전체', planId: null, poly: null}; }
+function wholeFloors() {
+  const n = draftAbove(); if (!n) { D.floors = []; return; }
+  const fs = []; for (let f = -draftBelow(); f <= n; f++) if (f) fs.push({...mkFloor(f), scope: '전체', poly: null});
+  D.floors = fs;
+}
+function setType(t) { D.leaseType = t; if (t === 'whole') wholeFloors(); else D.floors = []; render(); }
+function applyRange() {
+  const a = parseFl(D.range.from), b = D.range.to ? parseFl(D.range.to) : a;
+  if (a == null || b == null) return toast('층을 입력하세요', '예: 1, 3, B1');
+  const lo = Math.min(a, b), hi = Math.max(a, b), max = draftAbove();
+  if (max && hi > max) return toast(`지상 ${max}층까지 있는 건물입니다`);
+  const fs = []; for (let f = lo; f <= hi; f++) if (f) fs.push(mkFloor(f));
+  D.floors = fs; render();
+}
+function syncTotal() { const a = area1F(D.floors), t = $('#tt'), o = $('#t1'); if (t) t.textContent = nf(sumArea(D.floors)) + '㎡'; if (o) o.textContent = a != null ? nf(a) + '㎡' : '–'; }
+function setScope(i, s) { D.floors[i].scope = s; if (s === '전체') D.floors[i].poly = null; render(); }
+function setPlan(i, id) { D.floors[i].planId = id || null; D.floors[i].poly = null; render(); }
+function upd(path, v) { const ks = path.split('.'); let o = D; while (ks.length > 1) o = o[ks.shift()]; o[ks[0]] = v; }
+function setPS(k, s) { D[k] = s === 'v' ? P('v', D[k].v ?? '') : P(s); render(); }
+function readImg(file, cb) {
+  const r = new FileReader();
+  r.onload = () => { if (file.type === 'image/svg+xml') return cb(r.result);
+    const img = new Image(); img.onload = () => { const s = Math.min(1, 1600 / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = img.width * s; c.height = img.height * s; c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); cb(c.toDataURL('image/jpeg', .82)); }; img.src = r.result; };
+  r.readAsDataURL(file);
+}
+function addPhotos(inp) { [...inp.files].forEach(f => readImg(f, src => { D.photos.push(src); render(); })); }
+function addSamplePhoto() { const pool = SAMPLE_PHOTOS.filter(p => !D.photos.includes(p)); D.photos.push(pool[0] || SAMPLE_PHOTOS[0]); render(); }
+function addPlans(inp) { [...inp.files].forEach(f => readImg(f, src => { const id = uid('pl'); D.plans.push({id, name: `도면 ${D.plans.length + 1}`, src}); if (D.plans.length === 1) D.floors.forEach(x => x.planId = x.planId || id); render(); })); }
+function addSamplePlan() {
+  const r = draftReg(), name = r ? (r.name || D.manual?.name || '신규') : '신규';
+  const isOffice = /업무/.test(r?.use || D.manual?.use || '');
+  const target = D.floors.find(f => !f.planId) || D.floors[0];
+  const fl = target ? target.floor : 1, lbl = fmtF(fl);
+  const src = isOffice ? officePlan(`${name} ${lbl} 평면도`, lbl) : retailPlan(`${name} ${lbl} 평면도`, lbl, fl === 1 ? '도 로' : '', fl !== 1);
+  const id = uid('pl'); D.plans.push({id, name: lbl, src});
+  if (target && !target.planId) target.planId = id;
+  render();
+}
+function rmPhoto(i) { D.photos.splice(i, 1); render(); }
+function rmPlan(id) { D.plans = D.plans.filter(p => p.id !== id); D.floors.forEach(f => { if (f.planId === id) { f.planId = null; f.poly = null; } }); render(); }
+function importFrom(id) {
+  const L = getL(id); const keep = {id: null, visibility: 'private', mStart: S.today, mEnd: addDays(S.today, 182), internal: {landlord: '', phone: '', fee: '', floor: '', memo: ''}, upd: {}, q: ''};
+  D = {...clone(L), ...keep, pnu: getB(L.buildingId).pnu, from: id};
+  const fs = L.floors.map(f => f.floor); D.range = {from: fmtF(Math.min(...fs)), to: fmtF(Math.max(...fs))};
+  delete D.status; delete D.ownerId; delete D.grants; render(); toast('이전 매물 정보 복사', '도면 · 영역 · 사진 포함');
+}
+function seg(opts, cur, fn) { return `<div class="seg sm">${opts.map(([k, l]) => `<button type="button" class="${cur === k ? 'on' : ''}" onclick="${fn}('${k}')">${l}</button>`).join('')}</div>`; }
+function priceRow(k, label, opts, isDate) {
+  const p = D[k];
+  const input = p.s !== 'v' ? '' : isDate
+    ? `<input class="in" type="date" value="${p.v || ''}" oninput="D.${k}.v=this.value" style="max-width:200px">`
+    : `<div class="ui" style="max-width:240px"><input class="in" type="number" value="${p.v === '' ? '' : p.v / 10000}" oninput="D.${k}.v=this.value===''?'':Math.round(this.value*10000)" placeholder="0"><span>만원</span></div>`;
+  return `<div class="price-row"><b>${label}</b>${seg(opts, p.s, `(s=>setPS('${k}',s))`)}${input}</div>`;
+}
+function listingForm() {
+  const r = draftReg(), Bx = r ? S.buildings.find(b => b.pnu === r.pnu) : null;
+  const info = Bx || r;
+  const res = D.q ? REGISTRY.filter(x => x.address.replace(/\s/g, '').includes(D.q.replace(/\s/g, ''))) : [];
+  const grants = S.listings.filter(L => (L.grants || []).includes(me()));
+  const stChip = s => s === '준공' ? '<span class="chip ok">건축물대장</span>' : s === '인허가' ? '<span class="chip warn">인허가 기준</span>' : '<span class="chip red">공공정보 없음</span>';
+  const planOpts = sel => `<option value="">도면 없음</option>` + D.plans.map(p => `<option value="${p.id}" ${sel === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
+  const am = U.unit;
+  return `<div class="head"><button class="btn ghost icon" onclick="D=null;render()">←</button><h1>${D.id ? '매물 수정' : '매물 등록'}</h1><div class="sp"></div></div>
+  ${!D.id && grants.length ? `<div class="panel a" style="--i:0"><h3>이관받은 매물 <span class="chip blue">${grants.length}</span></h3><div class="row">${grants.map(L => `<button class="btn sm" onclick="importFrom('${L.id}')">${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))} 가져오기</button>`).join('')}</div></div>` : ''}
+  <div class="panel a" style="--i:1"><h3>건물</h3>
+    ${r ? `<div class="bcard"><div style="flex:1"><div class="row"><b style="font-size:15px">${esc(info.name || D.manual?.name || '이름 없음')}</b>${stChip(info.status)}</div><div class="sub">${esc(r.address)}</div>
+      ${info.status !== '정보없음' ? `<div class="kv"><span>용도<b>${esc(info.use)}</b></span><span>지상<b>${info.above}층</b></span><span>지하<b>${info.below}층</b></span><span>연면적<b>${nf(info.gfa)}㎡</b></span><span>준공<b>${info.year || '공사중'}</b></span></div>` : ''}</div>
+      ${D.id ? '' : `<button class="btn sm ghost" onclick="D.pnu=null;D.floors=[];render()">변경</button>`}</div>
+      ${info.status === '정보없음' ? `<div class="fg" style="margin-top:14px">
+        <div class="f"><label>건물명</label><input class="in" value="${esc(D.manual.name)}" oninput="D.manual.name=this.value"></div>
+        <div class="f"><label>용도</label><input class="in" value="${esc(D.manual.use)}" oninput="D.manual.use=this.value"></div>
+        <div class="f"><label>지상 층수</label><input class="in" type="number" value="${D.manual.above}" oninput="D.manual.above=+this.value"></div>
+        <div class="f"><label>연면적</label><div class="ui"><input class="in" type="number" value="${D.manual.gfa}" oninput="D.manual.gfa=+this.value"><span>㎡</span></div></div></div>` : ''}`
+    : `<input class="in" placeholder="주소 검색 (예: 여의대로, 연무장길)" value="${esc(D.q)}" oninput="D.q=this.value;renderSearch()" id="q" autofocus><div id="sr">${searchRes(res)}</div>`}
+  </div>
+  ${r ? `
+  <div class="panel a" style="--i:2"><h3>임대 범위</h3>
+    <div class="row" style="margin-bottom:14px">${seg([['whole', '통임대'], ['partial', '부분임대']], D.leaseType, '(t=>setType(t))')}
+      ${D.leaseType === 'partial' ? `<div class="row" style="margin-left:10px"><input class="in" style="width:80px" placeholder="시작층" value="${D.range.from}" oninput="D.range.from=this.value"><span class="sub">~</span><input class="in" style="width:80px" placeholder="끝층" value="${D.range.to}" oninput="D.range.to=this.value"><button class="btn sm" onclick="applyRange()">적용</button><span class="sub">지하층은 B1처럼 입력</span></div>` : ''}
+</div>
+    ${D.floors.length ? `<div class="fl-row fl-head"><span>층</span><span>범위</span><span>임대면적</span><span>도면</span><span></span><span></span></div>` + D.floors.map((f, i) => `<div class="fl-row"><span class="fn">${fmtF(f.floor)}</span>
+      ${D.leaseType === 'whole' ? '<span class="chip">전체</span>' : seg([['전체', '전체'], ['일부', '일부']], f.scope, `(s=>setScope(${i},s))`)}
+      <div class="ui"><input class="in" type="number" value="${f.area}" placeholder="0" oninput="D.floors[${i}].area=this.value===''?'':+this.value;syncTotal()"><span>㎡</span></div>
+      <select class="in" onchange="setPlan(${i},this.value)">${planOpts(f.planId)}</select>
+      ${f.scope === '일부' ? `<button class="btn sm ${f.poly ? '' : 'blue'}" ${f.planId ? '' : 'disabled'} onclick="openModal({type:'poly',fi:${i}})">${f.poly ? '✓ 영역 수정' : '영역 칠하기'}</button>` : '<span></span>'}<span></span></div>`).join('') : `<div class="sub">${D.leaseType === 'whole' ? '건물 층수 정보가 필요합니다' : '층 범위를 입력하세요'}</div>`}
+    ${D.floors.length ? `<div class="totals"><div><span>1층</span><b id="t1">${area1F(D.floors) != null ? nf(area1F(D.floors)) + '㎡' : '–'}</b></div><div><span>전체 임대면적</span><b id="tt">${nf(sumArea(D.floors))}㎡</b></div></div>` : ''}
+  </div>
+  <div class="panel a" style="--i:3"><h3>전용면적 <span class="sub">선택</span></h3><div class="fg">
+    <div class="f"><label>전용면적 합계</label><div class="ui"><input class="in" type="number" value="${D.exclArea ?? ''}" oninput="D.exclArea=this.value===''?null:+this.value"><span>㎡</span></div></div></div></div>
+  <div class="panel a" style="--i:4"><h3>조건</h3>
+    ${priceRow('deposit', '보증금', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
+    ${priceRow('rent', '월 임대료', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
+    ${priceRow('mgmt', '월 관리비', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
+    ${priceRow('keyMoney', '권리금', [['v', '금액'], ['none', '없음'], ['nego', '협의'], ['tbd', '미정']])}
+    ${priceRow('handover', '인도일', [['v', '날짜'], ['now', '즉시'], ['nego', '협의'], ['tbd', '미정']], true)}
+    <div class="f" style="margin-top:12px"><label>비고 (공개)</label><input class="in" value="${esc(D.note)}" oninput="D.note=this.value" placeholder="예: 렌트프리 3개월 협의 가능"></div></div>
+  <div class="panel a" style="--i:5"><h3>사진 <span class="sub">${D.photos.length}</span></h3><div class="thumbs">
+    ${D.photos.map((p, i) => `<div class="thumb" style="background-image:url('${p}')"><button onclick="rmPhoto(${i})">✕</button>${i === 0 ? '<em>대표</em>' : ''}</div>`).join('')}
+    <label class="add-tile">업로드<input type="file" accept="image/*" multiple onchange="addPhotos(this)"></label><div class="add-tile" onclick="addSamplePhoto()">샘플</div></div></div>
+  <div class="panel a" style="--i:6"><h3>도면 <span class="sub">${D.plans.length}</span></h3><div class="thumbs">
+    ${D.plans.map(p => `<div class="thumb plan" style="background-image:url('${p.src}')"><button onclick="rmPlan('${p.id}')">✕</button><em>${esc(p.name)}</em></div>`).join('')}
+    <label class="add-tile">업로드<input type="file" accept="image/*" multiple onchange="addPlans(this)"></label><div class="add-tile" onclick="addSamplePlan()">샘플</div></div></div>
+  <div class="panel a" style="--i:7"><h3>공개 · 담당</h3><div class="fg">
+    <div class="f"><label>공개 범위</label>${seg([['private', '🔒 나만'], ['shared', '전체 공유']], D.visibility, "(v=>{D.visibility=v;render()})")}</div>
+    <div class="f"><label>용역 시작</label><input class="in" type="date" value="${D.mStart}" oninput="D.mStart=this.value"></div>
+    <div class="f"><label>용역 종료</label><input class="in" type="date" value="${D.mEnd}" oninput="D.mEnd=this.value"></div></div></div>
+  <div class="panel internal a" style="--i:8"><h3>내부 전용 <span class="chip warn">클라이언트 비공개</span></h3><div class="fg">
+    <div class="f"><label>임대인</label><input class="in" value="${esc(D.internal.landlord)}" oninput="D.internal.landlord=this.value"></div>
+    <div class="f"><label>연락처</label><input class="in" value="${esc(D.internal.phone)}" oninput="D.internal.phone=this.value"></div>
+    <div class="f"><label>수수료</label><input class="in" value="${esc(D.internal.fee)}" oninput="D.internal.fee=this.value"></div>
+    <div class="f"><label>하한 조건</label><input class="in" value="${esc(D.internal.floor || '')}" oninput="D.internal.floor=this.value"></div></div>
+    <div class="f" style="margin-top:12px"><label>메모</label><textarea class="in" oninput="D.internal.memo=this.value">${esc(D.internal.memo)}</textarea></div></div>
+  <div class="sticky-foot"><button class="btn" onclick="D=null;render()">취소</button><button class="btn pri" onclick="saveListing()">${D.id ? '저장' : '등록'}</button></div>` : ''}`;
+}
+function searchRes(res) {
+  if (!D.q) return '';
+  if (!res.length) return `<div class="search-res"><button disabled><span class="sub">검색 결과 없음</span></button></div>`;
+  return `<div class="search-res">${res.map(x => `<button onclick="pickReg('${x.pnu}')"><div style="flex:1"><b>${esc(x.address)}</b><div class="sub">${esc(x.name || '—')} · PNU ${x.pnu}</div></div>${x.status === '준공' ? '<span class="chip ok">대장</span>' : x.status === '인허가' ? '<span class="chip warn">인허가</span>' : '<span class="chip red">정보없음</span>'}</button>`).join('')}</div>`;
+}
+function renderSearch() { const res = D.q ? REGISTRY.filter(x => x.address.replace(/\s/g, '').includes(D.q.replace(/\s/g, ''))) : []; $('#sr').innerHTML = searchRes(res); }
+function ensureBuilding(pnu) {
+  let B = S.buildings.find(b => b.pnu === pnu);
+  if (!B) { const r = REGISTRY.find(x => x.pnu === pnu); B = {id: uid('B'), ...clone(r)}; delete B.final; S.buildings.push(B); }
+  return B;
+}
+function saveListing() {
+  if (!D.pnu) return toast('건물을 선택하세요');
+  if (!D.floors.length) return toast('임대 범위를 지정하세요');
+  const noArea = D.floors.find(f => !(+f.area > 0));
+  if (noArea) return toast(`${fmtF(noArea.floor)} 임대면적을 입력하세요`);
+  D.leaseArea = sumArea(D.floors);
+  const miss = D.floors.find(f => f.scope === '일부' && !f.poly);
+  if (miss) return toast(`${fmtF(miss.floor)} 영역을 칠하세요`);
+  for (const k of ['deposit', 'rent', 'mgmt', 'keyMoney', 'handover']) if (D[k].s === 'v' && (D[k].v === '' || D[k].v == null)) return toast('금액/날짜가 비어 있습니다', '협의 또는 미정으로 바꿀 수 있습니다');
+  const B = ensureBuilding(D.pnu);
+  const data = clone(D); delete data.pnu; delete data.q; delete data.range; delete data.from;
+  data.buildingId = B.id;
+  let n;
+  if (!D.id) {
+    Object.assign(data, {id: uid('L'), ownerId: me(), status: 'active', upd: {}, grants: [], createdAt: stamp()});
+    S.listings.push(data);
+    if (D.from) { const src = getL(D.from); src.grants = (src.grants || []).filter(u => u !== me()); }
+    D = null; n = commit('매물 등록'); toast('등록 완료', B.status === '인허가' ? '인허가 정보 기준 · 대장 등록 시 자동 갱신' : '');
+  } else {
+    const L = getL(D.id);
+    PUB.forEach(k => { if (JSON.stringify(L[k] ?? null) !== JSON.stringify(data[k] ?? null)) data.upd[k] = stamp(); });
+    Object.assign(L, data);
+    D = null; n = commit('매물 수정');
+    toast('저장 완료', n ? `제안서 ${n}건 자동 재생성` : '클라이언트 페이지 변경 없음');
+  }
+  window.scrollTo({top: 0});
+}
+
+/* ---------- proposals ---------- */
+const linkOf = p => `https://p.cw-advisory.kr/${p.token}`;
+function propsView() {
+  const ps = S.proposals.filter(p => p.ownerId === me());
+  return `<div class="head"><h1>제안서</h1><span class="sub">${ps.length}건</span><div class="sp"></div><button class="btn pri" onclick="openModal({type:'newProp'})">+ 새 제안서</button></div>
+  <div class="grid">${ps.map((p, i) => { const ph = p.items.map(it => getL(it.listingId)).filter(Boolean).slice(0, 3);
+    return `<div class="card hov a" style="--i:${i}" onclick="openProp('${p.id}')"><div class="ph" style="display:grid;grid-template-columns:2fr 1fr;gap:2px;background:#ddd">${ph.map((L, j) => `<div style="background:url('${L.photos[0]}') center/cover;${j === 0 ? 'grid-row:span 2' : ''}"></div>`).join('')}</div>
+      <div class="bd"><div class="t">${esc(p.clientName)}</div><div class="ad">${esc(p.cover.region)}</div>
+      <div class="kv"><span>물건<b>${p.items.length}건</b></span><span>열람<b>${p.views.length}회</b></span><span>업데이트<b>${fmtStamp(p.genAt)}</b></span></div></div></div>`; }).join('') || '<div class="empty">제안서 없음</div>'}</div>`;
+}
+function openProp(id) { U.prop = id; render(); window.scrollTo({top: 0}); }
+function propEditor(p) {
+  const item = (it, i) => {
+    const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId);
+    return `<div class="panel a" style="--i:${i + 2};display:flex;gap:16px;${ok ? '' : 'opacity:.55'}">
+      <div style="width:120px;flex:none;border-radius:10px;background:url('${L.photos[0]}') center/cover;aspect-ratio:4/3"></div>
+      <div style="flex:1;min-width:0"><div class="row"><b>${esc(I.name)}</b><span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span>${L.ownerId !== me() ? `<span class="chip blue">${USERS[L.ownerId].name}</span>` : ''}${ok ? '' : '<span class="chip dark">제안 종료</span>'}<div class="sp"></div>
+        <button class="btn xs ghost" ${i === 0 ? 'disabled' : ''} onclick="moveItem('${p.id}',${i},-1)">↑</button><button class="btn xs ghost" ${i === p.items.length - 1 ? 'disabled' : ''} onclick="moveItem('${p.id}',${i},1)">↓</button><button class="btn xs ghost danger" onclick="rmItem('${p.id}',${i})">✕</button></div>
+        <textarea class="in" style="margin-top:8px;min-height:54px" placeholder="이 클라이언트를 위한 코멘트" onchange="setComment('${p.id}',${i},this.value)">${esc(it.comment)}</textarea></div></div>`;
+  };
+  return `<div class="head"><button class="btn ghost icon" onclick="U.prop=null;render()">←</button><h1>${esc(p.clientName)}</h1><span class="sub">업데이트 ${fmtStamp(p.genAt)}</span><div class="sp"></div>
+    <button class="btn" onclick="openModal({type:'preview',pid:'${p.id}'})">미리보기</button><button class="btn pri" onclick="copyLink('${p.id}')">링크 복사</button></div>
+  <div style="display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start">
+    <div>
+      <div class="panel a" style="--i:0"><h3>표지</h3><div class="fg">
+        <div class="f"><label>희망 지역</label><input class="in" value="${esc(p.cover.region)}" onchange="setCover('${p.id}','region',this.value)"></div>
+        <div class="f"><label>면적</label><input class="in" value="${esc(p.cover.size)}" onchange="setCover('${p.id}','size',this.value)"></div>
+        <div class="f"><label>입주 시기</label><input class="in" value="${esc(p.cover.moveIn)}" onchange="setCover('${p.id}','moveIn',this.value)"></div></div></div>
+      <div class="row a" style="--i:1;margin:20px 0 10px"><b>물건 ${p.items.length}</b><div class="sp"></div><button class="btn sm" onclick="openModal({type:'pick',pid:'${p.id}'})">+ 추가</button></div>
+      ${p.items.map(item).join('') || '<div class="empty">물건을 추가하세요</div>'}
+    </div>
+    <div>
+      <div class="panel a" style="--i:1"><h3>링크</h3>
+        <div class="in" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f7f7f4;word-break:break-all">${linkOf(p)}</div>
+        <div class="row" style="margin-top:12px"><div class="f" style="width:110px"><label>PIN</label><input class="in" value="${p.pin}" maxlength="4" onchange="setPin('${p.id}',this.value)" style="letter-spacing:4px;font-weight:700"></div><div class="sp"></div><button class="btn sm" style="align-self:flex-end" onclick="reissue('${p.id}')">재발급</button></div>
+        <div class="f" style="margin-top:12px"><label>유효기간</label><input class="in" disabled placeholder="다음 버전"></div></div>
+      <div class="panel a" style="--i:2"><h3>열람 <span class="chip">${p.views.length}</span></h3><div class="list">
+        ${p.views.slice().reverse().slice(0, 6).map(v => `<div class="li" style="padding:8px 0"><span class="sub">링크 열람</span><time>${fmtStamp(v.at)}</time></div>`).join('') || '<div class="sub">아직 없음</div>'}</div></div>
+      <div class="panel a" style="--i:3"><h3>재생성 이력</h3><div class="list">
+        ${S.log.filter(l => l.pid === p.id).slice(0, 6).map(l => `<div class="li" style="padding:8px 0"><span>${esc(l.reason)}</span><time>${fmtStamp(l.at)}</time></div>`).join('')}</div></div>
+    </div></div>`;
+}
+function setCover(pid, k, v) { getP(pid).cover[k] = v; const n = commit('표지 수정'); if (n) toast('클라이언트 페이지 갱신'); }
+function setComment(pid, i, v) { getP(pid).items[i].comment = v; const n = commit('코멘트 수정'); if (n) toast('코멘트 반영', '클라이언트 페이지 갱신'); }
+function setPin(pid, v) { if (!/^\d{4}$/.test(v)) { toast('PIN은 숫자 4자리'); return render(); } getP(pid).pin = v; save(); toast('PIN 변경'); }
+function moveItem(pid, i, d) { const it = getP(pid).items; [it[i], it[i + d]] = [it[i + d], it[i]]; commit('순서 변경'); }
+function rmItem(pid, i) { getP(pid).items.splice(i, 1); commit('물건 제외'); toast('제외됨'); }
+function addItem(pid, lid) {
+  const p = getP(pid), L = getL(lid);
+  if (p.items.some(x => x.listingId === lid)) return toast('이미 포함된 물건');
+  p.items.push({listingId: lid, comment: '', addedAt: stamp()});
+  if (L.ownerId !== me()) note(L.ownerId, `${USERS[me()].name}님이 <b>${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</b>를 ${esc(p.clientName)} 제안서에 추가했습니다`);
+  commit('물건 추가'); toast('추가됨', `${p.clientName} 제안서`);
+}
+function copyLink(pid) { const p = getP(pid); navigator.clipboard?.writeText(linkOf(p)); toast('링크 복사됨', `PIN ${p.pin}는 별도로 전달하세요`); }
+function reissue(pid) {
+  const p = getP(pid); p.oldTokens.push(p.token); p.token = mkToken();
+  S.msgs.push({client: p.clientId, pid: p.id, from: p.ownerId, token: p.token, at: stamp(), text: '링크가 재발급되었습니다. 이전 링크는 더 이상 열리지 않습니다.'});
+  save(); render(); toast('새 링크 발급', '이전 링크 즉시 차단');
+}
+function createProp(form) {
+  const c = form.client.value, name = c === 'clientA' ? CLIENTS.clientA : form.cname.value.trim();
+  if (!name) return toast('클라이언트명을 입력하세요');
+  const p = {id: uid('P'), ownerId: me(), clientId: c === 'clientA' ? 'clientA' : null, clientName: name,
+    cover: {region: form.region.value || '—', size: form.size.value || '—', moveIn: form.moveIn.value || '—'},
+    items: [], pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], snap: null, genAt: null, createdAt: stamp()};
+  S.proposals.unshift(p);
+  if (p.clientId) S.msgs.push({client: p.clientId, pid: p.id, from: me(), token: p.token, at: stamp(), text: '후보지 제안드립니다.'});
+  U.modal = null; renderModal(); commit('최초 발행'); openProp(p.id); toast('제안서 생성', `PIN ${p.pin}`);
+}
+
+/* ---------- notes / log ---------- */
+function notesView() {
+  const ns = S.notes.filter(n => n.to === me());
+  return `<div class="head"><h1>알림</h1></div><div class="panel"><div class="list">${ns.map((n, i) => `<div class="li a" style="--i:${i}"><span class="d ${n.read ? 'read' : ''}"></span><span>${n.text}</span><time>${fmtStamp(n.at)}</time></div>`).join('') || '<div class="empty">알림 없음</div>'}</div></div>`;
+}
+function logView() {
+  const ls = me() === 'admin' ? S.log : S.log.filter(l => l.owner === me());
+  return `<div class="head"><h1>발행 로그</h1><span class="sub">클라이언트 페이지 자동 재생성 기록</span></div>
+  <div class="panel"><table class="tbl"><thead><tr><th>시각</th><th>제안서</th>${me() === 'admin' ? '<th>담당</th>' : ''}<th>사유</th></tr></thead><tbody>
+  ${ls.slice(0, 60).map(l => `<tr><td style="font-variant-numeric:tabular-nums;white-space:nowrap">${fmtStamp(l.at)}</td><td><b>${esc(l.client)}</b></td>${me() === 'admin' ? `<td>${USERS[l.owner].name}</td>` : ''}<td>${esc(l.reason)}</td></tr>`).join('') || '<tr><td colspan="4" class="sub">기록 없음</td></tr>'}</tbody></table></div>`;
+}
+
+/* ---------- admin ---------- */
+function conflicts() {
+  const act = S.listings.filter(L => L.status === 'active'), out = [];
+  for (let i = 0; i < act.length; i++) for (let j = i + 1; j < act.length; j++) {
+    const a = act[i], b = act[j];
+    if (a.buildingId !== b.buildingId || a.ownerId === b.ownerId) continue;
+    const ov = a.floors.map(f => f.floor).filter(f => b.floors.some(g => g.floor === f));
+    if (ov.length) out.push({a, b, ov});
+  }
+  return out;
+}
+function adminView() {
+  const t = U.tab.admin;
+  if (t === 'over') return adminOver();
+  if (t === 'bld') return adminBld();
+  if (t === 'handover') return adminHand();
+  if (t === 'views') return adminViews();
+  if (t === 'log') return logView();
+}
+function adminOver() {
+  const act = S.listings.filter(L => L.status === 'active'), cf = conflicts();
+  const month = S.today.slice(0, 7), views = S.proposals.reduce((s, p) => s + p.views.filter(v => v.at.slice(0, 7) === month).length, 0);
+  const soon = act.filter(L => diffDays(L.mEnd, S.today) <= 30);
+  return `<div class="head"><h1>개요</h1></div>
+  <div class="stats">${[['진행 매물', act.length], ['공유 비율', Math.round(act.filter(l => l.visibility === 'shared').length / Math.max(act.length, 1) * 100) + '%'], ['제안서', S.proposals.length], ['이번 달 열람', views]].map(([l, v], i) => `<div class="stat a" style="--i:${i}"><span>${l}</span><b>${v}</b></div>`).join('')}</div>
+  <div class="panel a" style="--i:4"><h3>층 중복 <span class="chip ${cf.length ? 'warn' : 'ok'}">${cf.length}</span></h3>
+    ${cf.map(c => `<div class="conf"><span style="font-size:20px">⚠︎</span><div style="flex:1"><b>${esc(bInfo(c.a).name)}</b> · ${c.ov.join(', ')}F<div class="sub">${USERS[c.a.ownerId].name} (${esc(floorLabel(c.a.floors, c.a.leaseType))}, ${c.a.visibility === 'shared' ? '공유' : '나만'}) ↔ ${USERS[c.b.ownerId].name} (${esc(floorLabel(c.b.floors, c.b.leaseType))}, ${c.b.visibility === 'shared' ? '공유' : '나만'})</div></div><button class="btn sm" onclick="U.tab.admin='bld';U.open['${c.a.buildingId}']=true;render()">보기</button></div>`).join('') || '<div class="sub">중복 없음</div>'}</div>
+  <div class="panel a" style="--i:5"><h3>용역 만료 30일 이내 <span class="chip">${soon.length}</span></h3>
+    <table class="tbl"><tbody>${soon.map(L => `<tr><td><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span></td><td>${USERS[L.ownerId].name}</td><td class="num">${fmtDate(L.mEnd)}</td><td class="num"><span class="chip ${diffDays(L.mEnd, S.today) <= 14 ? 'warn' : ''}">D-${diffDays(L.mEnd, S.today)}</span></td></tr>`).join('') || '<tr><td class="sub">없음</td></tr>'}</tbody></table></div>`;
+}
+function adminBld() {
+  return `<div class="head"><h1>건물 · 매물</h1><span class="sub">${S.buildings.length}개 건물 · PNU 기준 통합</span></div>
+  ${S.buildings.map((B, i) => { const ls = S.listings.filter(L => L.buildingId === B.id), owners = new Set(ls.map(l => l.ownerId)); const open = U.open[B.id];
+    const name = B.name || ls[0]?.manual?.name || B.address;
+    return `<div class="panel a" style="--i:${i};padding:0;overflow:hidden">
+      <div class="row" style="padding:16px 20px;cursor:pointer" onclick="U.open['${B.id}']=!U.open['${B.id}'];render()">
+        <div style="width:54px;height:40px;border-radius:8px;background:url('${ls[0]?.photos[0] || ''}') center/cover #eee"></div>
+        <div style="flex:1"><div class="row"><b>${esc(name)}</b>${B.status === '준공' ? '<span class="chip ok">대장</span>' : B.status === '인허가' ? '<span class="chip warn">인허가</span>' : '<span class="chip red">정보없음</span>'}${owners.size > 1 ? `<span class="chip blue">브로커 ${owners.size}명</span>` : ''}</div><div class="sub">${esc(B.address)} · PNU ${B.pnu}</div></div>
+        <span class="chip">${ls.length}건</span><span class="sub" style="transition:transform .3s;transform:rotate(${open ? 180 : 0}deg)">⌄</span></div>
+      ${open ? `<div style="border-top:1px solid var(--line2);padding:6px 20px 14px;animation:fadeUp .3s var(--ease)"><table class="tbl"><thead><tr><th>범위</th><th>담당</th><th>공개</th><th>상태</th><th class="num">임대료</th><th>임대인 (내부)</th><th>메모 (내부)</th></tr></thead><tbody>
+        ${ls.map(L => `<tr><td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td></tr>`).join('')}</tbody></table></div>` : ''}</div>`; }).join('')}`;
+}
+function adminHand() {
+  const ls = S.listings.filter(L => L.status === 'expired' || L.status === 'withdrawn');
+  return `<div class="head"><h1>이관</h1><span class="sub">종료된 매물을 다른 브로커가 이어받도록 복사 권한 부여</span></div>
+  <div class="grid">${ls.map((L, i) => { const I = bInfo(L);
+    return `<div class="card a" style="--i:${i}"><div class="ph" style="background-image:url('${L.photos[0]}')"><div class="tags"><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span><span class="chip">${USERS[L.ownerId].name}</span></div></div>
+    <div class="bd"><div class="t">${esc(I.name)}</div><div class="ad">${esc(I.address)} · ${esc(floorLabel(L.floors, L.leaseType))}</div><div class="kv"><span>용역 종료<b>${fmtDate(L.mEnd)}</b></span><span>도면<b>${L.plans.length}</b></span><span>사진<b>${L.photos.length}</b></span></div></div>
+    <div class="ft">${Object.keys(USERS).filter(u => u !== 'admin' && u !== L.ownerId).map(u => (L.grants || []).includes(u) ? `<span class="chip ok">✓ ${USERS[u].name} 권한</span>` : `<button class="btn sm" onclick="grant('${L.id}','${u}')">${USERS[u].name}에게 이관</button>`).join('')}</div></div>`; }).join('') || '<div class="empty">종료된 매물 없음</div>'}</div>`;
+}
+function grant(lid, u) { const L = getL(lid); L.grants = [...(L.grants || []), u]; note(u, `<b>${esc(bInfo(L).name)}</b> 이전 매물 복사 권한을 받았습니다`); save(); render(); toast('이관 권한 부여', USERS[u].name); }
+function adminViews() {
+  const rows = S.proposals.flatMap(p => p.views.map(v => ({...v, p}))).sort((a, b) => b.at.localeCompare(a.at));
+  return `<div class="head"><h1>열람</h1><span class="sub">링크 단위 기록</span></div><div class="panel"><table class="tbl"><thead><tr><th>시각</th><th>클라이언트</th><th>담당</th></tr></thead><tbody>
+  ${rows.map(r => `<tr><td style="font-variant-numeric:tabular-nums">${fmtStamp(r.at)}</td><td><b>${esc(r.p.clientName)}</b></td><td>${USERS[r.p.ownerId].name}</td></tr>`).join('') || '<tr><td class="sub">없음</td></tr>'}</tbody></table></div>`;
+}
+
+/* ---------- client ---------- */
+function clientView() {
+  const c = U.client;
+  if (c.token) {
+    const p = S.proposals.find(x => x.token === c.token || x.oldTokens.includes(c.token));
+    if (!p || p.oldTokens.includes(c.token)) return `<div class="gate"><div class="card a"><div class="lock" style="background:var(--danger-soft);color:var(--danger)">⦸</div><h2 style="margin:0 0 6px">만료된 링크</h2><p class="sub">이 링크는 더 이상 사용할 수 없습니다.<br>담당 브로커에게 최신 링크를 요청하세요.</p><button class="btn" style="margin-top:14px" onclick="U.client={};render()">돌아가기</button></div></div>`;
+    if (!c.ok) return `<div class="gate"><div class="card a" id="gc"><div class="lock">🔒</div><h2 style="margin:0 0 4px">${esc(p.clientName)} 제안서</h2><p class="sub" style="margin:0">담당 브로커에게 받은 PIN 4자리</p>
+      <div class="pin">${[0, 1, 2, 3].map(i => `<input inputmode="numeric" maxlength="1" oninput="pinIn(this,${i})" onkeydown="if(event.key==='Backspace'&&!this.value&&this.previousElementSibling)this.previousElementSibling.focus()">`).join('')}</div>
+      <button class="btn ghost sm" onclick="U.client={};render()">취소</button></div></div>`;
+    return clientPage(p.snap, p.genAt, linkOf(p));
+  }
+  const ms = S.msgs.filter(m => m.client === 'clientA').slice().reverse();
+  return `<div class="main" style="max-width:720px;margin:0 auto"><div class="head"><h1>받은 메시지</h1><span class="sub">${CLIENTS.clientA} · 총무팀</span></div>
+    ${ms.map((m, i) => `<div class="mail a" style="--i:${i}" onclick="openLink('${m.token}')"><div class="av">${USERS[m.from].name[0]}</div><div style="flex:1;min-width:0"><div class="row"><b>${USERS[m.from].name}</b><span class="sub">C&amp;W Advisory</span><div class="sp"></div><span class="sub">${fmtStamp(m.at)}</span></div><div style="margin-top:4px">${esc(m.text)}</div><div class="url">https://p.cw-advisory.kr/${m.token}</div></div></div>`).join('')}</div>`;
+}
+function openLink(t) { U.client = {token: t, ok: false}; U.page = 0; render(); setTimeout(() => document.querySelector('.pin input')?.focus(), 50); window.scrollTo({top: 0}); }
+function pinIn(el, i) {
+  el.value = el.value.replace(/\D/g, '');
+  if (el.value && el.nextElementSibling) el.nextElementSibling.focus();
+  const ins = [...document.querySelectorAll('.pin input')], v = ins.map(x => x.value).join('');
+  if (v.length < 4) return;
+  const p = S.proposals.find(x => x.token === U.client.token);
+  if (v === p.pin) { p.views.push({at: stamp()}); save(); U.client.ok = true; render(); }
+  else { const g = $('#gc'); g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake'); ins.forEach(x => x.value = ''); ins[0].focus(); }
+}
+
+/* ---------- modals ---------- */
+function openModal(m) { U.modal = m; if (m.type === 'preview') U.page = 0; if (m.type === 'poly') m.pts = clone(D.floors[m.fi].poly || []); renderModal(); }
+function closeModal() { U.modal = null; renderModal(); }
+function renderModal() {
+  const m = U.modal, root = $('#modal-root');
+  if (!m) { root.innerHTML = ''; return; }
+  let h = '';
+  if (m.type === 'poly') {
+    const f = D.floors[m.fi], plan = D.plans.find(p => p.id === f.planId);
+    const pts = m.pts.map(p => p.join(',')).join(' ');
+    h = `<div class="modal wide"><div class="mh"><b>${f.floor}F 임대 영역</b><span class="sub">클릭해서 꼭짓점 추가</span><div class="sp"></div>
+      <button class="btn sm ghost" onclick="U.modal.pts.pop();renderModal()" ${m.pts.length ? '' : 'disabled'}>되돌리기</button><button class="btn sm ghost" onclick="U.modal.pts=[];renderModal()">초기화</button><button class="btn sm pri" onclick="savePoly()" ${m.pts.length >= 3 ? '' : 'disabled'}>완료</button></div>
+      <div class="mb"><div class="stage" onclick="polyClick(event)"><img src="${plan.src}" draggable="false"><svg viewBox="0 0 1 1" preserveAspectRatio="none">${m.pts.length >= 2 ? `<polygon class="poly" vector-effect="non-scaling-stroke" points="${pts}"/>` : ''}</svg>${m.pts.map((p, i) => `<span class="pt ${i === 0 ? 'first' : ''}" style="left:${p[0] * 100}%;top:${p[1] * 100}%"></span>`).join('')}</div></div></div>`;
+  } else if (m.type === 'pick') {
+    const p = getP(m.pid), avail = S.listings.filter(L => live(L, me()) && !p.items.some(x => x.listingId === L.id));
+    h = `<div class="modal"><div class="mh"><b>물건 추가</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
+      ${avail.map(L => `<div class="pick"><div class="pi" style="background-image:url('${L.photos[0]}')"></div><div style="flex:1"><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span><div class="pick-kv"><span>1층 <b>${area1F(L.floors) != null ? nf(area1F(L.floors)) + '㎡' : '–'}</b></span><span>전체 <b>${nf(L.leaseArea)}㎡</b></span><span>임대료 <b>${priceShort(L.rent)}</b></span>${L.ownerId !== me() ? `<span>담당 <b>${USERS[L.ownerId].name}</b></span>` : ''}</div></div><button class="btn sm" onclick="addItem('${p.id}','${L.id}');renderModal()">추가</button></div>`).join('') || '<div class="empty">추가할 물건 없음</div>'}</div></div>`;
+  } else if (m.type === 'toProp') {
+    const ps = S.proposals.filter(p => p.ownerId === me()), L = getL(m.lid);
+    h = `<div class="modal"><div class="mh"><b>${esc(bInfo(L).name)} → 제안서</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
+      ${ps.map(p => { const has = p.items.some(x => x.listingId === m.lid); return `<div class="pick"><div style="flex:1"><b>${esc(p.clientName)}</b><div class="sub">${p.items.length}건</div></div>${has ? '<span class="chip ok">포함됨</span>' : `<button class="btn sm" onclick="addItem('${p.id}','${m.lid}');renderModal()">추가</button>`}</div>`; }).join('') || '<div class="empty">제안서가 없습니다</div>'}
+      <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'newProp'})">+ 새 제안서</button></div></div>`;
+  } else if (m.type === 'newProp') {
+    h = `<div class="modal"><div class="mh"><b>새 제안서</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>
+      <form class="mb" onsubmit="event.preventDefault();createProp(this)"><div class="fg" style="grid-template-columns:1fr 1fr">
+      <div class="f"><label>클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value==='clientA'"><option value="clientA">한빛테크 (클라이언트A)</option><option value="other">직접 입력</option></select></div>
+      <div class="f"><label>클라이언트명</label><input class="in" name="cname" disabled placeholder="회사명"></div>
+      <div class="f"><label>희망 지역</label><input class="in" name="region" placeholder="성수 · 강남"></div>
+      <div class="f"><label>면적</label><input class="in" name="size" placeholder="1,000–1,500㎡"></div>
+      <div class="f"><label>입주 시기</label><input class="in" name="moveIn" placeholder="2027년 상반기"></div></div>
+      <div class="row" style="justify-content:flex-end;margin-top:18px"><button type="button" class="btn" onclick="closeModal()">취소</button><button class="btn pri">생성</button></div></form></div>`;
+  } else if (m.type === 'detail') {
+    const L = getL(m.lid);
+    const own = L.ownerId === me();
+    h = `<div class="modal full"><div class="mh" style="background:#fbfbf9"><b>제안서 미리보기</b><span class="sub">클라이언트에게 보이는 화면</span><div class="sp"></div>${unitBar()}
+      ${own ? `<button class="btn sm" onclick="closeModal();editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
+      <div class="cp"><div class="cp-wrap" style="padding-top:28px">${listingPage(projItem(L, null, L.ownerId), 0, 0, S.fx)}</div></div></div>`;
+  } else if (m.type === 'preview') {
+    const p = getP(m.pid);
+    h = `<div class="modal full"><div class="mh" style="background:#fff"><b>클라이언트 화면</b><span class="sub">${linkOf(p)}</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>${clientPage(p.snap, p.genAt)}</div>`;
+  }
+  root.innerHTML = `<div class="back" onclick="if(event.target===this)closeModal()">${h}</div>`;
+}
+function polyClick(e) {
+  const r = e.currentTarget.getBoundingClientRect();
+  U.modal.pts.push([+((e.clientX - r.left) / r.width).toFixed(4), +((e.clientY - r.top) / r.height).toFixed(4)]);
+  renderModal();
+}
+function savePoly() { D.floors[U.modal.fi].poly = U.modal.pts; U.modal = null; renderModal(); render(); toast('영역 저장'); }
+
+/* ---------- toast ---------- */
+function toast(t, s) {
+  const el = document.createElement('div'); el.className = 'toast'; el.innerHTML = `${esc(t)}${s ? `<small>${esc(s)}</small>` : ''}`;
+  $('#toasts').appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, 2800);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && U.modal) return closeModal();
+  if (e.target.closest('input,textarea,select')) return;
+  const onClient = U.modal?.type === 'preview' || (U.role === 'clientA' && U.client.ok && !U.modal);
+  if (!onClient || !document.querySelector('.ptabs')) return;
+  const n = document.querySelectorAll('.ptab').length - 1;
+  if (e.key === 'ArrowRight' && U.page < n) goPage(U.page + 1);
+  if (e.key === 'ArrowLeft' && U.page > 0) goPage(U.page - 1);
+});
+
+if (!S) { S = seed(); commitSilent('최초 발행'); }
+save(); render();
+</script>
+</body>
+</html>
