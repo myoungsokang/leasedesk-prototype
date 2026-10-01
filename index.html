@@ -496,6 +496,76 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 .pk-kv{grid-template-columns:repeat(4,1fr)!important}
 .pk-kv b{font-size:14px!important}.pk-kv small{font-size:11px;color:var(--muted)}
 .print-only{display:none}
+/* response */
+.resp{border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:18px;background:#fff;transition:border-color .3s,background .3s}
+.resp.r-yes{border-color:#9fd6bd;background:#f4fbf7}.resp.r-hold{border-color:#efd59a;background:#fffbf0}.resp.r-no{border-color:#e4c6c5;background:#fdf6f6}
+.resp-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.resp-top b{display:block;font-size:15px}.resp-top .sub{display:block;margin-top:2px}
+.resp-btns{display:flex;gap:6px}
+.rb{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:8px 14px;font-weight:600;font-size:13px;color:var(--ink2);transition:all .2s var(--ease)}
+.rb:hover{transform:translateY(-1px);border-color:#cfccc3}
+.rb[disabled]{opacity:.5;pointer-events:none}
+.rb-yes.on{background:var(--ok);border-color:var(--ok);color:#fff}.rb-hold.on{background:#c98500;border-color:#c98500;color:#fff}.rb-no.on{background:var(--danger);border-color:var(--danger);color:#fff}
+.rb.on{animation:pop .3s var(--ease)}
+.resp-c{margin-top:12px}.resp-c .in{background:rgba(255,255,255,.8)}
+.resp-tour{display:flex;align-items:center;gap:6px;margin-top:12px;flex-wrap:wrap}
+.chip.rc-yes{background:var(--ok-soft);color:var(--ok)}.chip.rc-hold{background:var(--warn-soft);color:var(--warn)}.chip.rc-no{background:var(--danger-soft);color:var(--danger)}
+.pk-ph .chip.rc-yes,.pk-ph .chip.rc-hold,.pk-ph .chip.rc-no{position:absolute;right:10px;top:10px}
+.r-line{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;padding:8px 10px;background:#f7f7f4;border-radius:10px}
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.day{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:8px 0;display:flex;flex-direction:column;align-items:center;gap:1px;transition:all .2s var(--ease)}
+.day span{font-size:11px;color:var(--muted)}.day b{font-size:18px}.day small{font-size:10.5px;color:var(--muted)}
+.day.on{background:var(--ink);border-color:var(--ink);color:#fff}.day.on span,.day.on small{color:#cfcdc6}
+.chk{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px}
+/* calc */
+.calc-in{display:flex;gap:24px;margin-bottom:14px;flex-wrap:wrap}
+.stepper{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.stepper button{border:0;background:#f4f3ef;width:34px;height:32px;font-size:16px;transition:background .2s}.stepper button:hover{background:#e9e8e3}
+.stepper b{min-width:64px;text-align:center;font-size:13.5px}
+.ctbl tr.tot td{border-top:1px solid var(--ink)}
+.ctbl tr.hi td{background:var(--accent-soft)}.ctbl tr.hi td:first-child{border-radius:10px 0 0 10px;padding-left:10px}.ctbl tr.hi td:last-child{border-radius:0 10px 10px 0}
+.ctbl tr.hi .val b{color:var(--accent-2);font-size:16px}
+.th-s{display:block;font-weight:500;font-size:10.5px;color:var(--muted)}
+/* cover map */
+.cvm{margin-bottom:40px}
+.cvm-box{display:grid;grid-template-columns:1fr 280px;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#fff;isolation:isolate}
+.cvmap{height:400px}
+.cvm-list{padding:14px;display:flex;flex-direction:column;gap:6px;border-left:1px solid var(--line2)}
+.cvm-hq{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;background:#f7f7f4}
+.cvm-hq i{font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center}
+.cvm-hq b,.cvm-i b{display:block;font-size:13.5px}.cvm-hq span,.cvm-i span{font-size:11.5px;color:var(--muted)}
+.cvm-i{display:flex;gap:10px;align-items:center;border:0;background:transparent;padding:8px 10px;border-radius:12px;text-align:left;transition:background .2s}
+.cvm-i:hover{background:#f7f7f4}
+.cvm-i .n{width:28px;height:28px;border-radius:50%;background:var(--c);color:#fff;font-weight:800;font-size:11.5px;display:flex;align-items:center;justify-content:center;flex:none}
+.npin{transform:translate(-14px,-14px);display:inline-flex;align-items:center;gap:6px;cursor:pointer;white-space:nowrap}
+.npin b{width:28px;height:28px;border-radius:50%;background:var(--c);color:#fff;font-size:11.5px;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.3);transition:transform .2s}
+.npin:hover b{transform:scale(1.15)}
+.npin span{background:#fff;font-weight:700;font-size:12px;padding:3px 8px;border-radius:7px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.hqpin{transform:translate(-15px,-15px);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.hqpin i{font-style:normal;width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.hqpin span{color:var(--ink);background:#fff;font-weight:700;font-size:12px;padding:3px 8px;border-radius:7px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+/* expiry */
+.exp-bk{display:flex;flex-direction:column;gap:2px;margin-top:14px;padding:12px;border-radius:12px;background:#f7f7f4;font-size:13px}.exp-bk span{color:var(--ink2)}
+/* analytics */
+.pv-sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.pv-sum div{background:#f7f7f4;border-radius:10px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}
+.pv-sum span{font-size:11px;color:var(--muted)}.pv-sum b{font-size:14px}
+.pv-r{display:grid;grid-template-columns:110px 1fr 70px;gap:8px;align-items:center;padding:5px 0;font-size:12.5px}
+.pv-l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink2)}
+.pv-b{height:8px;background:#f1f0ec;border-radius:4px;overflow:hidden}.pv-b i{display:block;height:100%;width:var(--w);background:var(--accent);border-radius:4px;animation:grow .9s var(--ease) both}
+.pv-v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}.pv-v small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+/* history timeline */
+.tl{position:relative;padding-left:18px}
+.tl::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl-i{position:relative;padding:0 0 16px;animation:fadeUp .45s var(--ease) both;animation-delay:calc(var(--i)*40ms)}
+.tl-d{position:absolute;left:-18px;top:6px;width:12px;height:12px;border-radius:50%;background:#fff;border:2.5px solid var(--accent)}
+.tl-b{background:#fff;border:1px solid var(--line2);border-radius:12px;padding:10px 14px}
+.tl-b time{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.av{width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.tl-c{margin-top:8px;display:flex;flex-direction:column;gap:4px}
+.ch{display:grid;grid-template-columns:120px max-content 18px 1fr;gap:8px;align-items:baseline;font-size:13px;padding:6px 8px;background:#f7f7f4;border-radius:8px}
+.ch-k{color:var(--muted);font-size:12px}.ch-k i{font-style:normal;font-size:10px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:5px;padding:0 5px;margin-left:5px}
+.ch-f{color:var(--muted);text-decoration:line-through}.ch-a{color:var(--muted)}.ch-t{font-weight:600}
 .xa{margin-bottom:40px}
 .xt td{vertical-align:middle}
 .xb{display:flex;flex-direction:column;gap:5px;min-width:110px}
@@ -512,6 +582,8 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 .fp-grid line{stroke:#ecebe6;stroke-width:.08}
 .fp-s polygon{fill:var(--c);fill-opacity:.1;stroke:var(--c);stroke-width:2.2;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill-opacity .25s}
 .fp-s:hover polygon{fill-opacity:.3}
+.fp-s.withimg polygon{fill-opacity:.16}
+.fp .row .seg+.seg{margin-left:6px}
 .fp-svg .fp-s{animation:fadeIn .6s ease both}
 .fp-leg{display:flex;flex-direction:column;gap:12px;justify-content:center}
 .fp-li{display:flex;gap:10px;align-items:flex-start}
@@ -572,7 +644,7 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 /* =========================================================
    LeaseDesk prototype — single file, in-memory + localStorage
    ========================================================= */
-const KEY = 'leasedesk-proto-v3';
+const KEY = 'leasedesk-proto-v4';
 const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -697,6 +769,50 @@ function retailPlan(title, sub, street, upper) {
   return svgURL(s + '</svg>');
 }
 
+/* plan drawn from a real outline (meters) — keeps scale info for same-scale comparison */
+function inPoly(x, y, pts) { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) c = !c; } return c; }
+function shapePlan(o) {
+  const {title, sub, street, outline, front = [], upper} = o, k = '#1b1b1b';
+  const W = Math.max(...outline.map(p => p[0])), H = Math.max(...outline.map(p => p[1]));
+  const s = Math.min(740 / W, 390 / H), ox = 130 + (740 - W * s) / 2, oy = 96 + (390 - H * s) / 2;
+  const P = ([x, y]) => [ox + x * s, oy + y * s], pts = outline.map(P), f1 = v => v.toFixed(1);
+  const ps = pts.map(p => p.map(f1).join(',')).join(' ');
+  let g = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" font-family="Helvetica,Arial,sans-serif"><rect width="1000" height="640" fill="#fff"/>`;
+  g += `<polygon points="${ps}" fill="#fff" stroke="${k}" stroke-width="6" stroke-linejoin="miter"/>`;
+  const inside = (x, y) => inPoly(x, y, outline);
+  front.forEach((ei, n) => {
+    const a = pts[ei], b = pts[(ei + 1) % pts.length], len = Math.hypot(b[0] - a[0], b[1] - a[1]), ux = (b[0] - a[0]) / len, uy = (b[1] - a[1]) / len;
+    let nx = -uy, ny = ux; const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    if (!inside((mid[0] + nx * 8 - ox) / s, (mid[1] + ny * 8 - oy) / s)) { nx = -nx; ny = -ny; }
+    g += `<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}" stroke="#fff" stroke-width="7"/>`;
+    [-2, 2].forEach(d => { g += `<line x1="${f1(a[0] + nx * d)}" y1="${f1(a[1] + ny * d)}" x2="${f1(b[0] + nx * d)}" y2="${f1(b[1] + ny * d)}" stroke="${k}" stroke-width="1"/>`; });
+    for (let t = 0; t <= len + .1; t += 2.4 * s) g += `<circle cx="${f1(a[0] + ux * t)}" cy="${f1(a[1] + uy * t)}" r="2.6" fill="${k}"/>`;
+    if (!upper && n === front.length - 1) {
+      const dw = 1.8 * s, c1 = [mid[0] - ux * dw, mid[1] - uy * dw], c2 = [mid[0] + ux * dw, mid[1] + uy * dw];
+      g += `<line x1="${f1(c1[0])}" y1="${f1(c1[1])}" x2="${f1(c2[0])}" y2="${f1(c2[1])}" stroke="#fff" stroke-width="5"/>`;
+      [[c1, 1], [c2, -1]].forEach(([c, sg]) => { const e = [c[0] + nx * dw, c[1] + ny * dw], m2 = [c[0] + ux * dw * sg, c[1] + uy * dw * sg];
+        g += `<path d="M${f1(c[0])} ${f1(c[1])} L${f1(e[0])} ${f1(e[1])} M${f1(m2[0])} ${f1(m2[1])} A${f1(dw)} ${f1(dw)} 0 0 ${sg > 0 ? (nx * uy - ny * ux > 0 ? 1 : 0) : (nx * uy - ny * ux > 0 ? 0 : 1)} ${f1(e[0])} ${f1(e[1])}" fill="none" stroke="#666" stroke-width=".8"/>`; });
+      g += `<text x="${f1(mid[0] - nx * 18)}" y="${f1(mid[1] - ny * 18 + 3)}" font-size="9" text-anchor="middle" font-weight="700" fill="#333">주출입구</text>`;
+    }
+  });
+  for (let x = 5.5; x < W; x += 6.2) for (let y = 4.8; y < H; y += 5.6) if ([[0, 0], [-1.4, 0], [1.4, 0], [0, -1.4], [0, 1.4]].every(([a, b]) => inside(x + a, y + b))) { const [px, py] = P([x, y]); g += `<rect x="${f1(px - 6)}" y="${f1(py - 6)}" width="12" height="12" fill="${k}"/>`; }
+  const st = P([.5, .5]), sw = 2.4 * s, sh = 4.8 * s;
+  g += `<rect x="${f1(st[0])}" y="${f1(st[1])}" width="${f1(sw)}" height="${f1(sh)}" fill="#fff" stroke="${k}" stroke-width="1.4"/><line x1="${f1(st[0] + sw / 2)}" y1="${f1(st[1] + 4)}" x2="${f1(st[0] + sw / 2)}" y2="${f1(st[1] + sh - 4)}" stroke="${k}"/>`;
+  for (let y = st[1] + 8; y < st[1] + sh - 4; y += Math.max(4, .28 * s)) g += `<line x1="${f1(st[0] + 2)}" y1="${f1(y)}" x2="${f1(st[0] + sw - 2)}" y2="${f1(y)}" stroke="#777" stroke-width=".5"/>`;
+  const wc = P([3.3, .5]), ww = 2.6 * s, wh = 2.2 * s;
+  g += `<rect x="${f1(wc[0])}" y="${f1(wc[1])}" width="${f1(ww)}" height="${f1(wh)}" fill="#fff" stroke="${k}" stroke-width="1.2"/><ellipse cx="${f1(wc[0] + ww * .3)}" cy="${f1(wc[1] + wh * .4)}" rx="${f1(Math.min(ww, wh) * .14)}" ry="${f1(Math.min(ww, wh) * .2)}" fill="none" stroke="#777" stroke-width=".7"/><text x="${f1(wc[0] + ww / 2)}" y="${f1(wc[1] + wh + 10)}" font-size="7.5" text-anchor="middle" fill="#555">WC</text>`;
+  const cx = outline.reduce((a, p) => a + p[0], 0) / outline.length, cy = outline.reduce((a, p) => a + p[1], 0) / outline.length, cc = P([cx, cy]);
+  g += `<text x="${f1(cc[0])}" y="${f1(cc[1])}" font-size="13" text-anchor="middle" fill="#a3a3a3" letter-spacing="4">${upper ? '매 장 / 사 무' : '매 장'}</text>`;
+  const L0 = P([0, 0]), R0 = P([W, 0]), B0 = P([0, H]);
+  g += `<line x1="${f1(L0[0])}" y1="${f1(L0[1] - 30)}" x2="${f1(R0[0])}" y2="${f1(R0[1] - 30)}" stroke="#777" stroke-width=".6"/><text x="${f1((L0[0] + R0[0]) / 2)}" y="${f1(L0[1] - 34)}" font-size="9" text-anchor="middle" fill="#555">${nf(W * 1000)}</text>`;
+  g += `<line x1="${f1(L0[0] - 30)}" y1="${f1(L0[1])}" x2="${f1(B0[0] - 30)}" y2="${f1(B0[1])}" stroke="#777" stroke-width=".6"/><text x="${f1(L0[0] - 36)}" y="${f1((L0[1] + B0[1]) / 2)}" font-size="9" text-anchor="middle" fill="#555" transform="rotate(-90 ${f1(L0[0] - 36)} ${f1((L0[1] + B0[1]) / 2)})">${nf(H * 1000)}</text>`;
+  if (!upper && street) g += `<text x="500" y="${f1(oy + H * s + 52)}" font-size="11" text-anchor="middle" fill="#888" letter-spacing="4">${esc(street)}</text><line x1="90" y1="${f1(oy + H * s + 30)}" x2="910" y2="${f1(oy + H * s + 30)}" stroke="#bbb" stroke-width=".8"/>`;
+  g += `<g transform="translate(952,48)"><circle r="14" fill="none" stroke="#555" stroke-width=".8"/><path d="M0 -12 L5 6 L0 2 L-5 6Z" fill="${k}"/><text y="-17" font-size="8" text-anchor="middle" font-weight="700">N</text></g>`;
+  g += `<g transform="translate(700,582)"><rect width="230" height="46" fill="#fff" stroke="${k}"/><line x1="0" y1="26" x2="230" y2="26" stroke="${k}" stroke-width=".6"/><text x="10" y="18" font-size="11" font-weight="700">${esc(title)}</text><text x="10" y="39" font-size="8.5" fill="#555">${esc(sub)}</text><text x="220" y="39" font-size="8.5" fill="#555" text-anchor="end">${nf(W, 1)} × ${nf(H, 1)}m</text></g>`;
+  return {src: svgURL(g + '</svg>'), geo: {s, ox, oy, outline}};
+}
+const toNorm = (geo, poly) => poly.map(([x, y]) => [+((geo.ox + x * geo.s) / 1000).toFixed(4), +((geo.oy + y * geo.s) / 640).toFixed(4)]);
+
 /* ---------- public data (mock APIs) ---------- */
 const REGISTRY = [
   {pnu: '1168010700105320001', lat: 37.5205, lng: 127.0229, stn: ['신사역', 37.5163, 127.0203], address: '서울 강남구 압구정로10길 24', name: '가로수 24', use: '제2종 근린생활시설', above: 4, below: 1, gfa: 1120, year: 2014, status: '준공', area: 'sinsa'},
@@ -787,14 +903,35 @@ function P(s, v) { return v === undefined ? {s} : {s, v}; }
 function seed() {
   const b = REGISTRY.filter(r => r.status !== '인허가').map((r, i) => ({id: 'B' + (i + 1), ...clone(r)}));
   const B = pnu => b.find(x => x.pnu === pnu).id;
-  const pl = (id, name, src) => ({id, name, src});
-  const rightHalf = [[.5, .11], [.86, .11], [.86, .703], [.5, .703]];
-  const frontLeft = [[.14, .38], [.47, .38], [.47, .703], [.14, .703]];
+  const pl = (id, name, sp) => ({id, name, src: sp.src, geo: sp.geo});
   const F = (floor, area, planId, scope = '전체', poly = null) => ({floor, area, scope, planId, poly});
+  const O = {
+    garosu: [[0, 0], [17.5, 0], [17.5, 7.2], [15, 9.8], [0, 9.8]],
+    garosuB1: [[0, 0], [17.5, 0], [17.5, 12], [0, 12]],
+    hannam: [[0, 0], [11, 0], [11, 6], [16, 6], [16, 14], [0, 14]],
+    myeong: [[0, 0], [8, 0], [8, 4], [9.5, 4], [9.5, 23], [0, 23]],
+    yeonmu: [[0, 0], [25, 0], [26.5, 16.5], [1.5, 17.5]],
+    eulji: [[0, 0], [6.5, 0], [6.5, 14.6], [0, 14.6]],
+    pangyo: [[0, 0], [20, 0], [20, 9], [17, 12.5], [0, 12.5]],
+  };
+  const sp = (title, sub, street, outline, front, upper) => shapePlan({title, sub, street, outline, front, upper});
+  const g1 = sp('가로수 24 1층 평면도', '1F · 임대 165㎡', '압 구 정 로 10 길', O.garosu, [2, 3]);
+  const g2 = sp('가로수 24 2층 평면도', '2F · 임대 172㎡', '', O.garosu, [2, 3], true);
+  const gb = sp('가로수 24 지하1층 평면도', 'B1 · 임대 210㎡', '', O.garosuB1, [], true);
+  const y1 = sp('연무장 45 1층 평면도', '1F · 임대 412㎡', '연 무 장 길', O.yeonmu, [2]);
+  const yu = sp('연무장 45 B1·2–5층 평면도', '층별 300–405㎡', '', O.yeonmu, [2], true);
+  const h1 = sp('한남 234 1층 평면도', '1F 일부 · 임대 118㎡', '이 태 원 로', O.hannam, [4]);
+  const h2 = sp('한남 234 2층 평면도', '2F · 임대 142㎡', '', O.hannam, [4], true);
+  const m1 = sp('명동 17 1층 평면도', '1F · 임대 210㎡', '명 동 8 길', O.myeong, [4]);
+  const mu = sp('명동 17 2–3층 평면도', '층별 198㎡', '', O.myeong, [4], true);
+  const e1 = sp('을지로 157 1층 평면도', '1F · 임대 95㎡', '을 지 로', O.eulji, [2]);
+  const p1 = sp('판교 166 1층 평면도', '1F · 임대 245㎡', '판 교 역 로', O.pangyo, [2, 3]);
+  const hannamPart = toNorm(h1.geo, [[0, 6.6], [16, 6.6], [16, 14], [0, 14]]);
+  const yeonPart = toNorm(y1.geo, [[15.6, 0], [25, 0], [26.5, 16.5], [16.4, 16.9]]);
   const L = [
     {id: 'L1', buildingId: B('1168010700105320001'), ownerId: 'brokerA', visibility: 'shared', status: 'active', leaseType: 'partial',
       floors: [F(1, 165, 'p1a'), F(2, 172, 'p1b')],
-      plans: [pl('p1a', '1층', retailPlan('가로수 24 1층 평면도', '1F · 임대 165㎡', '압 구 정 로 10 길')), pl('p1b', '2층', retailPlan('가로수 24 2층 평면도', '2F · 임대 172㎡', '', true))],
+      plans: [pl('p1a', '1층', g1), pl('p1b', '2층', g2)],
       photos: [PH.shopFront, PH.apparel, PH.apparel2, PH.shopLoft],
       exclArea: null, deposit: P('v', 300000000), rent: P('v', 28000000), mgmt: P('v', 1800000), keyMoney: P('nego'), handover: P('v', '2027-01-02'),
       note: '가로수길 메인 동선 코너 · 전면 폭 11m', mStart: '2026-07-01', mEnd: '2027-06-30',
@@ -802,22 +939,22 @@ function seed() {
       upd: {rent: '2026-09-28T15:20:00'}, grants: [], createdAt: '2026-07-03T09:00:00'},
     {id: 'L2', buildingId: B('1120011400106450002'), ownerId: 'brokerA', visibility: 'private', status: 'active', leaseType: 'whole',
       floors: [F(-1, 380, 'p2u'), F(1, 412, 'p2a'), F(2, 405, 'p2u'), F(3, 405, 'p2u'), F(4, 380, 'p2u'), F(5, 300, 'p2u')],
-      plans: [pl('p2a', '1층', retailPlan('연무장 45 1층 평면도', '1F · 임대 412㎡', '연 무 장 길')), pl('p2u', '2–5층', retailPlan('연무장 45 2–5층 평면도', '층별 300–405㎡', '', true))],
+      plans: [pl('p2a', '1층', y1), pl('p2u', 'B1·2–5층', yu)],
       photos: [PH.brick, PH.seoulStreet, PH.shopLoft, PH.cafe],
       exclArea: null, deposit: P('nego'), rent: P('v', 38000000), mgmt: P('tbd'), keyMoney: P('nego'), handover: P('now'),
       note: '플래그십 스토어 선호 · 외벽 사인 가능', mStart: '2026-04-13', mEnd: '2026-10-12',
       internal: {landlord: '개인 (정○○)', phone: '010-5521-0098', fee: '임대료 1개월분', floor: '월 3,500만원', memo: '보증금 5억 이하 시 임대료 조정 의향'},
       upd: {}, grants: [], createdAt: '2026-04-14T10:00:00'},
     {id: 'L3', buildingId: B('1117013100107340003'), ownerId: 'brokerB', visibility: 'shared', status: 'active', leaseType: 'partial',
-      floors: [F(1, 118, 'p3a', '일부', frontLeft), F(2, 142, 'p3b')],
-      plans: [pl('p3a', '1층', retailPlan('한남 234 1층 평면도', '1F 일부 · 임대 118㎡', '이 태 원 로')), pl('p3b', '2층', retailPlan('한남 234 2층 평면도', '2F · 임대 142㎡', '', true))],
+      floors: [F(1, 118, 'p3a', '일부', hannamPart), F(2, 142, 'p3b')],
+      plans: [pl('p3a', '1층', h1), pl('p3b', '2층', h2)],
       photos: [PH.terrace, PH.cafeBar, PH.garden],
       exclArea: 221, deposit: P('v', 200000000), rent: P('v', 16500000), mgmt: P('v', 900000), keyMoney: P('v', 100000000), handover: P('nego'),
       note: '전면 테라스 사용 가능', mStart: '2026-06-01', mEnd: '2027-03-31',
       internal: {landlord: '한남234 주식회사', phone: '02-794-2340', fee: '중개보수 0.9%', floor: '월 1,500만원', memo: 'F&B 선호, 주류 판매 가능'},
       upd: {}, grants: [], createdAt: '2026-06-02T09:00:00'},
     {id: 'L4', buildingId: B('1120011400106450002'), ownerId: 'brokerB', visibility: 'private', status: 'active', leaseType: 'partial',
-      floors: [F(1, 165, 'p4', '일부', rightHalf)], plans: [pl('p4', '1층', retailPlan('연무장 45 1층 평면도', '1F · 임대 412㎡', '연 무 장 길'))],
+      floors: [F(1, 165, 'p4', '일부', yeonPart)], plans: [pl('p4', '1층', y1)],
       photos: [PH.shopFront, PH.cafe], exclArea: 148,
       deposit: P('v', 100000000), rent: P('v', 9500000), mgmt: P('v', 800000), keyMoney: P('v', 150000000), handover: P('nego'),
       note: '', mStart: '2026-09-01', mEnd: '2027-02-28',
@@ -825,7 +962,7 @@ function seed() {
       upd: {}, grants: [], createdAt: '2026-09-02T11:00:00'},
     {id: 'L5', buildingId: B('1114012200100170004'), ownerId: 'brokerA', visibility: 'private', status: 'active', leaseType: 'partial',
       floors: [F(1, 210, 'p5a'), F(2, 198, 'p5u'), F(3, 198, 'p5u')],
-      plans: [pl('p5a', '1층', retailPlan('명동 17 1층 평면도', '1F · 임대 210㎡', '명 동 8 길')), pl('p5u', '2–3층', retailPlan('명동 17 2–3층 평면도', '층별 198㎡', '', true))],
+      plans: [pl('p5a', '1층', m1), pl('p5u', '2–3층', mu)],
       photos: [PH.seoulNeon, PH.arcade, PH.shopIn, PH.apparel3],
       exclArea: null, deposit: P('v', 1500000000), rent: P('v', 95000000), mgmt: P('v', 6000000), keyMoney: P('none'), handover: P('tbd'),
       note: '명동 중앙로 가시성 · 외국인 관광객 동선', mStart: '2026-08-01', mEnd: '2027-01-31',
@@ -833,21 +970,21 @@ function seed() {
       upd: {}, grants: [], createdAt: '2026-08-02T09:00:00'},
     {id: 'L6', buildingId: B('1114014500102120007'), ownerId: 'brokerA', visibility: 'shared', status: 'expired', leaseType: 'partial',
       manual: {name: '을지로 157', use: '근린생활시설', above: 4, gfa: 820},
-      floors: [F(1, 95, 'p6')], plans: [pl('p6', '1층', retailPlan('을지로 157 1층 평면도', '1F · 임대 95㎡', '을 지 로'))],
+      floors: [F(1, 95, 'p6')], plans: [pl('p6', '1층', e1)],
       photos: [PH.cheonggye, PH.openSign], exclArea: 82,
       deposit: P('v', 60000000), rent: P('v', 6200000), mgmt: P('v', 350000), keyMoney: P('v', 30000000), handover: P('now'),
       note: '', mStart: '2026-03-16', mEnd: '2026-09-15',
       internal: {landlord: '을지로157㈜', phone: '02-2265-1570', fee: '', floor: '', memo: '용역 재계약 불발'},
       upd: {}, grants: [], createdAt: '2026-03-17T09:00:00'},
     {id: 'L7', buildingId: B('1168010700105320001'), ownerId: 'brokerB', visibility: 'private', status: 'active', leaseType: 'partial',
-      floors: [F(-1, 210, 'p7')], plans: [pl('p7', 'B1', retailPlan('가로수 24 지하1층 평면도', 'B1 · 임대 210㎡', '', true))],
+      floors: [F(-1, 210, 'p7')], plans: [pl('p7', 'B1', gb)],
       photos: [PH.cafeSign, PH.shopLoft], exclArea: null,
       deposit: P('v', 80000000), rent: P('v', 7500000), mgmt: P('v', 1100000), keyMoney: P('none'), handover: P('v', '2026-11-15'),
       note: '', mStart: '2026-09-10', mEnd: '2027-03-09',
       internal: {landlord: '가로수24㈜', phone: '02-3445-0024', fee: '임대료 1개월분', floor: '', memo: ''},
       upd: {}, grants: [], createdAt: '2026-09-10T09:00:00'},
     {id: 'L8', buildingId: B('4113510900106660008'), ownerId: 'brokerB', visibility: 'shared', status: 'active', leaseType: 'partial',
-      floors: [F(1, 245, 'p8')], plans: [pl('p8', '1층', retailPlan('판교 166 1층 평면도', '1F · 임대 245㎡', '판 교 역 로'))],
+      floors: [F(1, 245, 'p8')], plans: [pl('p8', '1층', p1)],
       photos: [PH.mall, PH.shopIn], exclArea: null,
       deposit: P('v', 250000000), rent: P('v', 18000000), mgmt: P('v', 2400000), keyMoney: P('none'), handover: P('v', '2027-02-01'),
       note: '판교역 지하 연결 동선', mStart: '2026-08-15', mEnd: '2027-02-14',
@@ -857,7 +994,7 @@ function seed() {
   L.forEach(l => l.leaseArea = sumArea(l.floors));
   const tok = mkToken();
   const props = [{id: 'P1', ownerId: 'brokerA', clientId: 'clientA', clientName: '모먼트커피',
-    cover: {region: '성수 · 가로수길 · 한남 · 명동', size: '1층 100㎡ 이상 · 총 250–2,300㎡', moveIn: '2027년 상반기'},
+    cover: {region: '성수 · 가로수길 · 한남 · 명동', size: '1층 100㎡ 이상 · 총 250–2,300㎡', moveIn: '2027년 상반기', hq: {name: '모먼트커피 성수 본점', lat: 37.5447, lng: 127.0503}},
     items: [
       {listingId: 'L1', comment: '가로수길 메인 동선 코너 자리로 1층 전면 폭이 11m입니다. 2층은 로스터리 쇼룸으로 쓸 수 있습니다.', addedAt: '2026-09-20T10:00:00'},
       {listingId: 'L3', comment: '전면 테라스가 있는 한남동 F&B 입지입니다. 주말 매출 비중이 높아 브랜드 체험형 매장에 적합합니다.', addedAt: '2026-09-20T10:00:00'},
@@ -865,9 +1002,24 @@ function seed() {
       {listingId: 'L2', comment: '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 모을 수 있습니다.', addedAt: '2026-09-20T10:00:00'},
     ],
     pin: '4821', token: tok, oldTokens: ['Qm7xV2kPz9Ra'], views: [{at: '2026-09-21T09:12:00'}, {at: '2026-09-21T14:40:00'}, {at: '2026-09-29T10:05:00'}],
-    snap: null, genAt: null, createdAt: '2026-09-18T17:00:00'}];
+    snap: null, genAt: null, createdAt: '2026-09-18T17:00:00', expiresAt: '2026-10-31',
+    responses: {L1: {v: 'yes', comment: '2층 쇼룸 활용도가 좋아 보여요. 답사 희망합니다.', at: '2026-09-29T10:22:00'}, L3: {v: 'hold', comment: '주차 가능 여부 확인 부탁드립니다.', at: '2026-09-29T10:31:00'}},
+    tours: [{lid: 'L1', date: '2026-10-07', slot: '오후', people: 3, memo: '인테리어 업체 동행', at: '2026-09-29T10:24:00'}],
+    pv: [['2026-09-21T09:12:00', 'cover', 95], ['2026-09-21T09:14:00', 'L1', 210], ['2026-09-21T09:18:00', 'L3', 150], ['2026-09-21T09:21:00', 'L5', 25], ['2026-09-21T14:40:00', 'cover', 40], ['2026-09-21T14:41:00', 'L1', 180], ['2026-09-21T14:44:00', 'L2', 60], ['2026-09-29T10:05:00', 'cover', 20], ['2026-09-29T10:06:00', 'L1', 60], ['2026-09-29T10:20:00', 'L3', 90], ['2026-09-29T10:29:00', 'L1', 30], ['2026-09-29T10:33:00', 'L2', 15], ['2026-09-29T10:34:00', 'L3', 40]].map(([at, key, dur]) => ({at, key, dur}))}];
   return {
     today: '2026-10-01', buildings: b, listings: L, proposals: props, log: [],
+    hist: [
+      {lid: 'L1', at: '2026-07-03T09:00:00', by: 'brokerA', action: '등록', changes: []},
+      {lid: 'L1', at: '2026-08-11T16:40:00', by: 'brokerA', action: '공개 범위', changes: [{label: '공개 범위', from: '나만 보기', to: '전체 공유'}]},
+      {lid: 'L1', at: '2026-09-15T11:05:00', by: 'brokerA', action: '수정', changes: [{label: '내부 메모', from: '–', to: '현 임차인(편집숍) 권리금 1.5억 희망', internal: true}]},
+      {lid: 'L1', at: '2026-09-28T15:20:00', by: 'brokerA', action: '수정', changes: [{label: '월 임대료', from: '2,900만원', to: '2,800만원'}, {label: '하한 조건', from: '월 2,700만원', to: '월 2,600만원', internal: true}]},
+      {lid: 'L2', at: '2026-04-14T10:00:00', by: 'brokerA', action: '등록', changes: []},
+      {lid: 'L2', at: '2026-09-03T13:12:00', by: 'brokerA', action: '수정', changes: [{label: '인도일', from: '2026.11.01', to: '즉시'}]},
+      {lid: 'L3', at: '2026-06-02T09:00:00', by: 'brokerB', action: '등록', changes: []},
+      {lid: 'L3', at: '2026-09-10T17:30:00', by: 'brokerB', action: '수정', changes: [{label: '보증금', from: '2억 5,000만원', to: '2억원'}, {label: '권리금', from: '협의', to: '1억원'}]},
+      {lid: 'L6', at: '2026-03-17T09:00:00', by: 'brokerA', action: '등록', changes: []},
+      {lid: 'L6', at: '2026-09-16T00:00:00', by: 'system', action: '자동 만료', changes: [{label: '상태', from: '진행', to: '만료'}]},
+    ],
     fx: {month: '2026-09', rates: fxFor('2026-09')},
     notes: [
       {to: 'brokerB', text: '김민준님이 <b>한남 234 · 1F 일부 · 2F</b>를 모먼트커피 제안서에 추가했습니다', at: '2026-09-20T10:00:00', read: false},
@@ -884,7 +1036,7 @@ function seed() {
 let S;
 try { S = JSON.parse(store.getItem(KEY)); } catch (e) { S = null; }
 const U = {role: store.getItem(KEY + '-role') || 'brokerA', tab: {brokerA: 'mine', brokerB: 'mine', admin: 'over', clientA: 'inbox'},
-  prop: null, modal: null, client: {pid: null, token: null, ok: false}, unit: 'sqm', cur: 'USD', slot: 4, playing: null, guide: false, open: {}, page: 0, pgAnim: 0, printAll: false};
+  prop: null, modal: null, client: {pid: null, token: null, ok: false}, unit: 'sqm', cur: 'USD', slot: 4, playing: null, calc: {term: 24, rf: 0}, fpShape: 'plan', fpMode: 'overlay', guide: false, open: {}, page: 0, pgAnim: 0, printAll: false};
 let D = null; // listing draft
 let lastView = '';
 
@@ -930,7 +1082,7 @@ function projItem(L, it, ownerId) {
   const base = {id: L.id, title: I.name, address: I.address, floorsTxt: floorLabel(L.floors, L.leaseType), photos: L.photos.slice(0, 1)};
   if (!live(L, ownerId)) return {...base, ended: true};
   return {...base, use: I.use, above: I.above, below: I.below, gfa: I.gfa, year: I.year, leaseType: L.leaseType,
-    floors: L.floors.map(f => ({floor: f.floor, area: f.area, scope: f.scope, plan: (L.plans.find(p => p.id === f.planId) || {}).src || null, poly: f.scope === '일부' ? f.poly : null})),
+    floors: L.floors.map(f => { const pl = L.plans.find(p => p.id === f.planId) || {}; return {floor: f.floor, area: f.area, scope: f.scope, plan: pl.src || null, pgeo: pl.geo || null, poly: f.scope === '일부' ? f.poly : null}; }),
     leaseArea: L.leaseArea, area1: area1F(L.floors), exclArea: L.exclArea, deposit: L.deposit, rent: L.rent, mgmt: L.mgmt, keyMoney: L.keyMoney, handover: L.handover,
     note: L.note, photos: L.photos, area: I.B.area ? AREAS[I.B.area] : null, geo: I.B.lat ? {lat: I.B.lat, lng: I.B.lng, stn: I.B.stn} : null, comment: it ? it.comment : '',
     changed: it ? Object.entries(L.upd || {}).filter(([k, t]) => t > it.addedAt && diffDays(S.today, t.slice(0, 10)) <= 14).map(([k]) => k) : []};
@@ -951,6 +1103,40 @@ function commitSilent(reason) {
 function commit(reason) { const n = commitSilent(reason); save(); render(); return n; }
 function note(to, text) { S.notes.unshift({to, text, at: stamp(), read: false}); if (to === me()) toast('알림', text.replace(/<[^>]+>/g, '')); }
 
+/* ---------- listing change history ---------- */
+const FIELD_LBL = {leaseType: '임대 유형', floors: '층 · 면적', plans: '도면', photos: '사진', exclArea: '전용면적', deposit: '보증금', rent: '월 임대료', mgmt: '월 관리비', keyMoney: '권리금', handover: '인도일', note: '공개 비고', visibility: '공개 범위', mStart: '용역 시작', mEnd: '용역 종료', manual: '건물 정보(수동)',
+  'internal.landlord': '임대인', 'internal.phone': '임대인 연락처', 'internal.fee': '수수료', 'internal.floor': '하한 조건', 'internal.memo': '내부 메모'};
+const getPath = (o, k) => k.split('.').reduce((a, x) => a == null ? a : a[x], o);
+function fmtV(k, v) {
+  if (v == null || v === '') return '–';
+  if (['deposit', 'rent', 'mgmt', 'keyMoney', 'handover'].includes(k)) return v.s === 'v' && typeof v.v === 'string' ? fmtDate(v.v) : priceShort(v);
+  if (k === 'floors') return v.map(f => `${fmtF(f.floor)}${f.scope === '일부' ? ' 일부' : ''} ${nf(f.area || 0)}㎡`).join(', ');
+  if (k === 'photos' || k === 'plans') return `${v.length}장`;
+  if (k === 'visibility') return v === 'shared' ? '전체 공유' : '나만 보기';
+  if (k === 'leaseType') return v === 'whole' ? '통임대' : '부분임대';
+  if (k === 'manual') return [v.name, v.use, v.above && v.above + '층', v.gfa && nf(v.gfa) + '㎡'].filter(Boolean).join(' · ');
+  if (k === 'exclArea') return nf(v) + '㎡';
+  if (k === 'mStart' || k === 'mEnd') return fmtDate(v);
+  return String(v);
+}
+function diffListing(a, b) {
+  return Object.keys(FIELD_LBL).filter(k => JSON.stringify(getPath(a, k) ?? null) !== JSON.stringify(getPath(b, k) ?? null))
+    .map(k => ({label: FIELD_LBL[k], from: fmtV(k, getPath(a, k)), to: fmtV(k, getPath(b, k)), internal: k.startsWith('internal')}));
+}
+function logHist(lid, by, action, changes = []) { (S.hist = S.hist || []).push({lid, at: stamp(), by, action, changes}); }
+const WHO = by => by === 'system' ? '시스템' : USERS[by]?.name || by;
+function histList(hs, withListing) {
+  if (!hs.length) return '<div class="empty">이력 없음</div>';
+  const cls = {'등록': 'ok', '이관 등록': 'ok', '자동 만료': 'red', '상태 변경': 'warn', '공개 범위': 'blue', '이관 권한 부여': 'blue', '건축물대장 반영': ''};
+  return `<div class="tl">${hs.map((h, i) => { const L = getL(h.lid);
+    return `<div class="tl-i" style="--i:${Math.min(i, 14)}"><span class="tl-d"></span><div class="tl-b"><div class="row"><span class="av">${WHO(h.by)[0]}</span><b>${WHO(h.by)}</b><span class="chip ${cls[h.action] ?? ''}">${h.action}</span>${withListing && L ? `<span class="sub">${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</span>` : ''}<div class="sp"></div><time>${h.at.slice(0, 10).replace(/-/g, '.')} ${h.at.slice(11, 16)}</time></div>
+      ${h.changes.length ? `<div class="tl-c">${h.changes.map(c => `<div class="ch"><span class="ch-k">${esc(c.label)}${c.internal ? '<i>내부</i>' : ''}</span><span class="ch-f">${esc(c.from)}</span><span class="ch-a">→</span><span class="ch-t">${esc(c.to)}</span></div>`).join('')}</div>` : ''}</div></div>`; }).join('')}</div>`;
+}
+function histFor(lid) {
+  const L = getL(lid), full = me() === 'admin' || L.ownerId === me();
+  return {full, hs: (S.hist || []).filter(h => h.lid === lid).map(h => ({...h, changes: full ? h.changes : h.changes.filter(c => !c.internal)})).filter(h => full || h.changes.length || h.action !== '수정').sort((a, b) => b.at.localeCompare(a.at))};
+}
+
 /* ---------- daily batch ---------- */
 function advance(n) {
   const reasons = new Set();
@@ -960,12 +1146,13 @@ function advance(n) {
       if (L.status !== 'active') continue;
       const left = diffDays(L.mEnd, S.today), t = bInfo(L).name;
       if (left === 14) note(L.ownerId, `<b>${esc(t)}</b> 용역 만료 D-14`);
-      if (left < 0) { L.status = 'expired'; L.upd.status = stamp(); note(L.ownerId, `<b>${esc(t)}</b> 용역 만료 → 자동 종료`); reasons.add('용역 만료'); }
+      if (left < 0) { L.status = 'expired'; L.upd.status = stamp(); logHist(L.id, 'system', '자동 만료', [{label: '상태', from: '진행', to: '만료'}]); note(L.ownerId, `<b>${esc(t)}</b> 용역 만료 → 자동 종료`); reasons.add('용역 만료'); }
     }
     for (const B of S.buildings) {
       const r = REGISTRY.find(x => x.pnu === B.pnu);
       if (B.status === '인허가' && r.final && S.today >= r.final.at) {
         const old = B.gfa; Object.assign(B, {status: '준공', gfa: r.final.gfa, year: r.final.year});
+        S.listings.filter(L => L.buildingId === B.id).forEach(L => logHist(L.id, 'system', '건축물대장 반영', [{label: '연면적', from: nf(old) + '㎡', to: nf(B.gfa) + '㎡'}]));
         S.listings.filter(L => L.buildingId === B.id).forEach(L => note(L.ownerId, `<b>${esc(B.name)}</b> 건축물대장 등록 · 연면적 ${nf(old)} → ${nf(B.gfa)}㎡`));
         reasons.add('건축물대장 반영');
       }
@@ -1184,6 +1371,16 @@ function initMaps() {
   document.querySelectorAll('.map[data-key]:not(.ready)').forEach(el => {
     const d = MAPS[el.dataset.key]; if (!d) return;
     el.classList.add('ready');
+    if (d.multi) {
+      const m = L.map(el, {scrollWheelZoom: false, zoomControl: false, attributionControl: true});
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap', maxZoom: 19, className: 'osm-tiles'}).addTo(m);
+      const ll = d.pts.map(p => [p.lat, p.lng]); if (d.hq) ll.push([d.hq.lat, d.hq.lng]);
+      if (d.hq) { d.pts.forEach(p => L.polyline([[d.hq.lat, d.hq.lng], [p.lat, p.lng]], {color: '#8b8881', weight: 1.2, dashArray: '4 6', interactive: false}).addTo(m));
+        L.marker([d.hq.lat, d.hq.lng], {icon: L.divIcon({className: '', html: `<div class="hqpin"><i>★</i><span>${esc(d.hq.name)}</span></div>`, iconSize: null})}).addTo(m); }
+      d.pts.forEach(p => L.marker([p.lat, p.lng], {icon: L.divIcon({className: '', html: `<div class="npin" style="--c:${FP_C[p.i % 8]}"><b>${pad2(p.i + 1)}</b><span>${esc(p.title)}</span></div>`, iconSize: null})}).addTo(m).on('click', () => goPage(p.i + 1)));
+      m.fitBounds(ll, {padding: [60, 60], maxZoom: 15});
+      L.control.zoom({position: 'bottomright'}).addTo(m); LIVE_MAPS.push(m); return;
+    }
     const m = L.map(el, {scrollWheelZoom: false, zoomControl: false, attributionControl: true, zoomSnap: .5, maxZoom: 18}).setView([d.lat, d.lng], 16);
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap', maxZoom: 19, className: 'osm-tiles'}).addTo(m);
     if (d.area) {
@@ -1222,6 +1419,85 @@ function togglePlay() {
   document.querySelectorAll('.play').forEach(b => b.textContent = U.playing ? '❚❚' : '▶');
 }
 
+/* ---------- client response / tour / calculator ---------- */
+let CP = null;
+const RESP = [['yes', '관심 있음'], ['hold', '보류'], ['no', '관심 없음']];
+const RICO = {yes: '<path d="M5 12l4 4 10-10"/>', hold: '<path d="M9 6v12M15 6v12"/>', no: '<path d="M6 6l12 12M18 6 6 18"/>'};
+const ric = k => `<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">${RICO[k]}</svg>`;
+function respBlock(x) {
+  if (!CP) return '';
+  const p = getP(CP.pid); if (!p) return '';
+  const r = (p.responses || {})[x.id], tours = (p.tours || []).filter(t => t.lid === x.id), dis = CP.preview ? 'disabled' : '';
+  return `<div class="resp ${r ? 'r-' + r.v : ''}"><div class="resp-top"><div><b>이 물건 어떠세요?</b><span class="sub">${r ? `${fmtStamp(r.at)} 회신 · 담당자에게 전달됨` : '선택하면 담당자에게 바로 전달됩니다'}</span></div><div class="sp"></div>
+      <div class="resp-btns">${RESP.map(([k, l]) => `<button class="rb rb-${k} ${r?.v === k ? 'on' : ''}" ${dis} onclick="respond('${x.id}','${k}')">${ric(k)}${l}</button>`).join('')}</div></div>
+    ${r ? `<div class="resp-c"><input class="in" ${dis} maxlength="80" placeholder="한 줄 코멘트 (선택)" value="${esc(r.comment || '')}" onkeydown="if(event.key==='Enter')this.blur()" onchange="respComment('${x.id}',this.value)"></div>` : ''}
+    <div class="resp-tour">${tours.map(t => `<span class="chip blue">답사 요청 · ${+t.date.slice(5, 7)}/${+t.date.slice(8)} ${t.slot} · ${t.people}명</span>`).join('')}<div class="sp"></div><button class="btn sm" ${dis} onclick="openModal({type:'tour',lid:'${x.id}'})">현장 답사 요청</button></div>
+    ${CP.preview ? '<div class="sub" style="margin-top:8px">미리보기에서는 응답할 수 없습니다</div>' : ''}</div>`;
+}
+function snapTitle(pid, lid) { const p = getP(pid); return (JSON.parse(p.snap).items.find(x => x.id === lid) || {}).title || ''; }
+function respond(lid, v) {
+  const p = getP(CP.pid); p.responses = p.responses || {}; const prev = p.responses[lid];
+  p.responses[lid] = {v, comment: prev?.comment || '', at: stamp()};
+  note(p.ownerId, `${esc(p.clientName)}: <b>${esc(snapTitle(p.id, lid))}</b> → ${RESP.find(r => r[0] === v)[1]}`);
+  save(); rerenderClient(); toast('회신 완료', '담당 브로커에게 전달됐습니다');
+}
+function respComment(lid, val) {
+  const p = getP(CP.pid), r = p.responses[lid]; if (!r || r.comment === val) return;
+  r.comment = val; r.at = stamp(); note(p.ownerId, `${esc(p.clientName)}: <b>${esc(snapTitle(p.id, lid))}</b> 코멘트 "${esc(val)}"`); save(); toast('코멘트 전달됨');
+}
+function submitTour() {
+  const m = U.modal, p = getP(CP.pid);
+  (p.tours = p.tours || []).push({lid: m.lid, date: m.date, slot: m.slot, people: m.people || 2, memo: m.memo || '', at: stamp()});
+  note(p.ownerId, `${esc(p.clientName)}: <b>${esc(snapTitle(p.id, m.lid))}</b> 답사 요청 ${fmtDate(m.date).slice(5)} ${m.slot}`);
+  U.modal = null; save(); renderModal(); render(); toast('답사 요청 전달됨', `${fmtDate(m.date)} ${m.slot}`);
+}
+function effMonthly(x) {
+  if (x.rent?.s !== 'v') return null;
+  const t = U.calc.term, rf = Math.min(U.calc.rf, t), mg = x.mgmt?.s === 'v' ? x.mgmt.v : 0;
+  return (x.rent.v * (t - rf) + mg * t) / t;
+}
+function calcBlock(x, fx) {
+  if (x.rent?.s !== 'v') return '';
+  const t = U.calc.term, rf = Math.min(U.calc.rf, t), rent = x.rent.v, mg = x.mgmt?.s === 'v' ? x.mgmt.v : 0;
+  const tr = rent * (t - rf), tm = mg * t, tot = tr + tm, eff = tot / t;
+  const init = (x.deposit?.s === 'v' ? x.deposit.v : 0) + (x.keyMoney?.s === 'v' ? x.keyMoney.v : 0);
+  return `<section class="sec calc"><div class="sec-h"><h3>총비용 계산</h3><span class="sub">조건을 바꾸면 모든 물건에 같이 적용됩니다</span></div>
+    <div class="calc-in noprint"><div class="f"><label>계약 기간</label>${seg([['12', '1년'], ['24', '2년'], ['36', '3년'], ['60', '5년']], String(t), "(v=>{U.calc.term=+v;rerenderClient()})")}</div>
+      <div class="f"><label>렌트프리</label><div class="stepper"><button onclick="U.calc.rf=Math.max(0,U.calc.rf-1);rerenderClient()">−</button><b>${rf}개월</b><button onclick="U.calc.rf=Math.min(12,U.calc.rf+1);rerenderClient()">+</button></div></div></div>
+    <div class="print-only sub" style="margin-bottom:8px">${t}개월 · 렌트프리 ${rf}개월 기준</div>
+    <table class="ctbl"><thead><tr><th></th><th>원화 (KRW)</th><th>외화 (${U.cur})</th></tr></thead><tbody>
+      <tr><td class="lbl">총 임대료</td><td>${valCell(krw(tr), `${krw(rent)} × ${t - rf}개월`)}</td><td>${valCell(fxOf(tr, fx))}</td></tr>
+      <tr><td class="lbl">총 관리비</td><td>${mg ? valCell(krw(tm), `${krw(mg)} × ${t}개월`) : valCell('–', '관리비 미정 · 제외')}</td><td>${mg ? valCell(fxOf(tm, fx)) : '–'}</td></tr>
+      <tr class="tot"><td class="lbl">총 점유비용</td><td>${valCell(krw(tot))}</td><td>${valCell(fxOf(tot, fx))}</td></tr>
+      <tr class="hi"><td class="lbl">실질 월 비용</td><td>${valCell(krw(eff), `평당 ${krw(eff / (x.leaseArea * PYR))}`)}</td><td>${valCell(fxOf(eff, fx))}</td></tr>
+      ${init ? `<tr><td class="lbl">초기 비용</td><td>${valCell(krw(init), x.keyMoney?.s === 'v' ? '보증금 + 권리금 · 보증금은 반환' : '보증금 · 계약 종료 시 반환')}</td><td>${valCell(fxOf(init, fx))}</td></tr>` : ''}
+    </tbody></table></section>`;
+}
+function km(a, b) { const R = 6371, dLa = (b.lat - a.lat) * Math.PI / 180, dLn = (b.lng - a.lng) * Math.PI / 180; const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
+function coverMap(P) {
+  const pts = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended && o.x.geo); if (!pts.length) return '';
+  const hq = P.cover.hq;
+  MAPS.cover = {multi: true, hq, pts: pts.map(o => ({lat: o.x.geo.lat, lng: o.x.geo.lng, i: o.i, title: o.x.title}))};
+  return `<div class="cvm"><div class="row" style="margin-bottom:12px"><h3 class="sec-t" style="margin:0">후보지 위치</h3><span class="sub">번호를 누르면 해당 물건으로 이동</span></div>
+    <div class="cvm-box"><div class="map cvmap" data-key="cover"></div><div class="cvm-list">
+      ${hq ? `<div class="cvm-hq"><i>★</i><div><b>${esc(hq.name)}</b><span>기준 위치</span></div></div>` : ''}
+      ${pts.map(o => `<button class="cvm-i" onclick="goPage(${o.i + 1})"><span class="n" style="--c:${FP_C[o.i % 8]}">${pad2(o.i + 1)}</span><div><b>${esc(o.x.title)}</b><span>${o.x.geo.stn ? esc(o.x.geo.stn[0]) + ' 인근' : ''}${hq ? ` · 기준 위치에서 ${km(hq, o.x.geo).toFixed(1)}km` : ''}</span></div></button>`).join('')}</div></div></div>`;
+}
+/* page-view analytics (simulated beacon) */
+let PV = null;
+function pvFlush() { if (!PV) return; const p = getP(PV.pid); if (p) { (p.pv = p.pv || []).push({at: PV.at, key: PV.key, dur: Math.max(1, Math.round((Date.now() - PV.t) / 1000))}); save(); } PV = null; }
+function pvStart(pid, key) { pvFlush(); if (pid) PV = {pid, key, t: Date.now(), at: stamp()}; }
+const durTxt = sec => sec >= 60 ? `${Math.floor(sec / 60)}분 ${sec % 60 ? (sec % 60) + '초' : ''}`.trim() : `${sec}초`;
+function pvPanel(p) {
+  const P = JSON.parse(p.snap), pv = p.pv || [];
+  const pages = [{key: 'cover', label: '표지'}, ...P.items.map((x, i) => ({key: x.id, label: `${pad2(i + 1)} ${x.title}`}))];
+  const st = pages.map(g => { const r = pv.filter(v => v.key === g.key); return {...g, n: r.length, t: r.reduce((a, b) => a + b.dur, 0)}; });
+  const mx = Math.max(1, ...st.map(x => x.t)), total = pv.reduce((a, b) => a + b.dur, 0), last = pv[pv.length - 1];
+  return `<div class="panel a" style="--i:2"><h3>열람 분석</h3>
+    <div class="pv-sum"><div><span>세션</span><b>${p.views.length}회</b></div><div><span>총 열람</span><b>${durTxt(total)}</b></div><div><span>마지막</span><b>${last ? fmtStamp(last.at) : '–'}</b></div></div>
+    ${st.map(x => `<div class="pv-r"><span class="pv-l">${esc(x.label)}</span><span class="pv-b"><i style="--w:${(x.t / mx) * 100}%"></i></span><span class="pv-v">${durTxt(x.t)}<small>${x.n}회</small></span></div>`).join('')}</div>`;
+}
+
 /* ---------- listing page ---------- */
 function listingPage(x, i, n, fx) {
   const hd = `<div class="lp-h"><div class="eyebrow">${n ? `${pad2(i + 1)} / ${pad2(n)}` : '매물'}</div><h2>${esc(x.title)}</h2><div class="addr">${esc(x.address)}</div>`;
@@ -1242,6 +1518,7 @@ function listingPage(x, i, n, fx) {
       ${kv('보증금', money(x.deposit), x.deposit.s === 'v' ? fxOf(x.deposit.v, fx) : '')}
     </div>
     ${x.comment ? `<div class="cm"><b>담당 코멘트</b>${esc(x.comment)}</div>` : ''}
+    ${respBlock(x)}
     <div class="specs">
       <section class="sec"><div class="sec-h"><h3>임대 조건</h3><div class="sp"></div><span class="sub">원화 기준</span></div>
         <table class="ctbl"><thead><tr><th></th><th>원화 (KRW)</th><th class="fxh">외화 ${curSelect()}</th></tr></thead><tbody>
@@ -1259,6 +1536,7 @@ function listingPage(x, i, n, fx) {
         ${x.below ? specRow('지하', valCell(x.below + '층')) : ''}${specRow('연면적', valCell(areaMain(x.gfa), areaSub(x.gfa)))}${x.year ? specRow('준공', valCell(x.year + '년')) : ''}
       </div></section>
     </div>
+    ${calcBlock(x, fx)}
     ${plans.length ? `<section class="sec plans-sec"><div class="sec-h"><h3>도면</h3><span class="sub">파란 영역 = 임대 범위</span></div><div class="screen-only">${mosaic(key, plans, 'plans', '도면')}<div class="plan-list">${plans.map(m => `<div class="pl-i"><b>${esc(m.cap)}</b>${metaHtml(m)}</div>`).join('')}</div></div>${printMedia(plans, 'one')}</section>` : ''}
     ${photos.length ? `<div class="print-only"><section class="sec"><div class="sec-h"><h3>사진</h3></div>${printMedia(photos, 'two')}</section></div>` : ''}
     ${mapSection(x, key)}
@@ -1270,32 +1548,43 @@ function specRow(label, cell, changed) { return `<div class="spec-r"><span class
 /* ---------- footprint comparison (same scale) ---------- */
 const FP_C = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#4a3aa7', '#e34948'];
 function polyArea(pts) { let a = 0; for (let i = 0; i < pts.length; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[(i + 1) % pts.length]; a += x1 * y2 - x2 * y1; } return Math.abs(a) / 2; }
-function footprint(x) {
+function footprint(x, mode) {
   const fs = [...x.floors].sort((a, b) => a.floor - b.floor);
   const f = fs.find(v => v.floor === 1) || fs.find(v => v.floor > 0) || fs[0];
   const area = +f.area || 0; if (!area) return null;
-  let pts;
-  if (f.poly && f.poly.length >= 3) pts = f.poly.map(([u, v]) => [u * 1000, v * 640]);
-  else pts = [[0, 0], [21.6, 0], [21.6, 11.4], [0, 11.4]];
-  const k = Math.sqrt(area / polyArea(pts));
-  pts = pts.map(([u, v]) => [u * k, v * k]);
+  let pts, img = null;
+  if (mode === 'plan' && f.pgeo) {
+    const g = f.pgeo;
+    pts = f.poly ? f.poly.map(([u, v]) => [(u * 1000 - g.ox) / g.s, (v * 640 - g.oy) / g.s]) : g.outline.map(p => [...p]);
+    img = {href: f.plan, x: -g.ox / g.s, y: -g.oy / g.s, w: 1000 / g.s, h: 640 / g.s};
+  } else {
+    const w = Math.sqrt(area * 1.9); pts = [[0, 0], [w, 0], [w, area / w], [0, area / w]];
+  }
   const minX = Math.min(...pts.map(p => p[0])), minY = Math.min(...pts.map(p => p[1]));
   pts = pts.map(([u, v]) => [u - minX, v - minY]);
-  return {pts, w: Math.max(...pts.map(p => p[0])), h: Math.max(...pts.map(p => p[1])), area, floor: f.floor, multi: fs.length > 1};
+  if (img) { img.x -= minX; img.y -= minY; }
+  return {pts, img, w: Math.max(...pts.map(p => p[0])), h: Math.max(...pts.map(p => p[1])), area, floor: f.floor, multi: fs.length > 1};
 }
 function fpCompare(P) {
-  const items = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended).map(o => ({...o, fp: footprint(o.x)})).filter(o => o.fp);
+  const shape = U.fpShape || 'plan', side = U.fpMode === 'side';
+  const items = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended).map(o => ({...o, fp: footprint(o.x, shape)})).filter(o => o.fp);
   if (items.length < 2) return '';
-  const side = U.fpMode === 'side', gap = 4, pad = 3;
+  const gap = side ? 5 : 0, pad = 2.5;
   let off = 0; items.forEach(o => { o.ox = side ? off : 0; off += o.fp.w + gap; });
-  const W = (side ? off - gap : Math.max(...items.map(o => o.fp.w))) + pad * 2 + 8, H = Math.max(...items.map(o => o.fp.h)) + pad * 2 + 4;
-  const grid = []; for (let gx = 0; gx <= W; gx += 5) grid.push(`<line x1="${gx + pad}" y1="0" x2="${gx + pad}" y2="${H}"/>`); for (let gy = 0; gy <= H; gy += 5) grid.push(`<line x1="0" y1="${H - pad - gy}" x2="${W}" y2="${H - pad - gy}"/>`);
-  const shape = o => { const c = FP_C[o.i % 8], pts = o.fp.pts.map(([u, v]) => `${(u + o.ox + pad).toFixed(2)},${(H - pad - (o.fp.h - v)).toFixed(2)}`).join(' ');
-    return `<g class="fp-s" style="--c:${c}"><title>${pad2(o.i + 1)} ${o.x.title} · ${fmtF(o.fp.floor)} ${nf(o.fp.area)}㎡</title><polygon points="${pts}"/></g>`; };
+  const W = (side ? off - gap : Math.max(...items.map(o => o.fp.w))) + pad * 2, H = Math.max(...items.map(o => o.fp.h)) + pad * 2;
+  const grid = []; for (let gx = 0; gx <= W; gx += 5) grid.push(`<line x1="${(gx + pad).toFixed(2)}" y1="0" x2="${(gx + pad).toFixed(2)}" y2="${H.toFixed(2)}"/>`); for (let gy = 0; gy <= H; gy += 5) grid.push(`<line x1="0" y1="${(H - pad - gy).toFixed(2)}" x2="${W.toFixed(2)}" y2="${(H - pad - gy).toFixed(2)}"/>`);
+  const tx = o => o.ox + pad, ty = o => H - pad - o.fp.h;
+  const showImg = shape === 'plan' && side;
+  const imgs = showImg ? items.filter(o => o.fp.img).map(o => { const im = o.fp.img, id = `fpc${o.i}`;
+    return `<clipPath id="${id}"><rect x="${(tx(o) - 1.2).toFixed(2)}" y="${(ty(o) - 1.2).toFixed(2)}" width="${(o.fp.w + 2.4).toFixed(2)}" height="${(o.fp.h + 2.4).toFixed(2)}"/></clipPath><image href="${im.href}" x="${(tx(o) + im.x).toFixed(2)}" y="${(ty(o) + im.y).toFixed(2)}" width="${im.w.toFixed(2)}" height="${im.h.toFixed(2)}" clip-path="url(#${id})" opacity=".85"/>`; }).join('') : '';
+  const shp = o => { const c = FP_C[o.i % 8], pts = o.fp.pts.map(([u, v]) => `${(u + tx(o)).toFixed(2)},${(v + ty(o)).toFixed(2)}`).join(' ');
+    return `<g class="fp-s ${showImg ? 'withimg' : ''}" style="--c:${c}"><title>${pad2(o.i + 1)} ${o.x.title} · ${fmtF(o.fp.floor)} ${nf(o.fp.area)}㎡</title><polygon points="${pts}"/></g>`; };
+  const ctl = (k, cur, opts) => `<div class="seg sm noprint">${opts.map(([v, l]) => `<button class="${cur === v ? 'on' : ''}" onclick="U.${k}='${v}';rerenderClient()">${l}</button>`).join('')}</div>`;
   return `<div class="fp"><div class="row" style="margin-bottom:12px"><h3 class="sec-t" style="margin:0">면적 비교 · 동일 축척</h3><span class="sub">1층 기준 · 복층 매물도 1층만 비교 · 격자 5m</span><div class="sp"></div>
-      <div class="seg sm noprint"><button class="${!side ? 'on' : ''}" onclick="U.fpMode='overlay';rerenderClient()">겹쳐 보기</button><button class="${side ? 'on' : ''}" onclick="U.fpMode='side';rerenderClient()">나란히 보기</button></div></div>
-    <div class="fp-box"><svg class="fp-svg" viewBox="0 0 ${W.toFixed(1)} ${H.toFixed(1)}" preserveAspectRatio="xMinYMax meet"><g class="fp-grid">${grid.join('')}</g>${items.map(shape).join('')}</svg>
-      <div class="fp-leg">${items.map(o => `<div class="fp-li" style="--c:${FP_C[o.i % 8]}"><i></i><div><b>${pad2(o.i + 1)} ${esc(o.x.title)}</b><span>${fmtF(o.fp.floor)} ${nf(o.fp.area)}㎡ · ${nf(o.fp.area * PYR, 1)}평${o.fp.multi ? ` · 전체 ${nf(o.x.leaseArea)}㎡` : ''}</span></div></div>`).join('')}</div></div></div>`;
+      ${ctl('fpShape', shape, [['plan', '도면 형태'], ['rect', '사각형 환산']])}${ctl('fpMode', side ? 'side' : 'overlay', [['overlay', '겹쳐 보기'], ['side', '나란히 보기']])}</div>
+    <div class="fp-box"><svg class="fp-svg" viewBox="0 0 ${W.toFixed(1)} ${H.toFixed(1)}" preserveAspectRatio="xMinYMax meet"><g class="fp-grid">${grid.join('')}</g>${imgs}${items.map(shp).join('')}</svg>
+      <div class="fp-leg">${items.map(o => `<div class="fp-li" style="--c:${FP_C[o.i % 8]}"><i></i><div><b>${pad2(o.i + 1)} ${esc(o.x.title)}</b><span>${fmtF(o.fp.floor)} ${nf(o.fp.area)}㎡ · ${nf(o.fp.area * PYR, 1)}평${o.fp.multi ? ` · 전체 ${nf(o.x.leaseArea)}㎡` : ''}</span></div></div>`).join('')}
+      ${shape === 'plan' ? '<div class="sub" style="margin-top:4px">도면 형태: 1층 임대 범위의 실제 윤곽. 나란히 보기에서 도면이 함께 보입니다.</div>' : '<div class="sub" style="margin-top:4px">사각형 환산: 같은 면적의 사각형으로 크기만 비교합니다.</div>'}</div></div></div>`;
 }
 
 /* ---------- trade-area cross comparison ---------- */
@@ -1321,6 +1610,7 @@ function areaCompare(P) {
 }
 
 /* ---------- cover ---------- */
+function respChip(lid) { if (!CP) return ''; const r = (getP(CP.pid)?.responses || {})[lid]; return r ? `<span class="chip rc-${r.v}">${RESP.find(z => z[0] === r.v)[1]}</span>` : ''; }
 function coverPage(P, fx) {
   const act = P.items.filter(x => !x.ended);
   const rng = (arr, f) => { const v = arr.filter(x => x != null); if (!v.length) return '–'; const mn = Math.min(...v), mx = Math.max(...v); return mn === mx ? f(mn) : `${f(mn)}<i>–</i>${f(mx)}`; };
@@ -1340,28 +1630,31 @@ function coverPage(P, fx) {
       <div><span>월 임대료</span><b>${rng(act.map(x => x.rent?.s === 'v' ? x.rent.v : null), krw)}</b></div>
       <div><span>가장 빠른 인도</span><b>${ho}</b></div>
     </div>
+    ${coverMap(P)}
     ${fpCompare(P)}
     ${areaCompare(P)}
     <h3 class="sec-t">후보 물건</h3>
     <div class="picks">${P.items.map((x, i) => `<button class="pk ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})">
-      <div class="pk-ph" style="background-image:url('${x.photos?.[0] || ''}')"><span class="pk-n">${pad2(i + 1)}</span>${x.ended ? '<span class="chip dark">제안 종료</span>' : ''}</div>
+      <div class="pk-ph" style="background-image:url('${x.photos?.[0] || ''}')"><span class="pk-n">${pad2(i + 1)}</span>${x.ended ? '<span class="chip dark">제안 종료</span>' : respChip(x.id)}</div>
       <div class="pk-b"><b>${esc(x.title)}</b><small>${esc(x.address)} · ${esc(x.floorsTxt)}</small>
       ${x.ended ? '' : `<div class="pk-kv"><div><span>1층</span><b>${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</b></div><div><span>전체</span><b>${nf(x.leaseArea)}㎡</b></div><div><span>월 임대료</span><b>${short(x.rent)}</b>${sub(x.rent)}</div><div><span>인도</span><b>${short(x.handover)}</b></div></div>`}</div></button>`).join('')}</div>
     <div class="row" style="margin-bottom:12px"><h3 class="sec-t" style="margin:0">조건 비교</h3><div class="sp"></div><span class="sub">외화</span>${curSelect()}</div>
-    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num">보증금</th><th class="num">월 임대료</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
+    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num">보증금</th><th class="num">월 임대료</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">실질 월 비용<small class="th-s">${U.calc.term}개월 · RF ${U.calc.rf}개월</small></th><th class="num">인도</th></tr></thead><tbody>
     ${P.items.map((x, i) => x.ended
-      ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td colspan="7"><span class="chip dark">제안 종료</span></td></tr>`
-      : `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td class="num">${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</td><td class="num">${nf(x.leaseArea)}㎡</td>${['deposit', 'rent', 'mgmt', 'keyMoney'].map(k => `<td class="num"><div class="val"><b>${short(x[k])}</b>${sub(x[k])}</div></td>`).join('')}<td class="num">${short(x.handover)}</td></tr>`).join('')}
+      ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td colspan="8"><span class="chip dark">제안 종료</span></td></tr>`
+      : `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td class="num">${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</td><td class="num">${nf(x.leaseArea)}㎡</td>${['deposit', 'rent', 'mgmt', 'keyMoney'].map(k => `<td class="num"><div class="val"><b>${short(x[k])}</b>${sub(x[k])}</div></td>`).join('')}<td class="num">${effMonthly(x) ? `<div class="val"><b>${krw(effMonthly(x))}</b><small>${fxOf(effMonthly(x), fx)}</small></div>` : '–'}</td><td class="num">${short(x.handover)}</td></tr>`).join('')}
     </tbody></table></div>`;
 }
-function clientPage(snap, genAt, link) {
+function clientPage(snap, genAt, link, pid, preview) {
+  CP = pid ? {pid, preview: !!preview} : null;
+  const pp = pid ? getP(pid) : null, exp = pp?.expiresAt, left = exp ? diffDays(exp, S.today) : null;
   const P = JSON.parse(snap), fx = P.fx, n = P.items.length, pg = Math.min(U.page, n);
   const tabs = `<button class="ptab ${pg === 0 ? 'on' : ''}" onclick="goPage(0)"><span class="pt-cover">≡</span><span>표지</span></button>` + P.items.map((x, i) => `<button class="ptab ${pg === i + 1 ? 'on' : ''} ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})"><span class="pt-ph" style="background-image:url('${x.photos?.[0] || ''}')"></span><span><b>${pad2(i + 1)}</b> ${esc(x.title)}</span></button>`).join('');
   const pages = U.printAll
     ? [coverPage(P, fx), ...P.items.map((x, i) => listingPage(x, i, n, fx))].map((h, i) => `<div class="${i ? 'pbreak' : ''}">${h}</div>`).join('')
     : `<div class="pg ${U.pgAnim > 0 ? 'in-r' : U.pgAnim < 0 ? 'in-l' : ''}">${pg === 0 ? coverPage(P, fx) : listingPage(P.items[pg - 1], pg - 1, n, fx)}</div>`;
   return `<div class="cp ${U.printAll ? 'printing' : ''}">
-    <div class="cp-bar noprint"><div class="cp-brand">C&amp;W Advisory<span>업데이트 ${fmtStamp(genAt)}</span></div><div class="sp"></div><button class="btn sm" onclick="printPDF()">PDF</button>
+    <div class="cp-bar noprint"><div class="cp-brand">C&amp;W Advisory<span>업데이트 ${fmtStamp(genAt)}</span></div>${exp ? `<span class="chip ${left <= 3 ? 'warn' : 'line'}">${fmtDate(exp)}까지 유효${left <= 3 ? ` · D-${left}` : ''}</span>` : ''}<div class="sp"></div><button class="btn sm" onclick="printPDF()">PDF</button>
       <nav class="ptabs">${tabs}</nav></div>
     <div class="cp-wrap">
       <div class="print-stamp">${esc(P.client)} 임차 후보지 제안 · ${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 링크에서 확인하세요${link ? ' · ' + esc(link) : ''}</div>
@@ -1372,6 +1665,7 @@ function clientPage(snap, genAt, link) {
 }
 function goPage(i) {
   U.pgAnim = i > U.page ? 1 : -1; U.page = i; rerenderClient(); U.pgAnim = 0;
+  if (CP && !CP.preview && U.role === 'clientA') { const P = JSON.parse(getP(CP.pid).snap); pvStart(CP.pid, i === 0 ? 'cover' : P.items[i - 1].id); }
   const m = document.querySelector('.modal.full'); if (m) m.scrollTo({top: 0}); else window.scrollTo({top: 0});
 }
 function printPDF() {
@@ -1427,12 +1721,13 @@ function topbar() {
 function guide() {
   if (!U.guide) return '';
   return `<div class="guide"><div class="row" style="margin-bottom:8px"><b>시나리오</b><div class="sp"></div><button class="btn xs ghost" onclick="U.guide=false;render()">✕</button></div>
-  <h4>브로커A</h4><ol><li>매물 카드 클릭 → 제안서 미리보기</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
+  <h4>브로커A</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
   <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
-  <h4>관리자</h4><ol><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
-  <h4>클라이언트A</h4><ol><li>최신 링크 · PIN 4821</li><li>매물 탭 이동 · 단위 · 통화 · PDF</li><li>이전 링크 → 차단</li></ol></div>`;
+  <h4>관리자</h4><ol><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
+  <h4>클라이언트A</h4><ol><li>최신 링크 · PIN 4821</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>총비용 계산 · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
 }
-function setRole(r) { U.role = r; U.prop = null; D = null; U.modal = null; U.client = {pid: null, token: null, ok: false}; save(); render(); renderModal(); window.scrollTo({top: 0}); }
+window.addEventListener('beforeunload', () => pvFlush());
+function setRole(r) { pvFlush(); U.role = r; U.prop = null; D = null; U.modal = null; U.client = {pid: null, token: null, ok: false}; save(); render(); renderModal(); window.scrollTo({top: 0}); }
 function setTab(t) { U.tab[U.role] = t; U.prop = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
 function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); commitSilent('최초 발행'); D = null; U.prop = null; save(); render(); toast('초기화 완료'); }
 
@@ -1450,7 +1745,7 @@ function render() {
 function sideNav() {
   const u = USERS[me()], unread = S.notes.filter(n => n.to === me() && !n.read).length;
   const items = me() === 'admin'
-    ? [['over', '개요'], ['bld', '건물 · 매물'], ['handover', '이관'], ['views', '열람'], ['log', '발행 로그']]
+    ? [['over', '개요'], ['bld', '건물 · 매물'], ['hist', '변경 이력'], ['handover', '이관'], ['views', '열람'], ['log', '발행 로그']]
     : [['mine', '내 매물'], ['shared', '공유 매물'], ['props', '제안서'], ['notes', '알림'], ['log', '발행 로그']];
   return `<div class="me"><b>${u.name}</b><span>${u.title}</span></div><nav class="nav">${items.map(([k, l]) => `<button class="${U.tab[me()] === k && !D && !U.prop ? 'on' : ''}" onclick="setTab('${k}')">${l}${k === 'notes' && unread ? `<span class="ndot">${unread}</span>` : ''}</button>`).join('')}</nav>`;
 }
@@ -1473,9 +1768,9 @@ function listingCard(L, i, own) {
   const vis = `<span class="chip">${L.visibility === 'shared' ? '공유' : '🔒 나만'}</span>`;
   const actions = own
     ? `<button class="btn sm ghost" onclick="editListing('${L.id}')">수정</button>
-       <button class="btn sm ghost" onclick="toggleVis('${L.id}')">${L.visibility === 'shared' ? '공유 해제' : '공유'}</button><div class="sp"></div>
+       <button class="btn sm ghost" onclick="toggleVis('${L.id}')">${L.visibility === 'shared' ? '공유 해제' : '공유'}</button><button class="btn sm ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button><div class="sp"></div>
        ${L.status === 'active' ? `<button class="btn sm ghost" onclick="setStatus('${L.id}','done')">완료</button><button class="btn sm ghost danger" onclick="setStatus('${L.id}','withdrawn')">철회</button>` : (L.mEnd >= S.today ? `<button class="btn sm ghost" onclick="setStatus('${L.id}','active')">재개</button>` : '')}`
-    : `<span class="sub">${USERS[L.ownerId].name}</span><div class="sp"></div><button class="btn sm" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>`;
+    : `<span class="sub">${USERS[L.ownerId].name}</span><button class="btn sm ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button><div class="sp"></div><button class="btn sm" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>`;
   return `<div class="card hov a ${L.status !== 'active' ? 'dim' : ''}" style="--i:${i}" onclick="openModal({type:'detail',lid:'${L.id}'})">
     <div class="ph" style="background-image:url('${L.photos[0] || ''}')"><div class="tags"><span class="chip ${sc}">${sl}</span>${vis}${dd}</div></div>
     <div class="bd"><div class="t">${esc(I.name)}</div><div class="ad">${esc(I.address)}</div>
@@ -1500,11 +1795,12 @@ function sharedView() {
 }
 function toggleVis(id) {
   const L = getL(id); L.visibility = L.visibility === 'shared' ? 'private' : 'shared';
+  logHist(id, me(), '공개 범위', [{label: '공개 범위', from: fmtV('visibility', L.visibility === 'shared' ? 'private' : 'shared'), to: fmtV('visibility', L.visibility)}]);
   const n = commit(L.visibility === 'shared' ? '공유 설정' : '공유 해제');
   toast(L.visibility === 'shared' ? '전체 공유' : '나만 보기', n ? `제안서 ${n}건 갱신` : '');
 }
 function setStatus(id, s) {
-  const L = getL(id); L.status = s; L.upd.status = stamp();
+  const L = getL(id); logHist(id, me(), '상태 변경', [{label: '상태', from: STATUS[L.status][0], to: STATUS[s][0]}]); L.status = s; L.upd.status = stamp();
   const n = commit({done: '거래완료', withdrawn: '철회', active: '재개'}[s]);
   toast(STATUS[s][0], n ? `제안서 ${n}건 갱신` : '');
 }
@@ -1671,12 +1967,13 @@ function saveListing() {
   let n;
   if (!D.id) {
     Object.assign(data, {id: uid('L'), ownerId: me(), status: 'active', upd: {}, grants: [], createdAt: stamp()});
-    S.listings.push(data);
+    S.listings.push(data); logHist(data.id, me(), D.from ? '이관 등록' : '등록');
     if (D.from) { const src = getL(D.from); src.grants = (src.grants || []).filter(u => u !== me()); }
     D = null; n = commit('매물 등록'); toast('등록 완료', B.status === '인허가' ? '인허가 정보 기준 · 대장 등록 시 자동 갱신' : '');
   } else {
     const L = getL(D.id);
     PUB.forEach(k => { if (JSON.stringify(L[k] ?? null) !== JSON.stringify(data[k] ?? null)) data.upd[k] = stamp(); });
+    const ch = diffListing(L, data); if (ch.length) logHist(L.id, me(), '수정', ch);
     Object.assign(L, data);
     D = null; n = commit('매물 수정');
     toast('저장 완료', n ? `제안서 ${n}건 자동 재생성` : '클라이언트 페이지 변경 없음');
@@ -1692,20 +1989,22 @@ function propsView() {
   <div class="grid">${ps.map((p, i) => { const ph = p.items.map(it => getL(it.listingId)).filter(Boolean).slice(0, 3);
     return `<div class="card hov a" style="--i:${i}" onclick="openProp('${p.id}')"><div class="ph" style="display:grid;grid-template-columns:2fr 1fr;gap:2px;background:#ddd">${ph.map((L, j) => `<div style="background:url('${L.photos[0]}') center/cover;${j === 0 ? 'grid-row:span 2' : ''}"></div>`).join('')}</div>
       <div class="bd"><div class="t">${esc(p.clientName)}</div><div class="ad">${esc(p.cover.region)}</div>
-      <div class="kv"><span>물건<b>${p.items.length}건</b></span><span>열람<b>${p.views.length}회</b></span><span>업데이트<b>${fmtStamp(p.genAt)}</b></span></div></div></div>`; }).join('') || '<div class="empty">제안서 없음</div>'}</div>`;
+      <div class="kv"><span>물건<b>${p.items.length}건</b></span><span>응답<b>${Object.keys(p.responses || {}).length}/${p.items.length}</b></span><span>열람<b>${p.views.length}회</b></span><span>유효<b>${p.expiresAt ? fmtDate(p.expiresAt).slice(5) : '–'}</b></span></div></div></div>`; }).join('') || '<div class="empty">제안서 없음</div>'}</div>`;
 }
 function openProp(id) { U.prop = id; render(); window.scrollTo({top: 0}); }
 function propEditor(p) {
   const item = (it, i) => {
-    const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId);
+    const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId), rsp = (p.responses || {})[L.id], tr = (p.tours || []).filter(t => t.lid === L.id);
     return `<div class="panel a" style="--i:${i + 2};display:flex;gap:16px;${ok ? '' : 'opacity:.55'}">
       <div style="width:120px;flex:none;border-radius:10px;background:url('${L.photos[0]}') center/cover;aspect-ratio:4/3"></div>
       <div style="flex:1;min-width:0"><div class="row"><b>${esc(I.name)}</b><span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span>${L.ownerId !== me() ? `<span class="chip blue">${USERS[L.ownerId].name}</span>` : ''}${ok ? '' : '<span class="chip dark">제안 종료</span>'}<div class="sp"></div>
         <button class="btn xs ghost" ${i === 0 ? 'disabled' : ''} onclick="moveItem('${p.id}',${i},-1)">↑</button><button class="btn xs ghost" ${i === p.items.length - 1 ? 'disabled' : ''} onclick="moveItem('${p.id}',${i},1)">↓</button><button class="btn xs ghost danger" onclick="rmItem('${p.id}',${i})">✕</button></div>
-        <textarea class="in" style="margin-top:8px;min-height:54px" placeholder="이 클라이언트를 위한 코멘트" onchange="setComment('${p.id}',${i},this.value)">${esc(it.comment)}</textarea></div></div>`;
+        <textarea class="in" style="margin-top:8px;min-height:54px" placeholder="이 클라이언트를 위한 코멘트" onchange="setComment('${p.id}',${i},this.value)">${esc(it.comment)}</textarea>
+        ${rsp ? `<div class="r-line"><span class="chip rc-${rsp.v}">${RESP.find(z => z[0] === rsp.v)[1]}</span>${rsp.comment ? `<span>“${esc(rsp.comment)}”</span>` : ''}<div class="sp"></div><span class="sub">${fmtStamp(rsp.at)}</span></div>` : ''}
+        ${tr.map(t => `<div class="r-line"><span class="chip blue">답사 요청</span><span>${fmtDate(t.date)} ${t.slot} · ${t.people}명${t.memo ? ' · ' + esc(t.memo) : ''}</span><div class="sp"></div><span class="sub">${fmtStamp(t.at)}</span></div>`).join('')}</div></div>`;
   };
   return `<div class="head"><button class="btn ghost icon" onclick="U.prop=null;render()">←</button><h1>${esc(p.clientName)}</h1><span class="sub">업데이트 ${fmtStamp(p.genAt)}</span><div class="sp"></div>
-    <button class="btn" onclick="openModal({type:'preview',pid:'${p.id}'})">미리보기</button><button class="btn pri" onclick="copyLink('${p.id}')">링크 복사</button></div>
+    <button class="btn" onclick="openModal({type:'dup',pid:'${p.id}'})">복제</button><button class="btn" onclick="openModal({type:'preview',pid:'${p.id}'})">미리보기</button><button class="btn pri" onclick="copyLink('${p.id}')">링크 복사</button></div>
   <div style="display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start">
     <div>
       <div class="panel a" style="--i:0"><h3>표지</h3><div class="fg">
@@ -1719,15 +2018,27 @@ function propEditor(p) {
       <div class="panel a" style="--i:1"><h3>링크</h3>
         <div class="in" style="font-family:ui-monospace,Menlo,monospace;font-size:12px;background:#f7f7f4;word-break:break-all">${linkOf(p)}</div>
         <div class="row" style="margin-top:12px"><div class="f" style="width:110px"><label>PIN</label><input class="in" value="${p.pin}" maxlength="4" onchange="setPin('${p.id}',this.value)" style="letter-spacing:4px;font-weight:700"></div><div class="sp"></div><button class="btn sm" style="align-self:flex-end" onclick="reissue('${p.id}')">재발급</button></div>
-        <div class="f" style="margin-top:12px"><label>유효기간</label><input class="in" disabled placeholder="다음 버전"></div></div>
-      <div class="panel a" style="--i:2"><h3>열람 <span class="chip">${p.views.length}</span></h3><div class="list">
-        ${p.views.slice().reverse().slice(0, 6).map(v => `<div class="li" style="padding:8px 0"><span class="sub">링크 열람</span><time>${fmtStamp(v.at)}</time></div>`).join('') || '<div class="sub">아직 없음</div>'}</div></div>
+        <div class="f" style="margin-top:12px"><label>유효기간</label><div class="row"><input class="in" type="date" style="width:170px" value="${p.expiresAt || ''}" onchange="setExp('${p.id}',this.value)">${[7, 14, 30].map(d => `<button class="btn xs" onclick="setExp('${p.id}','${addDays(S.today, d)}')">+${d}일</button>`).join('')}${p.expiresAt ? `<button class="btn xs ghost" onclick="setExp('${p.id}','')">해제</button>` : ''}</div>
+          ${p.expiresAt ? `<span class="sub">${S.today > p.expiresAt ? '만료됨 · 링크 접속 시 만료 안내' : `D-${diffDays(p.expiresAt, S.today)}`}</span>` : '<span class="sub">기한 없음</span>'}</div></div>
+      ${pvPanel(p)}
       <div class="panel a" style="--i:3"><h3>재생성 이력</h3><div class="list">
         ${S.log.filter(l => l.pid === p.id).slice(0, 6).map(l => `<div class="li" style="padding:8px 0"><span>${esc(l.reason)}</span><time>${fmtStamp(l.at)}</time></div>`).join('')}</div></div>
     </div></div>`;
 }
 function setCover(pid, k, v) { getP(pid).cover[k] = v; const n = commit('표지 수정'); if (n) toast('클라이언트 페이지 갱신'); }
 function setComment(pid, i, v) { getP(pid).items[i].comment = v; const n = commit('코멘트 수정'); if (n) toast('코멘트 반영', '클라이언트 페이지 갱신'); }
+function setExp(pid, v) { getP(pid).expiresAt = v || null; save(); render(); toast(v ? `${fmtDate(v)}까지 유효` : '유효기간 해제'); }
+function createDup(form) {
+  const src = getP(form.pid.value), c = form.client.value, name = c === 'clientA' ? CLIENTS.clientA : form.cname.value.trim();
+  if (!name) return toast('클라이언트명을 입력하세요');
+  const p = {id: uid('P'), ownerId: me(), clientId: c === 'clientA' ? 'clientA' : null, clientName: name, cover: clone(src.cover),
+    items: src.items.map(it => ({listingId: it.listingId, comment: form.keep.checked ? it.comment : '', addedAt: stamp()})),
+    pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], pv: [], responses: {}, tours: [], expiresAt: null, snap: null, genAt: null, createdAt: stamp()};
+  if (c !== 'clientA') delete p.cover.hq;
+  S.proposals.unshift(p);
+  if (p.clientId) S.msgs.push({client: p.clientId, pid: p.id, from: me(), token: p.token, at: stamp(), text: '후보지 제안드립니다.'});
+  U.modal = null; renderModal(); commit('최초 발행'); openProp(p.id); toast('제안서 복제', `${name} · PIN ${p.pin}`);
+}
 function setPin(pid, v) { if (!/^\d{4}$/.test(v)) { toast('PIN은 숫자 4자리'); return render(); } getP(pid).pin = v; save(); toast('PIN 변경'); }
 function moveItem(pid, i, d) { const it = getP(pid).items; [it[i], it[i + d]] = [it[i + d], it[i]]; commit('순서 변경'); }
 function rmItem(pid, i) { getP(pid).items.splice(i, 1); commit('물건 제외'); toast('제외됨'); }
@@ -1749,7 +2060,7 @@ function createProp(form) {
   if (!name) return toast('클라이언트명을 입력하세요');
   const p = {id: uid('P'), ownerId: me(), clientId: c === 'clientA' ? 'clientA' : null, clientName: name,
     cover: {region: form.region.value || '—', size: form.size.value || '—', moveIn: form.moveIn.value || '—'},
-    items: [], pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], snap: null, genAt: null, createdAt: stamp()};
+    items: [], pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], pv: [], responses: {}, tours: [], expiresAt: null, snap: null, genAt: null, createdAt: stamp()};
   S.proposals.unshift(p);
   if (p.clientId) S.msgs.push({client: p.clientId, pid: p.id, from: me(), token: p.token, at: stamp(), text: '후보지 제안드립니다.'});
   U.modal = null; renderModal(); commit('최초 발행'); openProp(p.id); toast('제안서 생성', `PIN ${p.pin}`);
@@ -1783,6 +2094,7 @@ function adminView() {
   if (t === 'over') return adminOver();
   if (t === 'bld') return adminBld();
   if (t === 'handover') return adminHand();
+  if (t === 'hist') return `<div class="head"><h1>변경 이력</h1><span class="sub">전체 매물 · 누가 언제 무엇을 바꿨는지</span></div><div class="panel">${histList([...(S.hist || [])].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 80), true)}</div>`;
   if (t === 'views') return adminViews();
   if (t === 'log') return logView();
 }
@@ -1806,8 +2118,8 @@ function adminBld() {
         <div style="width:54px;height:40px;border-radius:8px;background:url('${ls[0]?.photos[0] || ''}') center/cover #eee"></div>
         <div style="flex:1"><div class="row"><b>${esc(name)}</b>${B.status === '준공' ? '<span class="chip ok">대장</span>' : B.status === '인허가' ? '<span class="chip warn">인허가</span>' : '<span class="chip red">정보없음</span>'}${owners.size > 1 ? `<span class="chip blue">브로커 ${owners.size}명</span>` : ''}</div><div class="sub">${esc(B.address)} · PNU ${B.pnu}</div></div>
         <span class="chip">${ls.length}건</span><span class="sub" style="transition:transform .3s;transform:rotate(${open ? 180 : 0}deg)">⌄</span></div>
-      ${open ? `<div style="border-top:1px solid var(--line2);padding:6px 20px 14px;animation:fadeUp .3s var(--ease)"><table class="tbl"><thead><tr><th>범위</th><th>담당</th><th>공개</th><th>상태</th><th class="num">임대료</th><th>임대인 (내부)</th><th>메모 (내부)</th></tr></thead><tbody>
-        ${ls.map(L => `<tr><td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td></tr>`).join('')}</tbody></table></div>` : ''}</div>`; }).join('')}`;
+      ${open ? `<div style="border-top:1px solid var(--line2);padding:6px 20px 14px;animation:fadeUp .3s var(--ease)"><table class="tbl"><thead><tr><th>범위</th><th>담당</th><th>공개</th><th>상태</th><th class="num">임대료</th><th>임대인 (내부)</th><th>메모 (내부)</th><th></th></tr></thead><tbody>
+        ${ls.map(L => `<tr><td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td><td><button class="btn xs" onclick="event.stopPropagation();openModal({type:'hist',lid:'${L.id}'})">이력</button></td></tr>`).join('')}</tbody></table></div>` : ''}</div>`; }).join('')}`;
 }
 function adminHand() {
   const ls = S.listings.filter(L => L.status === 'expired' || L.status === 'withdrawn');
@@ -1817,7 +2129,7 @@ function adminHand() {
     <div class="bd"><div class="t">${esc(I.name)}</div><div class="ad">${esc(I.address)} · ${esc(floorLabel(L.floors, L.leaseType))}</div><div class="kv"><span>용역 종료<b>${fmtDate(L.mEnd)}</b></span><span>도면<b>${L.plans.length}</b></span><span>사진<b>${L.photos.length}</b></span></div></div>
     <div class="ft">${Object.keys(USERS).filter(u => u !== 'admin' && u !== L.ownerId).map(u => (L.grants || []).includes(u) ? `<span class="chip ok">✓ ${USERS[u].name} 권한</span>` : `<button class="btn sm" onclick="grant('${L.id}','${u}')">${USERS[u].name}에게 이관</button>`).join('')}</div></div>`; }).join('') || '<div class="empty">종료된 매물 없음</div>'}</div>`;
 }
-function grant(lid, u) { const L = getL(lid); L.grants = [...(L.grants || []), u]; note(u, `<b>${esc(bInfo(L).name)}</b> 이전 매물 복사 권한을 받았습니다`); save(); render(); toast('이관 권한 부여', USERS[u].name); }
+function grant(lid, u) { const L = getL(lid); L.grants = [...(L.grants || []), u]; logHist(lid, 'admin', '이관 권한 부여', [{label: '복사 권한', from: '–', to: USERS[u].name}]); note(u, `<b>${esc(bInfo(L).name)}</b> 이전 매물 복사 권한을 받았습니다`); save(); render(); toast('이관 권한 부여', USERS[u].name); }
 function adminViews() {
   const rows = S.proposals.flatMap(p => p.views.map(v => ({...v, p}))).sort((a, b) => b.at.localeCompare(a.at));
   return `<div class="head"><h1>열람</h1><span class="sub">링크 단위 기록</span></div><div class="panel"><table class="tbl"><thead><tr><th>시각</th><th>클라이언트</th><th>담당</th></tr></thead><tbody>
@@ -1830,23 +2142,24 @@ function clientView() {
   if (c.token) {
     const p = S.proposals.find(x => x.token === c.token || x.oldTokens.includes(c.token));
     if (!p || p.oldTokens.includes(c.token)) return `<div class="gate"><div class="card a"><div class="lock" style="background:var(--danger-soft);color:var(--danger)">⦸</div><h2 style="margin:0 0 6px">만료된 링크</h2><p class="sub">이 링크는 더 이상 사용할 수 없습니다.<br>담당 브로커에게 최신 링크를 요청하세요.</p><button class="btn" style="margin-top:14px" onclick="U.client={};render()">돌아가기</button></div></div>`;
+    if (p.expiresAt && S.today > p.expiresAt) { const u = USERS[p.ownerId]; return `<div class="gate"><div class="card a"><div class="lock" style="background:var(--warn-soft);color:var(--warn)">⏱</div><h2 style="margin:0 0 6px">유효기간이 지난 제안서</h2><p class="sub">${fmtDate(p.expiresAt)}까지 유효한 제안서였습니다.<br>최신 제안이 필요하시면 담당자에게 연락해 주세요.</p><div class="exp-bk"><b>${u.name}</b><span>${u.title}</span><span>${u.phone}</span><span>${u.email}</span></div><button class="btn" style="margin-top:14px" onclick="U.client={};render()">돌아가기</button></div></div>`; }
     if (!c.ok) return `<div class="gate"><div class="card a" id="gc"><div class="lock">🔒</div><h2 style="margin:0 0 4px">${esc(p.clientName)} 제안서</h2><p class="sub" style="margin:0">담당 브로커에게 받은 PIN 4자리</p>
       <div class="pin">${[0, 1, 2, 3].map(i => `<input inputmode="numeric" maxlength="1" oninput="pinIn(this,${i})" onkeydown="if(event.key==='Backspace'&&!this.value&&this.previousElementSibling)this.previousElementSibling.focus()">`).join('')}</div>
       <button class="btn ghost sm" onclick="U.client={};render()">취소</button></div></div>`;
-    return clientPage(p.snap, p.genAt, linkOf(p));
+    return clientPage(p.snap, p.genAt, linkOf(p), p.id);
   }
   const ms = S.msgs.filter(m => m.client === 'clientA').slice().reverse();
   return `<div class="main" style="max-width:720px;margin:0 auto"><div class="head"><h1>받은 메시지</h1><span class="sub">${CLIENTS.clientA} · 총무팀</span></div>
     ${ms.map((m, i) => `<div class="mail a" style="--i:${i}" onclick="openLink('${m.token}')"><div class="av">${USERS[m.from].name[0]}</div><div style="flex:1;min-width:0"><div class="row"><b>${USERS[m.from].name}</b><span class="sub">C&amp;W Advisory</span><div class="sp"></div><span class="sub">${fmtStamp(m.at)}</span></div><div style="margin-top:4px">${esc(m.text)}</div><div class="url">https://p.cw-advisory.kr/${m.token}</div></div></div>`).join('')}</div>`;
 }
-function openLink(t) { U.client = {token: t, ok: false}; U.page = 0; render(); setTimeout(() => document.querySelector('.pin input')?.focus(), 50); window.scrollTo({top: 0}); }
+function openLink(t) { pvFlush(); U.client = {token: t, ok: false}; U.page = 0; render(); setTimeout(() => document.querySelector('.pin input')?.focus(), 50); window.scrollTo({top: 0}); }
 function pinIn(el, i) {
   el.value = el.value.replace(/\D/g, '');
   if (el.value && el.nextElementSibling) el.nextElementSibling.focus();
   const ins = [...document.querySelectorAll('.pin input')], v = ins.map(x => x.value).join('');
   if (v.length < 4) return;
   const p = S.proposals.find(x => x.token === U.client.token);
-  if (v === p.pin) { p.views.push({at: stamp()}); save(); U.client.ok = true; render(); }
+  if (v === p.pin) { p.views.push({at: stamp()}); save(); U.client.ok = true; U.page = 0; render(); pvStart(p.id, 'cover'); }
   else { const g = $('#gc'); g.classList.remove('shake'); void g.offsetWidth; g.classList.add('shake'); ins.forEach(x => x.value = ''); ins[0].focus(); }
 }
 
@@ -1883,13 +2196,33 @@ function renderModal() {
       <div class="row" style="justify-content:flex-end;margin-top:18px"><button type="button" class="btn" onclick="closeModal()">취소</button><button class="btn pri">생성</button></div></form></div>`;
   } else if (m.type === 'detail') {
     const L = getL(m.lid);
-    const own = L.ownerId === me();
+    const own = L.ownerId === me(); CP = null;
     h = `<div class="modal full"><div class="mh" style="background:#fbfbf9"><b>제안서 미리보기</b><span class="sub">클라이언트에게 보이는 화면</span><div class="sp"></div>
       ${own ? `<button class="btn sm" onclick="closeModal();editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <div class="cp"><div class="cp-wrap" style="padding-top:28px">${listingPage(projItem(L, null, L.ownerId), 0, 0, S.fx)}</div></div></div>`;
+  } else if (m.type === 'hist') {
+    const L = getL(m.lid), {full, hs} = histFor(m.lid);
+    h = `<div class="modal wide"><div class="mh"><b>변경 이력</b><span class="sub">${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</span><div class="sp"></div>${full ? '' : '<span class="chip">공개 항목만</span>'}<button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">${histList(hs)}</div></div>`;
+  } else if (m.type === 'tour') {
+    const days = []; let d = S.today; while (days.length < 10) { d = addDays(d, 1); const w = new Date(d + 'T00:00:00').getDay(); if (w && w !== 6) days.push(d); }
+    m.date = m.date || days[0]; m.slot = m.slot || '오후';
+    h = `<div class="modal"><div class="mh"><b>현장 답사 요청</b><span class="sub">${esc(snapTitle(CP.pid, m.lid))}</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
+      <div class="f"><label>희망 날짜</label><div class="days">${days.map(dd => `<button class="day ${m.date === dd ? 'on' : ''}" onclick="U.modal.date='${dd}';renderModal()"><span>${DOW[new Date(dd + 'T00:00:00').getDay()]}</span><b>${+dd.slice(8)}</b><small>${+dd.slice(5, 7)}월</small></button>`).join('')}</div></div>
+      <div class="f" style="margin-top:16px"><label>시간대</label>${seg([['오전', '오전'], ['오후', '오후'], ['저녁', '저녁']], m.slot, "(v=>{U.modal.slot=v;renderModal()})")}</div>
+      <div class="fg" style="margin-top:16px;grid-template-columns:110px 1fr"><div class="f"><label>인원</label><input class="in" type="number" min="1" value="${m.people || 2}" oninput="U.modal.people=+this.value"></div><div class="f"><label>메모</label><input class="in" value="${esc(m.memo || '')}" oninput="U.modal.memo=this.value" placeholder="예: 인테리어 업체 동행"></div></div>
+      <div class="row" style="justify-content:flex-end;margin-top:20px"><button class="btn" onclick="closeModal()">취소</button><button class="btn pri" onclick="submitTour()">요청 보내기</button></div></div></div>`;
+  } else if (m.type === 'dup') {
+    const src = getP(m.pid);
+    h = `<div class="modal"><div class="mh"><b>제안서 복제</b><span class="sub">${esc(src.clientName)} · 물건 ${src.items.length}건</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>
+      <form class="mb" onsubmit="event.preventDefault();createDup(this)"><input type="hidden" name="pid" value="${src.id}"><div class="fg" style="grid-template-columns:1fr 1fr">
+      <div class="f"><label>새 클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value==='clientA'"><option value="other">직접 입력</option><option value="clientA">모먼트커피 (클라이언트A)</option></select></div>
+      <div class="f"><label>클라이언트명</label><input class="in" name="cname" placeholder="회사명"></div></div>
+      <label class="chk"><input type="checkbox" name="keep" checked> 물건별 코멘트도 복사</label>
+      <div class="sub" style="margin-top:8px">표지 요구조건과 물건 구성이 복사됩니다. 링크 · PIN · 응답 · 열람 기록은 새로 시작합니다.</div>
+      <div class="row" style="justify-content:flex-end;margin-top:18px"><button type="button" class="btn" onclick="closeModal()">취소</button><button class="btn pri">복제</button></div></form></div>`;
   } else if (m.type === 'preview') {
     const p = getP(m.pid);
-    h = `<div class="modal full"><div class="mh" style="background:#fff"><b>클라이언트 화면</b><span class="sub">${linkOf(p)}</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>${clientPage(p.snap, p.genAt)}</div>`;
+    h = `<div class="modal full"><div class="mh" style="background:#fff"><b>클라이언트 화면</b><span class="sub">${linkOf(p)}</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>${clientPage(p.snap, p.genAt, null, p.id, true)}</div>`;
   }
   root.innerHTML = `<div class="back" onclick="if(event.target===this)closeModal()">${h}</div>`;
   initMaps();
