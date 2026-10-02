@@ -496,6 +496,35 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 .pk-kv{grid-template-columns:repeat(4,1fr)!important}
 .pk-kv b{font-size:14px!important}.pk-kv small{font-size:11px;color:var(--muted)}
 .print-only{display:none}
+.lead{margin:0 0 14px;font-size:14px;line-height:1.65;color:var(--ink2)}.lead b{color:var(--ink)}
+b.neg{color:var(--danger)}b.pos{color:var(--ok)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cmpbar{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.cmpbar div{display:grid;grid-template-columns:70px 1fr 90px;gap:10px;align-items:center;font-size:12.5px}
+.cmpbar span{color:var(--ink2)}.cmpbar b{text-align:right;font-variant-numeric:tabular-nums}
+.cmpbar i{display:block;height:14px;width:var(--w);background:var(--accent);border-radius:0 4px 4px 0;animation:grow .9s var(--ease) both}
+.sh-tl{position:relative;padding-top:24px}
+.sh-axis{position:relative;height:16px;margin-bottom:8px;border-bottom:1px solid var(--line)}
+.sh-axis span{position:absolute;transform:translateX(-50%);font-size:10.5px;color:var(--muted);top:-18px}
+.sh-row{position:relative;height:46px}
+.sh-bar{position:absolute;top:4px;height:38px;border-radius:8px;background:#e1ebf8;border:1px solid #bcd3ef;padding:4px 8px;overflow:hidden;white-space:nowrap;animation:fadeUp .5s var(--ease) both;animation-delay:calc(var(--i)*80ms)}
+.sh-bar.now{background:var(--accent);border-color:var(--accent);color:#fff}.sh-bar.now span{color:#dbe8fa}
+.sh-bar.vac{background:repeating-linear-gradient(45deg,#f1f0ec 0 6px,#e6e4de 6px 12px);border-color:#d6d4cd}
+.sh-bar b{display:block;font-size:12px}.sh-bar span{font-size:10.5px;color:var(--muted)}
+.xtra{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.xsec{border-top:1px dashed var(--line);padding-top:14px}
+.xs-h{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}.xs-h h4{margin:0;font-size:14px}
+.stage{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:12px 14px;border-radius:12px;background:var(--accent-soft)}
+.stage b{font-size:16px;color:var(--accent-2)}.stage span{font-size:13px;color:var(--ink2)}
+.leg-comp{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:600}.leg-comp i{width:9px;height:9px;border-radius:50%;background:#eb6834;border:1.5px solid #fff;box-shadow:0 0 0 1px #eb6834}
+.mods{display:flex;flex-direction:column;gap:6px}
+.mod{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;cursor:pointer;transition:background .2s}
+.mod:hover{background:#f7f7f4}
+.mod div{flex:1;min-width:0}.mod b{display:block;font-size:13px;font-weight:600}.mod span{font-size:11px;color:var(--muted)}
+.mod input{display:none}
+.sw{width:34px;height:20px;border-radius:999px;background:#d6d4cd;position:relative;flex:none;transition:background .25s}
+.sw::after{content:'';position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .25s var(--ease)}
+.mod.on .sw{background:var(--accent)}.mod.on .sw::after{transform:translateX(14px)}
 .cv-sec{margin-bottom:48px}
 .sh{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
 .sh-n{font-size:12px;font-weight:800;color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:4px 8px;font-variant-numeric:tabular-nums;margin-top:2px}
@@ -669,6 +698,7 @@ details.area[open] summary .chev{transform:rotate(180deg)}
   .tiles{grid-template-columns:repeat(2,1fr)}
   .charts{grid-template-columns:1fr}
   .stores{grid-template-columns:repeat(2,1fr)}
+  .two-col{grid-template-columns:1fr}
   .cvm-box,.fp-box,.ns{grid-template-columns:1fr}
   .cvm-list{border-left:0;border-top:1px solid var(--line2)}
   .fp-svg{height:240px}
@@ -826,7 +856,7 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 /* =========================================================
    LeaseDesk prototype — single file, in-memory + localStorage
    ========================================================= */
-const KEY = 'leasedesk-proto-v5';
+const KEY = 'leasedesk-proto-v6';
 const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -997,20 +1027,20 @@ const toNorm = (geo, poly) => poly.map(([x, y]) => [+((geo.ox + x * geo.s) / 100
 
 /* ---------- public data (mock APIs) ---------- */
 const REGISTRY = [
-  {pnu: '1168010700105320001', lat: 37.5205, lng: 127.0229, stn: ['신사역', 37.5163, 127.0203], address: '서울 강남구 압구정로10길 24', name: '가로수 24', use: '제2종 근린생활시설', above: 4, below: 1, gfa: 1120, year: 2014, status: '준공', area: 'sinsa'},
-  {pnu: '1120011400106450002', lat: 37.5432, lng: 127.056, stn: ['성수역', 37.5446, 127.0557], address: '서울 성동구 연무장길 45', name: '연무장 45', use: '제2종 근린생활시설', above: 5, below: 1, gfa: 2380, year: 2016, status: '준공', area: 'seongsu'},
-  {pnu: '1117013100107340003', lat: 37.5381, lng: 127.0009, stn: ['한강진역', 37.5397, 127.0018], address: '서울 용산구 이태원로 234', name: '한남 234', use: '제1종 근린생활시설', above: 3, below: 1, gfa: 690, year: 2018, status: '준공', area: 'hannam'},
-  {pnu: '1114012200100170004', lat: 37.5626, lng: 126.9849, stn: ['명동역', 37.5609, 126.9863], address: '서울 중구 명동8길 17', name: '명동 17', use: '판매시설', above: 6, below: 2, gfa: 2960, year: 2009, status: '준공', area: 'myeongdong'},
+  {pnu: '1168010700105320001', hist: [['2014.11', '2018.03', '의류 편집숍', '패션·잡화'], ['2018.05', '2022.12', '글로벌 SPA 플래그십', '패션·잡화'], ['2023.03', '현재', '편집숍 (현 임차인)', '패션·잡화']], lat: 37.5205, lng: 127.0229, stn: ['신사역', 37.5163, 127.0203], address: '서울 강남구 압구정로10길 24', name: '가로수 24', use: '제2종 근린생활시설', above: 4, below: 1, gfa: 1120, year: 2014, status: '준공', area: 'sinsa'},
+  {pnu: '1120011400106450002', hist: [['2016.09', '2019.06', '수제화 공방', '인쇄·제조'], ['2019.10', '2023.08', '대형 카페', '카페·디저트'], ['2023.11', '현재', '팝업 스토어 운영', '기타']], lat: 37.5432, lng: 127.056, stn: ['성수역', 37.5446, 127.0557], address: '서울 성동구 연무장길 45', name: '연무장 45', use: '제2종 근린생활시설', above: 5, below: 1, gfa: 2380, year: 2016, status: '준공', area: 'seongsu'},
+  {pnu: '1117013100107340003', hist: [['2018.07', '2021.02', '와인바', '주점'], ['2021.05', '현재', '브런치 카페', '카페·디저트']], lat: 37.5381, lng: 127.0009, stn: ['한강진역', 37.5397, 127.0018], address: '서울 용산구 이태원로 234', name: '한남 234', use: '제1종 근린생활시설', above: 3, below: 1, gfa: 690, year: 2018, status: '준공', area: 'hannam'},
+  {pnu: '1114012200100170004', hist: [['2009.12', '2020.03', '화장품 로드숍', '화장품'], ['2020.03', '2022.09', '공실', '공실'], ['2022.10', '현재', 'K-뷰티 편집숍', '화장품']], lat: 37.5626, lng: 126.9849, stn: ['명동역', 37.5609, 126.9863], address: '서울 중구 명동8길 17', name: '명동 17', use: '판매시설', above: 6, below: 2, gfa: 2960, year: 2009, status: '준공', area: 'myeongdong'},
   {pnu: '1165010800104370005', lat: 37.5006, lng: 127.0265, stn: ['강남역', 37.4979, 127.0276], address: '서울 서초구 강남대로 437', name: '강남대로 437', use: '판매시설', above: 12, below: 4, gfa: 9840, year: 2012, status: '준공', area: 'gangnam'},
   {pnu: '1120011500100180006', lat: 37.5419, lng: 127.0583, stn: ['성수역', 37.5446, 127.0557], address: '서울 성동구 성수이로7길 18', name: '성수 7길 18', use: '제2종 근린생활시설', above: 6, below: 2, gfa: 1980, year: null, status: '인허가', area: 'seongsu', final: {gfa: 2015, year: 2026, at: '2026-10-20'}},
-  {pnu: '1114014500102120007', lat: 37.5659, lng: 126.9905, stn: ['을지로3가역', 37.5663, 126.9918], address: '서울 중구 을지로 157', name: '', use: '', above: null, below: null, gfa: null, year: null, status: '정보없음', area: 'euljiro'},
-  {pnu: '4113510900106660008', lat: 37.3952, lng: 127.1103, stn: ['판교역', 37.3948, 127.1112], address: '경기 성남시 분당구 판교역로 166', name: '판교 166', use: '판매시설', above: 8, below: 5, gfa: 18400, year: 2015, status: '준공', area: null},
+  {pnu: '1114014500102120007', hist: [['2011.04', '2019.06', '인쇄소', '인쇄·제조'], ['2019.11', '2026.08', '노포 맥줏집', '주점']], lat: 37.5659, lng: 126.9905, stn: ['을지로3가역', 37.5663, 126.9918], address: '서울 중구 을지로 157', name: '', use: '', above: null, below: null, gfa: null, year: null, status: '정보없음', area: 'euljiro'},
+  {pnu: '4113510900106660008', hist: [['2015.10', '현재', '브랜드 리테일', '패션·잡화']], lat: 37.3952, lng: 127.1103, stn: ['판교역', 37.3948, 127.1112], address: '경기 성남시 분당구 판교역로 166', name: '판교 166', use: '판매시설', above: 8, below: 5, gfa: 18400, year: 2015, status: '준공', area: null},
   {pnu: '1120011400100130009', lat: 37.544, lng: 127.0571, stn: ['성수역', 37.5446, 127.0557], address: '서울 성동구 성수이로 113', name: '성수 S타워', use: '업무시설', above: 10, below: 2, gfa: 15420, year: 2019, status: '준공', area: 'seongsu'},
 ];
 
 /* mock 상권 data (서울시 상권분석서비스 형태, 예시 값) */
 const AREAS = {
-  seongsu: {name: '성수동 카페거리', kind: '발달상권', q: '2026년 2분기',
+  seongsu: {bench: {name: '뚝섬(성수)', rent: 41200, vac: [['25.3Q', 6.1], ['25.4Q', 5.4], ['26.1Q', 5.0], ['26.2Q', 4.6]]}, change: {stage: '상권확장', run: 62, closed: 41, open: 4.8, close: 3.1}, stores300: 610, salesAge: [['10대', 4], ['20대', 31], ['30대', 33], ['40대', 18], ['50대', 9], ['60+', 5]], female: 58, foreign: {daily: 6400, share: 6.5, top: [['중국', 31], ['일본', 24], ['미국', 11]], salesShare: 9}, hinter: {hh: 21400, single: 46, income: 512, spend: 298}, subway: {name: '성수역', daily: 92400, wk: [1.2, 15.8, 6.4, 5.1, 14.9, 4.6], we: [1.6, 6.2, 8.8, 10.4, 12.1, 6.3]}, name: '성수동 카페거리', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 18400], ['직장 인구', 52300], ['유동 인구', 98700]],
     hourly: [['00–06', 3], ['06–11', 11], ['11–14', 19], ['14–17', 23], ['17–21', 29], ['21–24', 15]],
     sales: [['25.3Q', 742], ['25.4Q', 768], ['26.1Q', 731], ['26.2Q', 812]],
@@ -1018,7 +1048,7 @@ const AREAS = {
     age: [['10대', 8], ['20대', 36], ['30대', 29], ['40대', 15], ['50대', 8], ['60+', 4]],
     dow: [['월', 11], ['화', 11], ['수', 12], ['목', 13], ['금', 15], ['토', 20], ['일', 18]],
     week: [56, 44], stores: [['카페·디저트', 31], ['음식점', 24], ['패션·잡화', 18], ['기타', 10], ['뷰티', 9], ['생활서비스', 8]]},
-  sinsa: {name: '가로수길', kind: '발달상권', q: '2026년 2분기',
+  sinsa: {bench: {name: '신사역', rent: 72500, vac: [['25.3Q', 18.9], ['25.4Q', 19.4], ['26.1Q', 17.6], ['26.2Q', 16.2]]}, change: {stage: '다이나믹', run: 58, closed: 52, open: 5.6, close: 5.9}, stores300: 540, salesAge: [['10대', 6], ['20대', 30], ['30대', 30], ['40대', 19], ['50대', 10], ['60+', 5]], female: 62, foreign: {daily: 5200, share: 4.6, top: [['중국', 28], ['일본', 26], ['대만', 12]], salesShare: 11}, hinter: {hh: 9800, single: 38, income: 780, spend: 452}, subway: {name: '신사역', daily: 68400, wk: [0.9, 11.2, 5.8, 4.9, 12.6, 4.1], we: [1.2, 4.1, 7.2, 8.9, 10.2, 5.2]}, name: '가로수길', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 8200], ['직장 인구', 38500], ['유동 인구', 112000]],
     hourly: [['00–06', 2], ['06–11', 9], ['11–14', 18], ['14–17', 25], ['17–21', 31], ['21–24', 15]],
     sales: [['25.3Q', 486], ['25.4Q', 512], ['26.1Q', 478], ['26.2Q', 534]],
@@ -1026,7 +1056,7 @@ const AREAS = {
     age: [['10대', 7], ['20대', 34], ['30대', 28], ['40대', 16], ['50대', 9], ['60+', 6]],
     dow: [['월', 11], ['화', 11], ['수', 12], ['목', 13], ['금', 16], ['토', 20], ['일', 17]],
     week: [49, 51], stores: [['패션·잡화', 34], ['카페·디저트', 21], ['음식점', 18], ['뷰티', 14], ['기타', 8], ['생활서비스', 5]]},
-  hannam: {name: '한남동 이태원로', kind: '발달상권', q: '2026년 2분기',
+  hannam: {bench: {name: '이태원', rent: 58300, vac: [['25.3Q', 22.1], ['25.4Q', 21.4], ['26.1Q', 20.2], ['26.2Q', 19.8]]}, change: {stage: '정체', run: 71, closed: 57, open: 3.9, close: 4.3}, stores300: 380, salesAge: [['10대', 3], ['20대', 24], ['30대', 34], ['40대', 22], ['50대', 11], ['60+', 6]], female: 54, foreign: {daily: 11800, share: 18.3, top: [['미국', 22], ['중국', 18], ['일본', 15]], salesShare: 16}, hinter: {hh: 15600, single: 41, income: 640, spend: 380}, subway: {name: '한강진역', daily: 31200, wk: [0.4, 5.1, 2.6, 2.4, 5.8, 2.2], we: [0.6, 2.2, 3.9, 4.8, 5.6, 3.1]}, name: '한남동 이태원로', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 14200], ['직장 인구', 21800], ['유동 인구', 64300]],
     hourly: [['00–06', 4], ['06–11', 8], ['11–14', 16], ['14–17', 22], ['17–21', 32], ['21–24', 18]],
     sales: [['25.3Q', 392], ['25.4Q', 418], ['26.1Q', 401], ['26.2Q', 437]],
@@ -1034,7 +1064,7 @@ const AREAS = {
     age: [['10대', 5], ['20대', 31], ['30대', 32], ['40대', 18], ['50대', 9], ['60+', 5]],
     dow: [['월', 10], ['화', 10], ['수', 11], ['목', 13], ['금', 17], ['토', 21], ['일', 18]],
     week: [47, 53], stores: [['음식점', 33], ['카페·디저트', 22], ['패션·잡화', 19], ['기타', 9], ['갤러리·문화', 9], ['뷰티', 8]]},
-  myeongdong: {name: '명동', kind: '관광특구', q: '2026년 2분기',
+  myeongdong: {bench: {name: '명동', rent: 148000, vac: [['25.3Q', 14.2], ['25.4Q', 12.6], ['26.1Q', 10.9], ['26.2Q', 9.8]]}, change: {stage: '상권확장', run: 66, closed: 44, open: 5.2, close: 3.6}, stores300: 920, salesAge: [['10대', 9], ['20대', 33], ['30대', 25], ['40대', 16], ['50대', 11], ['60+', 6]], female: 61, foreign: {daily: 38500, share: 42.1, top: [['중국', 36], ['일본', 21], ['대만', 9]], salesShare: 48}, hinter: {hh: 3900, single: 58, income: 455, spend: 270}, subway: {name: '명동역', daily: 104800, wk: [1.1, 16.4, 9.8, 9.1, 16.2, 6.9], we: [1.4, 7.6, 13.2, 15.8, 15.1, 7.4]}, name: '명동', kind: '관광특구', q: '2026년 2분기',
     pop: [['상주 인구', 3100], ['직장 인구', 67000], ['유동 인구', 241000]],
     hourly: [['00–06', 3], ['06–11', 12], ['11–14', 22], ['14–17', 24], ['17–21', 27], ['21–24', 12]],
     sales: [['25.3Q', 1388], ['25.4Q', 1462], ['26.1Q', 1301], ['26.2Q', 1520]],
@@ -1042,7 +1072,7 @@ const AREAS = {
     age: [['10대', 12], ['20대', 33], ['30대', 24], ['40대', 15], ['50대', 10], ['60+', 6]],
     dow: [['월', 13], ['화', 13], ['수', 13], ['목', 14], ['금', 16], ['토', 17], ['일', 14]],
     week: [61, 39], stores: [['화장품', 29], ['음식점', 24], ['패션·잡화', 21], ['카페·디저트', 9], ['환전·관광', 9], ['기타', 8]]},
-  gangnam: {name: '강남역', kind: '발달상권', q: '2026년 2분기',
+  gangnam: {bench: {name: '강남대로', rent: 88000, vac: [['25.3Q', 17.5], ['25.4Q', 18.1], ['26.1Q', 17.2], ['26.2Q', 16.9]]}, change: {stage: '정체', run: 69, closed: 58, open: 4.1, close: 4.5}, stores300: 760, salesAge: [['10대', 6], ['20대', 29], ['30대', 31], ['40대', 19], ['50대', 10], ['60+', 5]], female: 51, foreign: {daily: 9200, share: 5.3, top: [['중국', 27], ['일본', 19], ['미국', 14]], salesShare: 7}, hinter: {hh: 12800, single: 52, income: 690, spend: 410}, subway: {name: '강남역', daily: 186500, wk: [2.4, 34.1, 14.2, 12.8, 33.5, 11.9], we: [2.9, 12.4, 18.6, 21.2, 22.8, 12.1]}, name: '강남역', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 9800], ['직장 인구', 148000], ['유동 인구', 172000]],
     hourly: [['00–06', 2], ['06–11', 21], ['11–14', 27], ['14–17', 18], ['17–21', 24], ['21–24', 8]],
     sales: [['25.3Q', 1912], ['25.4Q', 2034], ['26.1Q', 1876], ['26.2Q', 1958]],
@@ -1050,7 +1080,7 @@ const AREAS = {
     age: [['10대', 9], ['20대', 35], ['30대', 27], ['40대', 15], ['50대', 9], ['60+', 5]],
     dow: [['월', 14], ['화', 14], ['수', 15], ['목', 15], ['금', 17], ['토', 14], ['일', 11]],
     week: [78, 22], stores: [['음식점', 38], ['기타', 16], ['카페·디저트', 14], ['병·의원', 12], ['생활서비스', 11], ['학원', 9]]},
-  euljiro: {name: '을지로3가', kind: '골목상권', q: '2026년 2분기',
+  euljiro: {bench: {name: '을지로', rent: 38000, vac: [['25.3Q', 11.2], ['25.4Q', 10.8], ['26.1Q', 10.1], ['26.2Q', 9.6]]}, change: {stage: '다이나믹', run: 74, closed: 49, open: 4.4, close: 4.7}, stores300: 480, salesAge: [['10대', 3], ['20대', 26], ['30대', 28], ['40대', 21], ['50대', 14], ['60+', 8]], female: 46, foreign: {daily: 4100, share: 5.1, top: [['중국', 30], ['일본', 22], ['미국', 10]], salesShare: 6}, hinter: {hh: 6100, single: 61, income: 470, spend: 285}, subway: {name: '을지로3가역', daily: 54300, wk: [0.6, 10.2, 5.1, 4.2, 9.8, 3.4], we: [0.5, 2.1, 3.4, 3.9, 4.6, 2.2]}, name: '을지로3가', kind: '골목상권', q: '2026년 2분기',
     pop: [['상주 인구', 7400], ['직장 인구', 61000], ['유동 인구', 88000]],
     hourly: [['00–06', 4], ['06–11', 13], ['11–14', 21], ['14–17', 16], ['17–21', 30], ['21–24', 16]],
     sales: [['25.3Q', 604], ['25.4Q', 655], ['26.1Q', 612], ['26.2Q', 671]],
@@ -1079,6 +1109,19 @@ const USERS = {
 };
 const CLIENTS = {clientA: '모먼트커피'};
 const ROLES = [['brokerA', '브로커A'], ['brokerB', '브로커B'], ['admin', '관리자'], ['clientA', '클라이언트A']];
+
+/* ---------- optional data modules (per proposal) ---------- */
+const MODULES = [
+  ['rent', '상권 평균 임대료 · 공실률', '한국부동산원 임대동향 · 제안 임대료와 비교', true],
+  ['comp', '반경 내 동종 업종 경쟁점', '소상공인시장진흥공단 상가정보', true],
+  ['site', '이 자리의 과거 업종 이력', '지방행정 인허가데이터', true],
+  ['change', '상권 변화 단계 · 개폐업률', '서울시 상권분석서비스', false],
+  ['subway', '가까운 역 시간대별 승하차', '서울 열린데이터광장', false],
+  ['sales', '성별 · 연령대별 매출', '서울시 상권분석서비스 추정매출', false],
+  ['foreign', '외국인 생활인구 · 소비', '서울 생활인구 · 한국관광공사', false],
+  ['hinter', '배후 주거 · 소득', '통계청 SGIS', false],
+];
+const DEFAULT_MODS = Object.fromEntries(MODULES.map(m => [m[0], m[3]]));
 
 /* ---------- seed ---------- */
 function P(s, v) { return v === undefined ? {s} : {s, v}; }
@@ -1123,9 +1166,9 @@ function seed() {
       floors: [F(-1, 380, 'p2u'), F(1, 412, 'p2a'), F(2, 405, 'p2u'), F(3, 405, 'p2u'), F(4, 380, 'p2u'), F(5, 300, 'p2u')],
       plans: [pl('p2a', '1층', y1), pl('p2u', 'B1·2–5층', yu)],
       photos: [PH.brick, PH.seoulStreet, PH.shopLoft, PH.cafe],
-      exclArea: null, deposit: P('nego'), rent: P('v', 38000000), mgmt: P('tbd'), keyMoney: P('nego'), handover: P('now'),
+      exclArea: null, deposit: P('nego'), rent: P('v', 85000000), mgmt: P('tbd'), keyMoney: P('nego'), handover: P('now'),
       note: '플래그십 스토어 선호 · 외벽 사인 가능', mStart: '2026-04-13', mEnd: '2026-10-12',
-      internal: {landlord: '개인 (정○○)', phone: '010-5521-0098', fee: '임대료 1개월분', floor: '월 3,500만원', memo: '보증금 5억 이하 시 임대료 조정 의향'},
+      internal: {landlord: '개인 (정○○)', phone: '010-5521-0098', fee: '임대료 1개월분', floor: '월 8,000만원', memo: '보증금 5억 이하 시 임대료 조정 의향'},
       upd: {}, grants: [], createdAt: '2026-04-14T10:00:00'},
     {id: 'L3', buildingId: B('1117013100107340003'), ownerId: 'brokerB', visibility: 'shared', status: 'active', leaseType: 'partial',
       floors: [F(1, 118, 'p3a', '일부', hannamPart), F(2, 142, 'p3b')],
@@ -1177,7 +1220,8 @@ function seed() {
   const tok = mkToken();
   const props = [{id: 'P1', ownerId: 'brokerA', clientId: 'clientA', clientName: '모먼트커피',
     cover: {region: '성수 · 가로수길 · 한남 · 명동', size: '1층 100㎡ 이상 · 총 250–2,300㎡', moveIn: '2027년 상반기', hq: {name: '모먼트커피 성수 본점', lat: 37.5447, lng: 127.0503},
-      crit: {regions: ['성수', '가로수길', '한남', '명동'], min1F: 100, totalMin: 250, totalMax: 2300, moveBy: '2027-06-30'}},
+      crit: {regions: ['성수', '가로수길', '한남', '명동'], min1F: 100, totalMin: 250, totalMax: 2300, moveBy: '2027-06-30'}, category: '카페·디저트'},
+    modules: {...DEFAULT_MODS},
     items: [
       {listingId: 'L1', comment: '가로수길 메인 동선 코너 자리로 1층 전면 폭이 11m입니다. 2층은 로스터리 쇼룸으로 쓸 수 있습니다.', addedAt: '2026-09-20T10:00:00'},
       {listingId: 'L3', comment: '전면 테라스가 있는 한남동 F&B 입지입니다. 주말 매출 비중이 높아 브랜드 체험형 매장에 적합합니다.', addedAt: '2026-09-20T10:00:00'},
@@ -1267,12 +1311,12 @@ function projItem(L, it, ownerId) {
   return {...base, use: I.use, above: I.above, below: I.below, gfa: I.gfa, year: I.year, leaseType: L.leaseType,
     floors: L.floors.map(f => { const pl = L.plans.find(p => p.id === f.planId) || {}; return {floor: f.floor, area: f.area, scope: f.scope, plan: pl.src || null, pgeo: pl.geo || null, poly: f.scope === '일부' ? f.poly : null}; }),
     leaseArea: L.leaseArea, area1: area1F(L.floors), exclArea: L.exclArea, deposit: L.deposit, rent: L.rent, mgmt: L.mgmt, keyMoney: L.keyMoney, handover: L.handover,
-    note: L.note, photos: L.photos, area: I.B.area ? AREAS[I.B.area] : null, geo: I.B.lat ? {lat: I.B.lat, lng: I.B.lng, stn: I.B.stn} : null, comment: it ? it.comment : '',
+    note: L.note, photos: L.photos, area: I.B.area ? AREAS[I.B.area] : null, geo: I.B.lat ? {lat: I.B.lat, lng: I.B.lng, stn: I.B.stn} : null, siteHist: I.B.hist || null, comment: it ? it.comment : '',
     changed: it ? Object.entries(L.upd || {}).filter(([k, t]) => t > it.addedAt && diffDays(S.today, t.slice(0, 10)) <= 14).map(([k]) => k) : []};
 }
 function project(p) {
   const u = USERS[p.ownerId];
-  return {client: p.clientName, cover: p.cover, broker: {name: u.name, title: u.title, phone: u.phone, email: u.email},
+  return {client: p.clientName, cover: p.cover, modules: {...DEFAULT_MODS, ...(p.modules || {})}, broker: {name: u.name, title: u.title, phone: u.phone, email: u.email},
     fx: S.fx, items: p.items.map(it => projItem(getL(it.listingId), it, p.ownerId))};
 }
 function commitSilent(reason) {
@@ -1440,6 +1484,7 @@ function areaBlock(a) {
         <div class="stack"><i style="width:${a.week[0]}%;background:var(--accent)" title="평일 ${a.week[0]}%"></i><i style="width:${a.week[1]}%;background:var(--series-2)" title="주말 ${a.week[1]}%"></i></div>
         <div class="legend"><span><i style="background:var(--accent)"></i>평일 ${a.week[0]}%</span><span><i style="background:var(--series-2)"></i>주말 ${a.week[1]}%</span></div></div>
     </div>
+    ${areaExtras(a)}
     <div class="chart" style="margin-top:10px"><h5>점포 구성</h5><div class="stores">${a.stores.map(([k, v], i) => `<div class="store" style="--i:${i}"><span class="ico">${icon(k)}</span><div class="st-t"><span>${k}</span><b>${v}%</b></div><span class="st-bar"><i style="--w:${(v / a.stores[0][1]) * 100}%"></i></span></div>`).join('')}</div></div>
   </section>`;
 }
@@ -1519,12 +1564,12 @@ const HEAT_C = ['#fee7d6', '#fcc39d', '#f7955e', '#e8622b', '#b8410f'];
 const COMMUTE = [1, 30, 12, 9, 34, 6];
 function mapSection(x, key) {
   if (!x.geo) return '';
-  MAPS[key] = {...x.geo, title: x.title, area: x.area};
+  MAPS[key] = {...x.geo, title: x.title, area: x.area, comp: MODS.comp && x.area ? compPoints(x, key) : null};
   const a = x.area, slots = a ? a.hourly.map(h => h[0]) : [];
   return `<section class="sec map-sec"><div class="sec-h"><h3>위치 · 시간대별 유동인구</h3>${a ? '<span class="chip line">예시 데이터</span>' : ''}<div class="sp"></div><span class="sub">${esc(x.address)}</span></div>
     <div class="mapwrap"><div class="map" data-key="${key}"></div>
     ${a ? `<div class="map-time noprint"><button class="play" onclick="togglePlay()" title="재생">${U.playing ? '❚❚' : '▶'}</button>${slots.map((h, i) => `<button class="slot ${U.slot === i ? 'on' : ''}" data-i="${i}" onclick="setSlot(${i})">${h}시</button>`).join('')}</div>
-      <div class="map-leg"><span>시간당 유동인구</span><div class="ramp">${HEAT_C.map(c => `<i style="background:${c}"></i>`).join('')}</div><div class="ramp-l"><span>적음</span><span>많음</span></div></div>` : ''}</div>
+      <div class="map-leg">${MODS.comp ? '<div class="leg-comp"><i></i>동종 업종 매장</div>' : ''}<span>시간당 유동인구</span><div class="ramp">${HEAT_C.map(c => `<i style="background:${c}"></i>`).join('')}</div><div class="ramp-l"><span>적음</span><span>많음</span></div></div>` : ''}</div>
     ${a ? `<div class="map-note" data-key="${key}"></div>` : `<div class="map-note"><span class="sub">서울 외 지역은 상권 데이터를 제공하지 않습니다</span></div>`}</section>`;
 }
 function heatCells(d) {
@@ -1574,6 +1619,7 @@ function initMaps() {
       m._heat = {d, vals, max, scale, cells, circles: cells.map(c => L.circle([c.lat, c.lng], {radius: 30, stroke: false, fillOpacity: 0, interactive: false}).addTo(m))};
       drawHeat(m);
     }
+    if (d.comp) d.comp.forEach(([la, ln]) => L.circleMarker([la, ln], {radius: 4, color: '#fff', weight: 1.2, fillColor: '#eb6834', fillOpacity: 1, interactive: false, pane: 'markerPane'}).addTo(m));
     L.circle([d.lat, d.lng], {radius: 300, color: '#2a78d6', weight: 1.2, dashArray: '5 5', fill: false, interactive: false}).addTo(m);
     if (d.stn) L.marker([d.stn[1], d.stn[2]], {icon: L.divIcon({className: '', html: `<div class="stn-b"><i>M</i>${esc(d.stn[0])}</div>`, iconSize: null, iconAnchor: [12, 12]})}).addTo(m);
     L.marker([d.lat, d.lng], {icon: L.divIcon({className: '', html: `<div class="mpin"><div class="pin-l">${esc(d.title)}</div><div class="pin-b"></div></div>`, iconSize: null, iconAnchor: [0, 0]})}).addTo(m);
@@ -1681,6 +1727,80 @@ function pvPanel(p) {
     ${st.map(x => `<div class="pv-r"><span class="pv-l">${esc(x.label)}</span><span class="pv-b"><i style="--w:${(x.t / mx) * 100}%"></i></span><span class="pv-v">${durTxt(x.t)}<small>${x.n}회</small></span></div>`).join('')}</div>`;
 }
 
+/* ---------- optional data blocks ---------- */
+let MODS = {...DEFAULT_MODS}, CAT = null;
+const myRentM2 = x => x.rent?.s === 'v' && x.leaseArea ? x.rent.v / x.leaseArea : null;
+const benchDiff = x => { const m = myRentM2(x), b = x.area?.bench?.rent; return m && b ? Math.round((m / b - 1) * 100) : null; };
+const pct = v => `${v > 0 ? '+' : ''}${v}%`;
+function catOf(a) { return CAT && a.stores.some(st => st[0] === CAT) ? CAT : a.stores[0][0]; }
+function compCount(a) { const c = catOf(a), sh = (a.stores.find(st => st[0] === c) || a.stores[0])[1]; return Math.round(a.stores300 * sh / 100); }
+const BRANDS = {'카페·디저트': ['스타벅스', '메가MGC커피', '투썸플레이스', '블루보틀', '폴 바셋', '개인 카페'], '패션·잡화': ['무신사 스탠다드', '자라', '유니클로', '편집숍', '스트리트 브랜드', '개인 매장'], '음식점': ['한식', '일식', '양식', '중식', '분식', '기타'], '화장품': ['올리브영', '이니스프리', '아모레 편집숍', '시코르', '로드숍', '기타']};
+function compBrands(a) { const c = catOf(a), n = compCount(a), names = BRANDS[c] || ['브랜드 A', '브랜드 B', '브랜드 C', '개인 매장']; const w = [.16, .12, .09, .06, .05]; let left = n;
+  const r = names.slice(0, -1).map((nm, i) => { const v = Math.max(1, Math.round(n * (w[i] || .04))); left -= v; return [nm, v]; }); r.push([names[names.length - 1], Math.max(0, left)]); return r.sort((x, y) => y[1] - x[1]); }
+function compPoints(x, key) {
+  const n = Math.min(compCount(x.area), 70); let seed = Math.abs(Math.round(x.geo.lat * 1e5 + x.geo.lng * 1e4)) % 2147483646 + 1;
+  const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  return Array.from({length: n}, () => { const r = Math.sqrt(rnd()) * 0.0027, t = rnd() * Math.PI * 2; return [x.geo.lat + r * Math.sin(t), x.geo.lng + r * Math.cos(t) * 1.25]; });
+}
+function rentBlock(x, fx) {
+  if (!MODS.rent || !x.area?.bench) return '';
+  const b = x.area.bench, m = myRentM2(x); if (!m) return '';
+  const d = benchDiff(x), mx = Math.max(m, b.rent) * 1.1, vs = b.vac.map(v => v[1]);
+  return `<section class="sec"><div class="sec-h"><h3>임대료 수준</h3><span class="chip line">예시 데이터</span><div class="sp"></div><span class="sub">한국부동산원 임대동향 · ${esc(b.name)} 상권 · ${b.vac[b.vac.length - 1][0]}</span></div>
+    <p class="lead">제안 임대료는 ㎡당 <b>${krw(m)}</b>으로 ${esc(b.name)} 상권 평균(${krw(b.rent)})보다 <b class="${d > 0 ? 'neg' : 'pos'}">${pct(d)}</b> ${d > 0 ? '높습니다' : '낮습니다'}. 상권 공실률은 ${vs[0]}% → ${vs[vs.length - 1]}%로 ${vs[vs.length - 1] < vs[0] ? '낮아지는' : '높아지는'} 추세입니다.</p>
+    <div class="two-col"><div class="chart"><h5>㎡당 월 임대료</h5>
+      <div class="cmpbar"><div><span>상권 평균</span><i style="--w:${b.rent / mx * 100}%;background:#c9c7bf"></i><b>${krw(b.rent)}</b></div><div><span>이 물건</span><i style="--w:${m / mx * 100}%"></i><b>${krw(m)}</b></div></div>
+      <div class="sub" style="margin-top:8px">부동산원 수치는 전체 층 평균입니다. 이 물건 값은 임대료 ÷ 전체 임대면적입니다.</div></div>
+      <div class="chart"><h5>상권 공실률 (%)</h5>${lineChart(b.vac, '%')}</div></div></section>`;
+}
+function compBlock(x) {
+  if (!MODS.comp || !x.area) return '';
+  const a = x.area, c = catOf(a), n = compCount(a), br = compBrands(a);
+  return `<section class="sec"><div class="sec-h"><h3>동종 업종 경쟁점</h3><span class="chip line">예시 데이터</span><div class="sp"></div><span class="sub">소상공인시장진흥공단 상가정보 · 반경 300m</span></div>
+    <p class="lead">반경 300m 안에 <b>${c}</b> 매장이 <b>${n}곳</b> 있습니다. 상권 전체 점포의 ${(a.stores.find(st => st[0] === c) || a.stores[0])[1]}%로, 위 지도에 주황색 점으로 표시했습니다.</p>
+    <div class="two-col"><div class="tiles" style="grid-template-columns:1fr 1fr;margin:0"><div class="tile"><span>300m 내 ${c}</span><b>${n}곳</b></div><div class="tile"><span>500m 내 (추정)</span><b>${Math.round(n * 2.6)}곳</b></div><div class="tile"><span>300m 내 전체 점포</span><b>${nf(a.stores300)}곳</b></div><div class="tile"><span>비중</span><b>${(a.stores.find(st => st[0] === c) || a.stores[0])[1]}%</b></div></div>
+    <div class="chart"><h5>브랜드 · 유형별 (곳)</h5>${hbars(br, v => v + '곳')}</div></div></section>`;
+}
+function siteBlock(x) {
+  if (!MODS.site || !x.siteHist?.length) return '';
+  const h = x.siteHist, yr = v => v === '현재' ? +S.today.slice(0, 4) + (+S.today.slice(5, 7)) / 12 : +v.slice(0, 4) + (+(v.slice(5, 7) || 6)) / 12;
+  const y0 = Math.floor(yr(h[0][0])), y1 = Math.ceil(yr('현재')), span = y1 - y0 || 1;
+  const done = h.filter(r => r[1] !== '현재' && r[2] !== '공실'), avg = done.length ? done.reduce((t, r) => t + yr(r[1]) - yr(r[0]), 0) / done.length : null;
+  return `<section class="sec"><div class="sec-h"><h3>이 자리의 업종 이력</h3><span class="chip line">예시 데이터</span><div class="sp"></div><span class="sub">지방행정 인허가데이터 · ${esc(x.address)}</span></div>
+    <p class="lead">${y0}년 이후 <b>${h.length}번</b> 바뀌었습니다.${avg ? ` 이전 점포의 평균 영업 기간은 <b>${avg.toFixed(1)}년</b>입니다.` : ''} 현재는 ${esc(h[h.length - 1][2])}입니다.</p>
+    <div class="sh-tl"><div class="sh-axis">${Array.from({length: span + 1}, (_, i) => y0 + i).filter((y, i, arr) => span <= 8 || i % 2 === 0 || i === arr.length - 1).map(y => `<span style="left:${(y - y0) / span * 100}%">${y}</span>`).join('')}</div>
+      ${h.map((r, i) => `<div class="sh-row"><div class="sh-bar ${r[2] === '공실' ? 'vac' : ''} ${r[1] === '현재' ? 'now' : ''}" style="left:${(yr(r[0]) - y0) / span * 100}%;width:${Math.max(2, (yr(r[1]) - yr(r[0])) / span * 100)}%;--i:${i}"><b>${esc(r[2])}</b><span>${r[0]} – ${r[1]}</span></div></div>`).join('')}</div></section>`;
+}
+function line2(rowsA, rowsB, unit) {
+  const W = 300, H = 130, pad = 22, all = [...rowsA, ...rowsB].map(r => r[1]), mx = Math.max(...all) * 1.08;
+  const pt = (rows) => rows.map(([k, v], i) => [pad + i * (W - pad * 2) / (rows.length - 1), H - 22 - v / mx * (H - 40)]);
+  const path = pts => pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+  const A = pt(rowsA), B = pt(rowsB);
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%"><line x1="${pad}" x2="${W - pad}" y1="${H - 22}" y2="${H - 22}" stroke="#e6e4de"/>
+    <path d="${path(A)}" fill="none" stroke="var(--accent)" stroke-width="2"/><path d="${path(B)}" fill="none" stroke="var(--series-2)" stroke-width="2"/>
+    ${A.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#fff" stroke="var(--accent)" stroke-width="2"><title>평일 ${rowsA[i][0]} · ${rowsA[i][1]}${unit}</title></circle>`).join('')}
+    ${B.map((p, i) => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#fff" stroke="var(--series-2)" stroke-width="2"><title>주말 ${rowsB[i][0]} · ${rowsB[i][1]}${unit}</title></circle>`).join('')}
+    ${rowsA.map((r, i) => `<text x="${A[i][0]}" y="${H - 6}" font-size="10" text-anchor="middle" fill="#8b8881">${r[0]}</text>`).join('')}</svg>
+    <div class="legend"><span><i style="background:var(--accent)"></i>평일</span><span><i style="background:var(--series-2)"></i>주말</span></div>`;
+}
+function areaExtras(a) {
+  const out = [];
+  if (MODS.change && a.change) { const c = a.change, desc = {'상권확장': '신규 진입이 늘고 있는 성장 국면', '다이나믹': '진입과 폐업이 모두 활발한 변동 국면', '정체': '진입과 폐업이 모두 적은 안정 국면', '상권축소': '폐업이 진입보다 많은 위축 국면'}[c.stage];
+    out.push(`<div class="xsec"><div class="xs-h"><h4>상권 변화 단계</h4><span class="sub">서울시 상권분석서비스</span></div><div class="stage"><b>${c.stage}</b><span>${desc}</span></div>
+      <div class="tiles"><div class="tile"><span>운영 점포 평균 영업</span><b>${c.run}개월</b></div><div class="tile"><span>폐업 점포 평균 영업</span><b>${c.closed}개월</b></div><div class="tile"><span>${catOf(a)} 개업률</span><b>${c.open}%</b></div><div class="tile"><span>${catOf(a)} 폐업률</span><b>${c.close}%</b></div></div></div>`); }
+  if (MODS.subway && a.subway) { const sw = a.subway, sl = a.hourly.map(h => h[0]);
+    out.push(`<div class="xsec"><div class="xs-h"><h4>${esc(sw.name)} 시간대별 승하차</h4><span class="sub">서울 열린데이터광장 · 일평균 ${nf(sw.daily)}명</span></div><div class="two-col"><div class="tiles" style="grid-template-columns:1fr 1fr;margin:0"><div class="tile"><span>일평균 승하차</span><b>${nf(sw.daily)}명</b></div><div class="tile"><span>평일 피크</span><b>${sl[sw.wk.indexOf(Math.max(...sw.wk))]}시</b></div><div class="tile"><span>주말 피크</span><b>${sl[sw.we.indexOf(Math.max(...sw.we))]}시</b></div><div class="tile"><span>주말/평일</span><b>${Math.round(sw.we.reduce((x, y) => x + y) / sw.wk.reduce((x, y) => x + y) * 100)}%</b></div></div><div class="chart"><h5>시간대별 승하차 (천 명)</h5>${line2(sl.map((k, i) => [k, sw.wk[i]]), sl.map((k, i) => [k, sw.we[i]]), '천 명')}</div></div></div>`); }
+  if (MODS.sales && a.salesAge) {
+    out.push(`<div class="xsec"><div class="xs-h"><h4>성별 · 연령대별 매출</h4><span class="sub">서울시 상권분석서비스 추정매출</span></div><div class="two-col"><div class="chart"><h5>연령대별 매출 (%)</h5>${cols(a.salesAge, '%')}</div>
+      <div class="chart"><h5>성별 매출</h5><div class="stack"><i style="width:${a.female}%;background:var(--accent)" title="여성 ${a.female}%"></i><i style="width:${100 - a.female}%;background:var(--series-2)" title="남성 ${100 - a.female}%"></i></div><div class="legend"><span><i style="background:var(--accent)"></i>여성 ${a.female}%</span><span><i style="background:var(--series-2)"></i>남성 ${100 - a.female}%</span></div></div></div></div>`); }
+  if (MODS.foreign && a.foreign) { const f = a.foreign;
+    out.push(`<div class="xsec"><div class="xs-h"><h4>외국인 생활인구 · 소비</h4><span class="sub">서울 생활인구 · 한국관광공사 데이터랩</span></div><div class="two-col"><div class="tiles" style="grid-template-columns:1fr 1fr;margin:0"><div class="tile"><span>외국인 일평균</span><b>${nf(f.daily)}명</b></div><div class="tile"><span>생활인구 중 비중</span><b>${f.share}%</b></div><div class="tile"><span>외국인 카드 매출 비중</span><b>${f.salesShare}%</b></div><div class="tile"><span>1위 국적</span><b>${f.top[0][0]}</b></div></div>
+      <div class="chart"><h5>국적별 비중 (상위 3)</h5>${hbars(f.top, v => v + '%')}</div></div></div>`); }
+  if (MODS.hinter && a.hinter) { const hh = a.hinter;
+    out.push(`<div class="xsec"><div class="xs-h"><h4>배후 주거 · 소득</h4><span class="sub">통계청 SGIS · 반경 500m</span></div><div class="tiles"><div class="tile"><span>세대 수</span><b>${nf(hh.hh)}세대</b></div><div class="tile"><span>1인 가구 비중</span><b>${hh.single}%</b></div><div class="tile"><span>가구 월평균 소득</span><b>${nf(hh.income)}만원</b></div><div class="tile"><span>가구 월 소비지출</span><b>${nf(hh.spend)}만원</b></div></div></div>`); }
+  return out.length ? `<div class="xtra">${out.join('')}</div>` : '';
+}
+
 /* ---------- listing page ---------- */
 function listingPage(x, i, n, fx) {
   const hd = `<div class="lp-h"><div class="eyebrow">${n ? `${pad2(i + 1)} / ${pad2(n)}` : '매물'}</div><h2>${esc(x.title)}</h2><div class="addr">${esc(x.address)}</div>`;
@@ -1720,9 +1840,12 @@ function listingPage(x, i, n, fx) {
       </div></section>
     </div>
     ${calcBlock(x, fx)}
+    ${rentBlock(x, fx)}
+    ${siteBlock(x)}
     ${plans.length ? `<section class="sec plans-sec"><div class="sec-h"><h3>도면</h3><span class="sub">파란 영역 = 임대 범위</span></div><div class="screen-only">${mosaic(key, plans, 'plans', '도면')}<div class="plan-list">${plans.map(m => `<div class="pl-i"><b>${esc(m.cap)}</b>${metaHtml(m)}</div>`).join('')}</div></div>${printMedia(plans, 'one')}</section>` : ''}
     ${photos.length ? `<div class="print-only"><section class="sec"><div class="sec-h"><h3>사진</h3></div>${printMedia(photos, 'two')}</section></div>` : ''}
     ${mapSection(x, key)}
+    ${compBlock(x)}
     ${x.area ? areaBlock(x.area) : ''}
   </article>`;
 }
@@ -1779,14 +1902,14 @@ function areaCompare(P, hd) {
   const top = arr => arr.reduce((m, v) => v[1] > m[1] ? v : m);
   const bar = (v, m, lbl) => `<div class="xb"><b>${lbl}</b><span><i style="--w:${(v / m) * 100}%"></i></span></div>`;
   return `<div class="xa">${hd}
-    <div class="cmp"><table class="tbl xt"><thead><tr><th></th><th>상권</th><th>유형</th><th>일평균 유동인구</th><th>분기 추정 매출</th><th>주말 매출 비중</th><th>유동 피크</th><th>주 연령대</th><th>최다 업종</th></tr></thead><tbody>
+    <div class="cmp"><table class="tbl xt"><thead><tr><th></th><th>상권</th><th>유형</th><th>일평균 유동인구</th><th>분기 추정 매출</th><th>주말 매출 비중</th><th>유동 피크</th><th>주 연령대</th>${MODS.comp ? `<th>동종 업종 300m<small class="th-s">${esc(CAT || '최다 업종')}</small></th>` : ''}<th>최다 업종</th></tr></thead><tbody>
     ${rows.map(({x, i}) => { const a = x.area;
-      if (!a) return `<tr><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">서울 외 지역</div></td><td colspan="7" class="sub">상권 데이터 없음</td></tr>`;
+      if (!a) return `<tr><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">서울 외 지역</div></td><td colspan="${MODS.comp ? 8 : 7}" class="sub">상권 데이터 없음</td></tr>`;
       const ins = areaInsight(a), st = top(a.stores), ag = top(a.age);
       return `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">${esc(a.name)} · ${a.kind}</div></td>
         <td><span class="chip ${ins.type === '유동형' ? 'blue' : ''}">${ins.type}</span></td>
         <td>${bar(fl(a), mx(fl), nf(fl(a)) + '명')}</td><td>${bar(sl(a), mx(sl), nf(sl(a)) + '억원')}</td><td>${bar(we(a), 100, we(a) + '%')}</td>
-        <td><b>${top(a.hourly)[0]}시</b></td><td><b>${ag[0]}</b> <span class="sub">${ag[1]}%</span></td>
+        <td><b>${top(a.hourly)[0]}시</b></td><td><b>${ag[0]}</b> <span class="sub">${ag[1]}%</span></td>${MODS.comp ? `<td><b>${compCount(a)}곳</b></td>` : ''}
         <td><div class="xs"><span class="ico">${icon(st[0])}</span><div><b>${st[0]}</b><span>${st[1]}%</span></div></div></td></tr>`; }).join('')}
     </tbody></table></div></div>`;
 }
@@ -1846,15 +1969,17 @@ function coverPage(P, fx) {
       ${x.ended ? '' : `${fitChips(f)}<div class="pk-kv"><div><span>1층</span><b>${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</b></div><div><span>전체</span><b>${nf(x.leaseArea)}㎡</b></div><div><span>실질 월 비용</span><b>${effMonthly(x) ? krw(effMonthly(x)) : short(x.rent)}</b>${effMonthly(x) ? `<small>${fxOf(effMonthly(x), fx)}</small>` : ''}</div><div><span>인도</span><b>${short(x.handover)}</b></div></div>`}</div></button>`; }).join('')}</div></section>`;
 
   /* 02 cost */
-  h += `<section class="cv-sec">${secHead(2, '비용 비교', cheap ? `실질 월 비용이 가장 낮은 곳은 ${nm(cheap)} (${krw(eff(cheap))}, 평당 ${krw(eff(cheap) / (cheap.x.leaseArea * PYR))})입니다. 금액은 원화 기준이며 외화는 참고용입니다.` : '')}
+  const benchLow = MODS.rent ? by(act.filter(o => benchDiff(o.x) != null), o => benchDiff(o.x), 1) : null;
+  h += `<section class="cv-sec">${secHead(2, '비용 비교', cheap ? `실질 월 비용이 가장 낮은 곳은 ${nm(cheap)} (${krw(eff(cheap))}, 평당 ${krw(eff(cheap) / (cheap.x.leaseArea * PYR))})입니다.${benchLow ? ` 상권 평균 임대료 대비로는 ${nm(benchLow)}이 ${pct(benchDiff(benchLow.x))}로 가장 유리합니다.` : ''} 금액은 원화 기준이며 외화는 참고용입니다.` : '')}
     <div class="row cmp-ctl"><span class="sub">${U.calc.term}개월 · 렌트프리 ${U.calc.rf}개월 기준 · 물건 페이지의 총비용 계산에서 조건 변경</span><div class="sp"></div><span class="sub">외화</span>${curSelect()}</div>
-    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num hi">실질 월 비용</th><th class="num">월 임대료</th><th class="num">보증금</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
+    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num hi">실질 월 비용</th>${MODS.rent ? '<th class="num">상권 평균 대비<small class="th-s">㎡당 임대료</small></th>' : ''}<th class="num">월 임대료</th><th class="num">보증금</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
     ${P.items.map((x, i) => { const o = {x, i};
       return x.ended
-      ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td colspan="8"><span class="chip dark">제안 종료</span></td></tr>`
+      ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td colspan="${MODS.rent ? 9 : 8}"><span class="chip dark">제안 종료</span></td></tr>`
       : `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td>
         <td class="num">${x.area1 != null ? nf(x.area1) + '㎡' : '–'}${tag(o, big, '최대')}</td><td class="num">${nf(x.leaseArea)}㎡</td>
         <td class="num hi">${effMonthly(x) ? `<div class="val"><b>${krw(effMonthly(x))}</b><small>${fxOf(effMonthly(x), fx)}</small></div>${tag(o, cheap, '최저')}` : '–'}</td>
+        ${MODS.rent ? `<td class="num">${benchDiff(x) != null ? `<b class="${benchDiff(x) > 0 ? 'neg' : 'pos'}">${pct(benchDiff(x))}</b><div class="sub">${esc(x.area.bench.name)}</div>` : '–'}</td>` : ''}
         ${['rent', 'deposit', 'mgmt', 'keyMoney'].map(k => `<td class="num"><div class="val"><b>${short(x[k])}</b>${sub(x[k])}</div></td>`).join('')}
         <td class="num">${short(x.handover)}${tag(o, soon, '최단')}</td></tr>`; }).join('')}
     </tbody></table></div></section>`;
@@ -1885,6 +2010,7 @@ function clientPage(snap, genAt, link, pid, preview) {
   CP = pid ? {pid, preview: !!preview} : null;
   const pp = pid ? getP(pid) : null, exp = pp?.expiresAt, left = exp ? diffDays(exp, S.today) : null;
   const P = JSON.parse(snap), fx = P.fx, n = P.items.length, pg = Math.min(U.page, n);
+  MODS = {...DEFAULT_MODS, ...(P.modules || {})}; CAT = P.cover.category || null;
   const tabs = `<button class="ptab ${pg === 0 ? 'on' : ''}" onclick="goPage(0)"><span class="pt-cover">≡</span><span>표지</span></button>` + P.items.map((x, i) => `<button class="ptab ${pg === i + 1 ? 'on' : ''} ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})"><span class="pt-ph" style="background-image:url('${x.photos?.[0] || ''}')"></span><span><b>${pad2(i + 1)}</b> ${esc(x.title)}</span></button>`).join('');
   const pages = U.printAll
     ? [coverPage(P, fx), ...P.items.map((x, i) => listingPage(x, i, n, fx))].map((h, i) => `<div class="${i ? 'pbreak' : ''}">${h}</div>`).join('')
@@ -2268,6 +2394,8 @@ function propEditor(p) {
         <div class="row" style="margin-top:12px"><div class="f" style="width:110px"><label>PIN</label><input class="in" value="${p.pin}" maxlength="4" onchange="setPin('${p.id}',this.value)" style="letter-spacing:4px;font-weight:700"></div><div class="sp"></div><button class="btn sm" style="align-self:flex-end" onclick="reissue('${p.id}')">재발급</button></div>
         <div class="f" style="margin-top:12px"><label>유효기간</label><div class="row"><input class="in" type="date" style="width:170px" value="${p.expiresAt || ''}" onchange="setExp('${p.id}',this.value)">${[7, 14, 30].map(d => `<button class="btn xs" onclick="setExp('${p.id}','${addDays(S.today, d)}')">+${d}일</button>`).join('')}${p.expiresAt ? `<button class="btn xs ghost" onclick="setExp('${p.id}','')">해제</button>` : ''}</div>
           ${p.expiresAt ? `<span class="sub">${S.today > p.expiresAt ? '만료됨 · 링크 접속 시 만료 안내' : `D-${diffDays(p.expiresAt, S.today)}`}</span>` : '<span class="sub">기한 없음</span>'}</div></div>
+      <div class="panel a" style="--i:2"><h3>포함할 데이터</h3><div class="mods">${MODULES.map(([k, l, src]) => { const on = (p.modules || DEFAULT_MODS)[k] ?? DEFAULT_MODS[k];
+        return `<label class="mod ${on ? 'on' : ''}"><div><b>${l}</b><span>${src}</span></div><input type="checkbox" ${on ? 'checked' : ''} onchange="setMod('${p.id}','${k}',this.checked)"><i class="sw"></i></label>`; }).join('')}</div></div>
       ${pvPanel(p)}
       <div class="panel a" style="--i:3"><h3>재생성 이력</h3><div class="list">
         ${S.log.filter(l => l.pid === p.id).slice(0, 6).map(l => `<div class="li" style="padding:8px 0"><span>${esc(l.reason)}</span><time>${fmtStamp(l.at)}</time></div>`).join('')}</div></div>
@@ -2275,12 +2403,13 @@ function propEditor(p) {
 }
 function setCover(pid, k, v) { getP(pid).cover[k] = v; const n = commit('표지 수정'); if (n) toast('클라이언트 페이지 갱신'); }
 function setComment(pid, i, v) { getP(pid).items[i].comment = v; const n = commit('코멘트 수정'); if (n) toast('코멘트 반영', '클라이언트 페이지 갱신'); }
+function setMod(pid, k, v) { const p = getP(pid); p.modules = {...DEFAULT_MODS, ...(p.modules || {}), [k]: v}; const n = commit(`데이터 ${v ? '추가' : '제외'}: ${MODULES.find(m => m[0] === k)[1]}`); toast(`${MODULES.find(m => m[0] === k)[1]} ${v ? 'ON' : 'OFF'}`, n ? '클라이언트 페이지 갱신' : ''); }
 function setExp(pid, v) { getP(pid).expiresAt = v || null; save(); render(); toast(v ? `${fmtDate(v)}까지 유효` : '유효기간 해제'); }
 function createDup(form) {
   const src = getP(form.pid.value), c = form.client.value, name = c === 'clientA' ? CLIENTS.clientA : form.cname.value.trim();
   if (!name) return toast('클라이언트명을 입력하세요');
   const p = {id: uid('P'), ownerId: me(), clientId: c === 'clientA' ? 'clientA' : null, clientName: name, cover: clone(src.cover),
-    items: src.items.map(it => ({listingId: it.listingId, comment: form.keep.checked ? it.comment : '', addedAt: stamp()})),
+    items: src.items.map(it => ({listingId: it.listingId, comment: form.keep.checked ? it.comment : '', addedAt: stamp()})), modules: {...DEFAULT_MODS, ...(src.modules || {})},
     pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], pv: [], responses: {}, tours: [], expiresAt: null, snap: null, genAt: null, createdAt: stamp()};
   if (c !== 'clientA') delete p.cover.hq;
   S.proposals.unshift(p);
@@ -2308,7 +2437,7 @@ function createProp(form) {
   if (!name) return toast('클라이언트명을 입력하세요');
   const p = {id: uid('P'), ownerId: me(), clientId: c === 'clientA' ? 'clientA' : null, clientName: name,
     cover: {region: form.region.value || '—', size: form.size.value || '—', moveIn: form.moveIn.value || '—'},
-    items: [], pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], pv: [], responses: {}, tours: [], expiresAt: null, snap: null, genAt: null, createdAt: stamp()};
+    items: [], modules: {...DEFAULT_MODS}, pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], pv: [], responses: {}, tours: [], expiresAt: null, snap: null, genAt: null, createdAt: stamp()};
   S.proposals.unshift(p);
   if (p.clientId) S.msgs.push({client: p.clientId, pid: p.id, from: me(), token: p.token, at: stamp(), text: '후보지 제안드립니다.'});
   U.modal = null; renderModal(); commit('최초 발행'); openProp(p.id); toast('제안서 생성', `PIN ${p.pin}`);
@@ -2444,7 +2573,7 @@ function renderModal() {
       <div class="row" style="justify-content:flex-end;margin-top:18px"><button type="button" class="btn" onclick="closeModal()">취소</button><button class="btn pri">생성</button></div></form></div>`;
   } else if (m.type === 'detail') {
     const L = getL(m.lid);
-    const own = L.ownerId === me(); CP = null;
+    const own = L.ownerId === me(); CP = null; MODS = {...DEFAULT_MODS}; CAT = null;
     h = `<div class="modal full"><div class="mh" style="background:#fbfbf9"><b>제안서 미리보기</b><span class="sub">클라이언트에게 보이는 화면</span><div class="sp"></div>
       ${own ? `<button class="btn sm" onclick="closeModal();editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <div class="cp"><div class="cp-wrap" style="padding-top:28px">${listingPage(projItem(L, null, L.ownerId), 0, 0, S.fx)}</div></div></div>`;
