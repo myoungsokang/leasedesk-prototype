@@ -496,6 +496,8 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 .pk-kv{grid-template-columns:repeat(4,1fr)!important}
 .pk-kv b{font-size:14px!important}.pk-kv small{font-size:11px;color:var(--muted)}
 .print-only{display:none}
+.seg.lang button{padding:4px 10px;font-size:12px}
+.est{display:inline-block;font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-soft);border-radius:5px;padding:0 5px;margin-left:4px;vertical-align:1px}
 .lead{margin:0 0 14px;font-size:14px;line-height:1.65;color:var(--ink2)}.lead b{color:var(--ink)}
 b.neg{color:var(--danger)}b.pos{color:var(--ok)}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -856,7 +858,7 @@ b.neg{color:var(--danger)}b.pos{color:var(--ok)}
 /* =========================================================
    LeaseDesk prototype — single file, in-memory + localStorage
    ========================================================= */
-const KEY = 'leasedesk-proto-v8';
+const KEY = 'leasedesk-proto-v9';
 const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1108,9 +1110,103 @@ const USERS = {
   admin: {name: '박정호', short: '관리자', title: '상무 · 임차자문 총괄'},
 };
 const CLIENTS = {clientA: {name: '모먼트커피', team: '점포개발팀', label: '클라이언트-카페'}, clientB: {name: '어반스레드', team: '리테일 전략팀', label: '클라이언트-패션'}};
-const ROLES = [['brokerA', '브로커A'], ['brokerB', '브로커B'], ['admin', '관리자'], ...Object.entries(CLIENTS).map(([k, c]) => [k, c.label])];
+const ROLES = [['brokerA', '브로커-카페'], ['brokerB', '브로커-패션'], ['admin', '관리자'], ...Object.entries(CLIENTS).map(([k, c]) => [k, c.label])];
 const isClient = r => r.startsWith('client');
 const clientOpts = sel => Object.entries(CLIENTS).map(([k, c]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${c.name} (${c.label})</option>`).join('');
+
+/* ---------- i18n (client page) ---------- */
+const LG = (ko, en) => U.lang === 'en' ? en : ko;
+const EN = {
+  // names & places
+  '모먼트커피 성수 본점': 'Moment Coffee Seongsu flagship', '어반스레드 성수 쇼룸': 'Urban Thread Seongsu showroom', '모먼트커피': 'Moment Coffee', '어반스레드': 'Urban Thread',
+  '김민준': 'Minjun Kim', '이서연': 'Seoyeon Lee', '이사 · 임차자문팀': 'Director · Tenant Advisory', '차장 · 임차자문팀': 'Associate Director · Tenant Advisory',
+  '가로수 24': 'Garosu 24', '연무장 45': 'Yeonmujang 45', '한남 234': 'Hannam 234', '명동 17': 'Myeongdong 17', '강남대로 437': 'Gangnam-daero 437', '성수 7길 18': 'Seongsu 7-gil 18', '을지로 157': 'Euljiro 157', '판교 166': 'Pangyo 166', '성수 S타워': 'Seongsu S Tower',
+  '서울 강남구 압구정로10길 24': '24 Apgujeong-ro 10-gil, Gangnam-gu, Seoul', '서울 성동구 연무장길 45': '45 Yeonmujang-gil, Seongdong-gu, Seoul', '서울 용산구 이태원로 234': '234 Itaewon-ro, Yongsan-gu, Seoul',
+  '서울 중구 명동8길 17': '17 Myeongdong 8-gil, Jung-gu, Seoul', '서울 서초구 강남대로 437': '437 Gangnam-daero, Seocho-gu, Seoul', '서울 성동구 성수이로7길 18': '18 Seongsui-ro 7-gil, Seongdong-gu, Seoul',
+  '서울 중구 을지로 157': '157 Euljiro, Jung-gu, Seoul', '경기 성남시 분당구 판교역로 166': '166 Pangyoyeok-ro, Bundang-gu, Seongnam', '서울 성동구 성수이로 113': '113 Seongsui-ro, Seongdong-gu, Seoul',
+  '성수 · 가로수길 · 한남 · 명동': 'Seongsu · Garosu-gil · Hannam · Myeongdong', '가로수길 · 한남 · 판교': 'Garosu-gil · Hannam · Pangyo',
+  '1층 100㎡ 이상 · 총 250–2,300㎡': 'Ground floor 100㎡+ · total 250–2,300㎡', '1층 110㎡ 이상 · 총 240–400㎡': 'Ground floor 110㎡+ · total 240–400㎡', '2027년 상반기': '1H 2027', '2027년 1분기': 'Q1 2027',
+  '제2종 근린생활시설': 'Neighborhood retail (Class 2)', '제1종 근린생활시설': 'Neighborhood retail (Class 1)', '근린생활시설': 'Neighborhood retail', '판매시설': 'Retail facility', '업무시설': 'Office',
+  '성수동 카페거리': 'Seongsu Cafe Street', '한남동 이태원로': 'Hannam-dong · Itaewon-ro', '가로수길': 'Garosu-gil', '을지로3가역': 'Euljiro 3-ga Stn.', '을지로3가': 'Euljiro 3-ga', '강남역': 'Gangnam Stn.', '명동역': 'Myeongdong Stn.', '신사역': 'Sinsa Stn.', '성수역': 'Seongsu Stn.', '한강진역': 'Hangangjin Stn.', '판교역': 'Pangyo Stn.',
+  '뚝섬(성수)': 'Ttukseom (Seongsu)', '강남대로': 'Gangnam-daero', '이태원': 'Itaewon', '을지로': 'Euljiro', '명동': 'Myeongdong', '성수': 'Seongsu', '한남': 'Hannam', '판교': 'Pangyo',
+  '발달상권': 'Developed district', '관광특구': 'Tourist zone', '골목상권': 'Alley district', '상권확장': 'Expanding', '다이나믹': 'Dynamic', '정체': 'Stable', '상권축소': 'Contracting',
+  // seed copy
+  '가로수길 메인 동선 코너 자리로 1층 전면 폭이 11m입니다. 2층은 로스터리 쇼룸으로 쓸 수 있습니다.': 'A corner unit on Garosu-gil\'s main path with an 11m ground-floor frontage. The 2nd floor works as a roastery showroom.',
+  '전면 테라스가 있는 한남동 F&B 입지입니다. 주말 매출 비중이 높아 브랜드 체험형 매장에 적합합니다.': 'A Hannam-dong F&B site with a front terrace. Weekend-heavy sales suit an experiential brand store.',
+  '관광객 유동이 가장 많은 대안입니다. 해외 고객 대상 플래그십으로 검토해 보시길 권합니다.': 'The option with the most tourist traffic. Worth considering as a flagship for overseas customers.',
+  '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 모을 수 있습니다.': 'A whole-building lease that can house roastery, cafe and office under one roof.',
+  '가로수길 메인 동선 코너, 전면 폭 11m라 쇼윈도 노출이 가장 좋습니다. 같은 자리에 의류 매장이 10년 가까이 이어진 자리입니다.': 'Corner of Garosu-gil\'s main path; the 11m frontage gives the best window exposure. Apparel stores have occupied this unit for nearly 10 years.',
+  '1층 일부 + 2층 구성으로 쇼룸과 피팅 공간을 나누기 좋습니다. 30대 매출 비중이 높은 상권입니다.': 'Part of the ground floor plus the 2nd floor makes it easy to split showroom and fitting areas. Sales skew to customers in their 30s.',
+  '판교역 지하 연결 동선의 몰 1층입니다. 평일 직장인 수요를 겨냥한 대안입니다.': 'Ground floor of a mall linked underground to Pangyo Station. An option aimed at weekday office workers.',
+  '가로수길 메인 동선 코너 · 전면 폭 11m': 'Garosu-gil main-path corner · 11m frontage', '플래그십 스토어 선호 · 외벽 사인 가능': 'Flagship use preferred · façade signage allowed', '전면 테라스 사용 가능': 'Front terrace available',
+  '명동 중앙로 가시성 · 외국인 관광객 동선': 'High visibility on Myeongdong main street · on the tourist path', '판교역 지하 연결 동선': 'Underground link to Pangyo Station',
+  '2층 쇼룸 활용도가 좋아 보여요. 답사 희망합니다.': 'The 2nd-floor showroom looks useful. We\'d like a site visit.', '주차 가능 여부 확인 부탁드립니다.': 'Please confirm parking availability.', '권리금 조건 확인 후 결정하겠습니다.': 'We\'ll decide after checking the key-money terms.', '테라스 좋아요': 'Love the terrace', '인테리어 업체 동행': 'With interior contractor',
+  '의류 편집숍': 'Apparel select shop', '글로벌 SPA 플래그십': 'Global SPA flagship', '편집숍 (현 임차인)': 'Select shop (current tenant)', '수제화 공방': 'Handmade shoe workshop', '대형 카페': 'Large cafe', '팝업 스토어 운영': 'Pop-up stores',
+  '와인바': 'Wine bar', '브런치 카페': 'Brunch cafe', '화장품 로드숍': 'Cosmetics road shop', 'K-뷰티 편집숍': 'K-beauty select shop', '인쇄소': 'Print shop', '노포 맥줏집': 'Old-school pub', '브랜드 리테일': 'Brand retail',
+  '스타벅스': 'Starbucks', '메가MGC커피': 'Mega MGC Coffee', '투썸플레이스': 'A Twosome Place', '블루보틀': 'Blue Bottle', '폴 바셋': 'Paul Bassett', '개인 카페': 'Independent cafes', '무신사 스탠다드': 'Musinsa Standard', '자라': 'Zara', '유니클로': 'Uniqlo', '스트리트 브랜드': 'Street brands', '개인 매장': 'Independent stores', '올리브영': 'Olive Young', '이니스프리': 'Innisfree', '아모레 편집숍': 'Amore select shop', '시코르': 'Chicor', '로드숍': 'Road shops',
+  // categories & chart labels
+  '카페·디저트': 'Cafe & dessert', '음식점': 'Restaurants', '패션·잡화': 'Fashion & accessories', '뷰티': 'Beauty', '생활서비스': 'Services', '병·의원': 'Clinics', '학원': 'Academies', '화장품': 'Cosmetics', '환전·관광': 'Exchange & tourism', '주점': 'Bars', '인쇄·제조': 'Printing & making', '갤러리·문화': 'Galleries & culture', '금융': 'Finance', '편집숍': 'Select shops',
+  '상주 인구': 'Residents', '직장 인구': 'Workers', '유동 인구': 'Visitors', '중국': 'China', '일본': 'Japan', '미국': 'USA', '대만': 'Taiwan', '여성': 'Female', '남성': 'Male', '평일': 'Weekday', '주말': 'Weekend',
+  // UI
+  '임차 후보지 제안': 'Tenant Site Proposal', '귀중': '', '희망 지역': 'Target areas', '입주 시기': 'Move-in', '담당': 'Advisor', '후보 물건': 'Candidates', '1층 임대면적': 'Ground-floor area', '전체 임대면적': 'Total leased area', '실질 월 비용': 'Effective monthly cost', '가장 빠른 인도': 'Earliest handover',
+  '비용 비교': 'Cost comparison', '위치': 'Location', '공간 · 동일 축척': 'Space · same scale', '상권': 'Trade area', '다음 단계': 'Next steps', '조건 비교': 'Terms',
+  '1층 면적': 'Ground-floor area', '전체 면적': 'Total area', '지역': 'Area', '1층': 'GF', '전체': 'Total', '월 임대료': 'Monthly rent', '보증금': 'Deposit', '월 관리비': 'Monthly CAM', '권리금': 'Key money', '인도일': 'Handover', '인도': 'Handover',
+  '상권 평균 대비': 'vs. market avg.', '㎡당 임대료': 'rent per ㎡', '물건 페이지의 총비용 계산에서 조건 변경': 'adjust in each property\'s cost calculator', '렌트프리': 'Rent-free', '기준': 'basis', '외화': 'FX', '원화 기준': 'KRW basis', '원화 (KRW)': 'KRW',
+  '제안 종료': 'Withdrawn', '회신 전': 'No reply yet', '관심 있음': 'Interested', '관심 없음': 'Not interested', '보류': 'On hold', '협의': 'Negotiable', '추후 안내': 'TBA', '추후': 'TBA', '없음': 'None', '즉시': 'Immediate', '예상 일정 · 확정 아님': 'Estimated · not confirmed', '예상': 'est.',
+  '최저': 'Lowest', '최대': 'Largest', '최단': 'Soonest', '미충족': 'not met', '확인 필요': 'to confirm', '번호를 누르면 해당 물건으로 이동': 'Tap a number to open the property', '기준 위치': 'Reference point', '인근': 'nearby',
+  '도면 형태': 'Plan shape', '사각형 환산': 'Equal-area box', '겹쳐 보기': 'Overlay', '나란히 보기': 'Side by side', '1층 기준 · 격자 5m': 'Ground floor · 5m grid',
+  '도면 형태: 1층 임대 범위의 실제 윤곽. 나란히 보기에서 도면이 함께 보입니다.': 'Plan shape: actual outline of the ground-floor lease. Side-by-side shows the drawings.', '사각형 환산: 같은 면적의 사각형으로 크기만 비교합니다.': 'Equal-area box: compares size only.',
+  '서울 외 지역': 'Outside Seoul', '상권 데이터 없음': 'No trade-area data', '유형': 'Type', '일평균 유동인구': 'Daily visitors', '분기 추정 매출': 'Quarterly sales (est.)', '주말 매출 비중': 'Weekend sales share', '유동 피크': 'Peak hours', '주 연령대': 'Main age group', '최다 업종': 'Top category', '동종 업종 300m': 'Same category 300m',
+  '유동형': 'Visitor-driven', '상주형': 'Resident-driven', '균형형': 'Balanced', '유동형 상권': 'Visitor-driven area', '상주형 상권': 'Resident-driven area', '균형형 상권': 'Balanced area',
+  '물건': 'Property', '범위': 'Scope', '통임대': 'Whole building', '부분임대': 'Partial', '일부': 'part', '층별 임대면적': 'Area by floor', '임대면적': 'Leased area', '합계': 'Total', '전용면적': 'Net area', '건물 정보': 'Building',
+  '주소': 'Address', '용도': 'Use', '지상': 'Above ground', '지하': 'Below ground', '연면적': 'Gross floor area', '준공': 'Completed', '임대 조건': 'Lease terms', '담당 코멘트': 'Advisor\'s note', '1층 미포함': 'No ground floor',
+  '이 물건 어떠세요?': 'What do you think of this property?', '선택하면 담당자에게 바로 전달됩니다': 'Your choice goes straight to your advisor', '한 줄 코멘트 (선택)': 'One-line comment (optional)', '현장 답사 요청': 'Request a site visit', '미리보기에서는 응답할 수 없습니다': 'Responses are disabled in preview',
+  '총비용 계산': 'Total cost calculator', '조건을 바꾸면 모든 물건에 같이 적용됩니다': 'Changes apply to every property', '계약 기간': 'Lease term', '1년': '1 yr', '2년': '2 yrs', '3년': '3 yrs', '5년': '5 yrs', '총 임대료': 'Total rent', '총 관리비': 'Total CAM', '총 점유비용': 'Total occupancy cost', '초기 비용': 'Upfront cost',
+  '관리비 미정 · 제외': 'CAM TBD · excluded', '보증금 + 권리금 · 보증금은 반환': 'Deposit + key money · deposit refundable', '보증금 · 계약 종료 시 반환': 'Deposit · refunded at lease end',
+  '임대료 수준': 'Rent level', '예시 데이터': 'Sample data', '한국부동산원 임대동향': 'Korea Real Estate Board rent survey', '㎡당 월 임대료': 'Monthly rent per ㎡', '상권 평균': 'Market avg.', '이 물건': 'This property', '상권 공실률 (%)': 'Vacancy rate (%)',
+  '부동산원 수치는 전체 층 평균입니다. 이 물건 값은 임대료 ÷ 전체 임대면적입니다.': 'Survey figures average all floors. This property = rent ÷ total leased area.',
+  '이 자리의 업종 이력': 'Tenancy history of this unit', '지방행정 인허가데이터': 'Local business permit data', '현재': 'Present', '공실': 'Vacant',
+  '도면': 'Floor plans', '파란 영역 = 임대 범위': 'Blue = leased area', '평면도': 'floor plan', '층 일부 임대 · 파란 영역': 'Part of floor · blue area', '층 전체 임대': 'Full floor', '층 전체': 'Full floor', '표시 영역': 'Marked area', '층당': 'per floor', '건물': 'Building',
+  '위치 · 시간대별 유동인구': 'Location · visitors by hour', '시간당 유동인구': 'Visitors per hour', '적음': 'Low', '많음': 'High', '동종 업종 매장': 'Same-category stores', '서울 외 지역은 상권 데이터를 제공하지 않습니다': 'Trade-area data is available in Seoul only',
+  '동종 업종 경쟁점': 'Same-category competitors', '소상공인시장진흥공단 상가정보 · 반경 300m': 'SEMAS store data · 300m radius', '500m 내 (추정)': 'Within 500m (est.)', '300m 내 전체 점포': 'All stores within 300m', '비중': 'Share', '브랜드 · 유형별 (곳)': 'By brand / type',
+  '상권 분석': 'Trade-area analysis', '상권 유형': 'Area type', '일평균 유동 인구': 'Daily visitors', '인구 구성': 'Population mix', '분기 매출 추이 (억원)': 'Quarterly sales (₩100M)', '시간대별 유동 인구 (%)': 'Visitors by hour (%)', '시간대별 매출 (%)': 'Sales by hour (%)',
+  '연령대별 유동 인구 (%)': 'Visitors by age (%)', '요일별 매출 (%)': 'Sales by weekday (%)', '평일 · 주말 매출': 'Weekday vs weekend sales', '점포 구성': 'Store mix',
+  '상권 변화 단계': 'Trade-area stage', '서울시 상권분석서비스': 'Seoul Trade Area Analysis Service', '운영 점포 평균 영업': 'Avg. age of open stores', '폐업 점포 평균 영업': 'Avg. life of closed stores',
+  '신규 진입이 늘고 있는 성장 국면': 'Growing — new entrants increasing', '진입과 폐업이 모두 활발한 변동 국면': 'Volatile — many openings and closures', '진입과 폐업이 모두 적은 안정 국면': 'Stable — few openings or closures', '폐업이 진입보다 많은 위축 국면': 'Shrinking — more closures than openings',
+  '일평균 승하차': 'Daily riders', '평일 피크': 'Weekday peak', '주말 피크': 'Weekend peak', '주말/평일': 'Weekend / weekday', '시간대별 승하차 (천 명)': 'Riders by hour (thousands)',
+  '성별 · 연령대별 매출': 'Sales by gender and age', '서울시 상권분석서비스 추정매출': 'Seoul estimated sales data', '연령대별 매출 (%)': 'Sales by age (%)', '성별 매출': 'Sales by gender',
+  '외국인 생활인구 · 소비': 'Foreign visitors and spending', '서울 생활인구 · 한국관광공사 데이터랩': 'Seoul living population · KTO DataLab', '외국인 일평균': 'Foreign visitors / day', '생활인구 중 비중': 'Share of population', '외국인 카드 매출 비중': 'Foreign card sales share', '1위 국적': 'Top nationality', '국적별 비중 (상위 3)': 'Top 3 nationalities',
+  '배후 주거 · 소득': 'Catchment households and income', '통계청 SGIS · 반경 500m': 'Statistics Korea SGIS · 500m radius', '세대 수': 'Households', '1인 가구 비중': 'Single-person households', '가구 월평균 소득': 'Avg. monthly household income', '가구 월 소비지출': 'Monthly household spending',
+  '사진': 'Photos', '이전': 'Prev', '다음': 'Next', '표지': 'Cover', 'PDF 다운로드': 'Download PDF', '담당자 연락': 'Contact advisor', '제안서를 PDF로 저장': 'Save this proposal as PDF', '업데이트': 'Updated',
+  '현장 답사 요청': 'Request a site visit', '희망 날짜': 'Preferred date', '시간대': 'Time', '오전': 'Morning', '오후': 'Afternoon', '저녁': 'Evening', '인원': 'People', '메모': 'Note', '예: 인테리어 업체 동행': 'e.g., coming with our contractor', '취소': 'Cancel', '요청 보내기': 'Send request',
+  '답사 요청': 'Visit requested', '면적': 'Area', '곳': '', '기타': 'Other', '재생': 'Play', '외화 선택': 'Select currency', '사진': 'photos', '도면': 'floor plans',
+  '상권 평균 임대료 대비로는': 'vs market rent', '시간당 유동인구': 'Visitors per hour',
+};
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const DOW_EN = {'일': 'Sun', '월': 'Mon', '화': 'Tue', '수': 'Wed', '목': 'Thu', '금': 'Fri', '토': 'Sat'};
+let EN_RE = null;
+Object.keys(EN).filter(k => k.includes('&')).forEach(k => { EN[k.replace(/&/g, '&amp;')] = EN[k]; });
+const wonEN = v => v >= 1e9 ? `₩${(v / 1e9).toFixed(2).replace(/\.?0+$/, '')}B` : v >= 1e6 ? `₩${(v / 1e6).toFixed(1).replace(/\.0$/, '')}M` : `₩${nf(Math.round(v))}`;
+const num = a => parseFloat(String(a).replace(/,/g, ''));
+const tv = s => U.lang === 'en' ? (EN[s] ?? s) : s;
+function tr(h) {
+  if (U.lang !== 'en') return h;
+  if (!EN_RE) EN_RE = new RegExp(Object.keys(EN).sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+  h = h.replace(/>([월화수목금토일])</g, (_, d) => `>${DOW_EN[d]}<`).replace(/="([월화수목금토일]) ·/g, (_, d) => `="${DOW_EN[d]} ·`).replace(/(\d+(?:\.\d+)?)천 명/g, '$1k');
+  h = h.replace(EN_RE, m => EN[m]).replace(/>층</g, '>Floor<')
+    .replace(/(\d[\d,]*(?:\.\d+)?)억\s?(\d[\d,]*(?:\.\d+)?)만원/g, (_, a, b) => wonEN(num(a) * 1e8 + num(b) * 1e4))
+    .replace(/(\d[\d,]*(?:\.\d+)?)억원?/g, (_, a) => wonEN(num(a) * 1e8))
+    .replace(/(\d[\d,]*(?:\.\d+)?)만원/g, (_, a) => wonEN(num(a) * 1e4))
+    .replace(/(\d[\d,]*)원/g, (_, a) => wonEN(num(a)))
+    .replace(/평당 /g, 'per py ').replace(/(\d[\d,]*(?:\.\d+)?)평/g, '$1 py')
+    .replace(/(\d{4})년 (\d)분기/g, 'Q$2 $1').replace(/(\d{4})년 (\d{1,2})월/g, (_, y, m) => `${MON[+m - 1]} ${y}`)
+    .replace(/(\d{4})년/g, '$1').replace(/(\d+(?:\.\d+)?)년/g, '$1 yrs')
+    .replace(/(\d+)개월/g, '$1 mo').replace(/(\d+)개 층/g, '$1 floors')
+    .replace(/(\d[\d,]*)곳/g, '$1').replace(/(\d[\d,]*)명/g, '$1').replace(/(\d[\d,]*)세대/g, '$1 HH').replace(/(\d+)회/g, '$1×')
+    .replace(/(\d+)분 (\d+)초/g, '$1m $2s').replace(/(\d+)분/g, '$1m').replace(/(\d+)초/g, '$1s')
+    .replace(/(\d+)층/g, '$1').replace(/(\d+)시/g, '$1h').replace(/(\d)0대/g, '$10s').replace(/(\d{1,2})월/g, (_, m) => MON[+m - 1]);
+  return h;
+}
 
 /* ---------- optional data modules (per proposal) ---------- */
 const MODULES = [
@@ -1176,7 +1272,7 @@ function seed() {
       floors: [F(1, 118, 'p3a', '일부', hannamPart), F(2, 142, 'p3b')],
       plans: [pl('p3a', '1층', h1), pl('p3b', '2층', h2)],
       photos: [PH.terrace, PH.cafeBar, PH.garden],
-      exclArea: 221, deposit: P('v', 200000000), rent: P('v', 16500000), mgmt: P('v', 900000), keyMoney: P('v', 100000000), handover: P('nego'),
+      exclArea: 221, deposit: P('v', 200000000), rent: P('v', 16500000), mgmt: P('v', 900000), keyMoney: P('v', 100000000), handover: P('est', '2027-02-01'),
       note: '전면 테라스 사용 가능', mStart: '2026-06-01', mEnd: '2027-03-31',
       internal: {landlord: '한남234 주식회사', phone: '02-794-2340', fee: '중개보수 0.9%', floor: '월 1,500만원', memo: 'F&B 선호, 주류 판매 가능'},
       upd: {}, grants: [], createdAt: '2026-06-02T09:00:00'},
@@ -1280,7 +1376,7 @@ function seed() {
 let S;
 try { S = JSON.parse(store.getItem(KEY)); } catch (e) { S = null; }
 const U = {role: store.getItem(KEY + '-role') || 'brokerA', tab: {brokerA: 'mine', brokerB: 'mine', admin: 'over', clientA: 'inbox', clientB: 'inbox'},
-  prop: null, modal: null, client: {pid: null, token: null, ok: false}, unit: 'sqm', cur: 'USD', slot: 4, playing: null, calc: {term: 24, rf: 0}, fpShape: 'plan', fpMode: 'overlay', guide: false, open: {}, page: 0, pgAnim: 0, printAll: false};
+  prop: null, modal: null, client: {pid: null, token: null, ok: false}, unit: 'sqm', lang: 'ko', cur: 'USD', slot: 4, playing: null, calc: {term: 24, rf: 0}, fpShape: 'plan', fpMode: 'overlay', guide: false, open: {}, page: 0, pgAnim: 0, printAll: false};
 let D = null; // listing draft
 let lastView = '';
 
@@ -1353,7 +1449,7 @@ const FIELD_LBL = {leaseType: '임대 유형', floors: '층 · 면적', plans: '
 const getPath = (o, k) => k.split('.').reduce((a, x) => a == null ? a : a[x], o);
 function fmtV(k, v) {
   if (v == null || v === '') return '–';
-  if (['deposit', 'rent', 'mgmt', 'keyMoney', 'handover'].includes(k)) return v.s === 'v' && typeof v.v === 'string' ? fmtDate(v.v) : priceShort(v);
+  if (['deposit', 'rent', 'mgmt', 'keyMoney', 'handover'].includes(k)) return v.s === 'est' ? fmtDate(v.v) + ' (예상)' : v.s === 'v' && typeof v.v === 'string' ? fmtDate(v.v) : priceShort(v);
   if (k === 'floors') return v.map(f => `${fmtF(f.floor)}${f.scope === '일부' ? ' 일부' : ''} ${nf(f.area || 0)}㎡`).join(', ');
   if (k === 'photos' || k === 'plans') return `${v.length}장`;
   if (k === 'visibility') return v === 'shared' ? '전체 공유' : '나만 보기';
@@ -1445,6 +1541,7 @@ function priceTxt(p, fx, area) {
 }
 function priceShort(p) {
   if (!p) return '–';
+  if (p.s === 'est') return `${fmtDate(p.v).slice(2)} 예상`;
   return {nego: '협의', tbd: '추후', none: '없음', now: '즉시'}[p.s] || (typeof p.v === 'string' ? fmtDate(p.v).slice(2) : krw(p.v));
 }
 
@@ -1475,10 +1572,10 @@ function areaInsight(a) {
   const type = r >= 1.1 ? '유동형' : r <= 0.9 ? '상주형' : '균형형';
   const pk = a.hourly.reduce((m, x) => x[1] > m[1] ? x : m);
   const sp = a.salesHourly.reduce((m, x) => x[1] > m[1] ? x : m);
-  const t1 = type === '유동형' ? '상주 인구보다 방문 인구가 많아 <b>짧은 방문·체류형 업종</b>에 유리합니다.'
-    : type === '상주형' ? '직장·거주 인구 비중이 높아 <b>반복 이용 수요</b>가 안정적입니다.' : '상주와 유동 인구가 비슷해 <b>업종 선택 폭</b>이 넓습니다.';
-  const t2 = a.week[1] >= 40 ? `주말 매출이 ${a.week[1]}%로 <b>여가·소비 수요</b>가 강합니다.` : `평일 매출이 ${a.week[0]}%로 <b>직장인 수요 중심</b>입니다.`;
-  return {type, html: `<b>${type} 상권</b> · ${t1} 유동 인구는 <b>${pk[0]}시</b>, 매출은 <b>${sp[0]}시</b>에 가장 많습니다. ${t2}`};
+  const t1 = type === '유동형' ? LG('상주 인구보다 방문 인구가 많아 <b>짧은 방문·체류형 업종</b>에 유리합니다.', 'Visitors outnumber residents, favoring <b>short-visit and dwell-time concepts</b>.')
+    : type === '상주형' ? LG('직장·거주 인구 비중이 높아 <b>반복 이용 수요</b>가 안정적입니다.', 'A high share of workers and residents gives <b>steady repeat demand</b>.') : LG('상주와 유동 인구가 비슷해 <b>업종 선택 폭</b>이 넓습니다.', 'Residents and visitors are balanced, leaving <b>wide room for concepts</b>.');
+  const t2 = a.week[1] >= 40 ? LG(`주말 매출이 ${a.week[1]}%로 <b>여가·소비 수요</b>가 강합니다.`, `Weekend sales are ${a.week[1]}%, showing <b>strong leisure spending</b>.`) : LG(`평일 매출이 ${a.week[0]}%로 <b>직장인 수요 중심</b>입니다.`, `Weekday sales are ${a.week[0]}%, <b>driven by office workers</b>.`);
+  return {type, html: LG(`<b>${type} 상권</b> · ${t1} 유동 인구는 <b>${pk[0]}시</b>, 매출은 <b>${sp[0]}시</b>에 가장 많습니다. ${t2}`, `<b>${type} 상권</b> · ${t1} Visitors peak at <b>${pk[0]}시</b> and sales at <b>${sp[0]}시</b>. ${t2}`)};
 }
 function areaBlock(a) {
   const ins = areaInsight(a);
@@ -1536,6 +1633,7 @@ function valCell(main, ...subs) { return `<div class="val"><b>${main}</b>${subs.
 const STATE_LBL = {nego: '협의', tbd: '추후 안내', none: '없음', now: '즉시'};
 function krwCell(p, area) {
   if (!p) return valCell('–');
+  if (p.s === 'est') return valCell(`${fmtDate(p.v)} <span class="est">예상</span>`, '예상 일정 · 확정 아님');
   if (STATE_LBL[p.s]) return `<div class="val"><b class="soft">${STATE_LBL[p.s]}</b></div>`;
   if (typeof p.v === 'string') return valCell(fmtDate(p.v));
   return valCell(krw(p.v), area ? `평당 ${krw(p.v / (area * PYR))}` : '');
@@ -1571,7 +1669,7 @@ function mosaic(key, items, tab, label) {
   if (!items.length) return '';
   const sh = items.slice(0, 3), more = items.length - sh.length;
   return `<div class="gal n${sh.length} ${tab}">${sh.map((m, j) => `<button class="gcell" onclick="openViewer('${key}','${tab}')">${fig(m)}${j === sh.length - 1 && more > 0 ? `<span class="more">+${more}</span>` : ''}</button>`).join('')}
-    <button class="gall" onclick="openViewer('${key}','${tab}')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>${label} ${items.length}장 모두 보기</button></div>`;
+    <button class="gall" onclick="openViewer('${key}','${tab}')"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>${LG(`${label} ${items.length}장 모두 보기`, `View all ${items.length} ${label}`)}</button></div>`;
 }
 function printMedia(items, cls) { return items.length ? `<div class="print-only"><div class="pmedia ${cls}">${items.map(m => `<figure>${fig(m, true)}<figcaption><b>${esc(m.cap)}</b>${metaHtml(m)}</figcaption></figure>`).join('')}</div></div>` : ''; }
 
@@ -1621,8 +1719,8 @@ function initMaps() {
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap', maxZoom: 19, className: 'osm-tiles'}).addTo(m);
       const ll = d.pts.map(p => [p.lat, p.lng]); if (d.hq) ll.push([d.hq.lat, d.hq.lng]);
       if (d.hq) { d.pts.forEach(p => L.polyline([[d.hq.lat, d.hq.lng], [p.lat, p.lng]], {color: '#8b8881', weight: 1.2, dashArray: '4 6', interactive: false}).addTo(m));
-        L.marker([d.hq.lat, d.hq.lng], {icon: L.divIcon({className: '', html: `<div class="hqpin"><i>★</i><span>${esc(d.hq.name)}</span></div>`, iconSize: null})}).addTo(m); }
-      d.pts.forEach(p => L.marker([p.lat, p.lng], {icon: L.divIcon({className: '', html: `<div class="npin" style="--c:${FP_C[p.i % 8]}"><b>${pad2(p.i + 1)}</b><span>${esc(p.title)}</span></div>`, iconSize: null})}).addTo(m).on('click', () => goPage(p.i + 1)));
+        L.marker([d.hq.lat, d.hq.lng], {icon: L.divIcon({className: '', html: `<div class="hqpin"><i>★</i><span>${esc(tv(d.hq.name))}</span></div>`, iconSize: null})}).addTo(m); }
+      d.pts.forEach(p => L.marker([p.lat, p.lng], {icon: L.divIcon({className: '', html: `<div class="npin" style="--c:${FP_C[p.i % 8]}"><b>${pad2(p.i + 1)}</b><span>${esc(tv(p.title))}</span></div>`, iconSize: null})}).addTo(m).on('click', () => goPage(p.i + 1)));
       m.fitBounds(ll, {padding: [60, 60], maxZoom: 15});
       L.control.zoom({position: 'bottomright'}).addTo(m); LIVE_MAPS.push(m); return;
     }
@@ -1638,8 +1736,8 @@ function initMaps() {
     }
     if (d.comp) d.comp.forEach(([la, ln]) => L.circleMarker([la, ln], {radius: 4, color: '#fff', weight: 1.2, fillColor: '#eb6834', fillOpacity: 1, interactive: false, pane: 'markerPane'}).addTo(m));
     L.circle([d.lat, d.lng], {radius: 300, color: '#2a78d6', weight: 1.2, dashArray: '5 5', fill: false, interactive: false}).addTo(m);
-    if (d.stn) L.marker([d.stn[1], d.stn[2]], {icon: L.divIcon({className: '', html: `<div class="stn-b"><i>M</i>${esc(d.stn[0])}</div>`, iconSize: null, iconAnchor: [12, 12]})}).addTo(m);
-    L.marker([d.lat, d.lng], {icon: L.divIcon({className: '', html: `<div class="mpin"><div class="pin-l">${esc(d.title)}</div><div class="pin-b"></div></div>`, iconSize: null, iconAnchor: [0, 0]})}).addTo(m);
+    if (d.stn) L.marker([d.stn[1], d.stn[2]], {icon: L.divIcon({className: '', html: `<div class="stn-b"><i>M</i>${esc(tv(d.stn[0]))}</div>`, iconSize: null, iconAnchor: [12, 12]})}).addTo(m);
+    L.marker([d.lat, d.lng], {icon: L.divIcon({className: '', html: `<div class="mpin"><div class="pin-l">${esc(tv(d.title))}</div><div class="pin-b"></div></div>`, iconSize: null, iconAnchor: [0, 0]})}).addTo(m);
     L.control.zoom({position: 'bottomright'}).addTo(m);
     LIVE_MAPS.push(m);
   });
@@ -1651,7 +1749,7 @@ function drawHeat(m) {
     c.setStyle({fillColor: HEAT_C[k], fillOpacity: k === 0 ? 0 : .22 + k * .12}); });
   const ci = h.cells ? h.cells.findIndex(c => c.self) : -1, near = Math.round(vs[ci >= 0 ? ci : Math.floor(vs.length / 2)] * h.scale / 10) * 10;
   const note = document.querySelector(`.map-note[data-key="${m.getContainer().dataset.key}"]`);
-  if (note) note.innerHTML = `<b>${h.d.area.hourly[U.slot][0]}시</b><span>매물 앞 시간당 약 <b>${nf(near)}명</b></span><span class="sub">· 반경 300m 점선 = 상권 영역</span>`;
+  if (note) note.innerHTML = LG(`<b>${h.d.area.hourly[U.slot][0]}시</b><span>매물 앞 시간당 약 <b>${nf(near)}명</b></span><span class="sub">· 반경 300m 점선 = 상권 영역</span>`, `<b>${h.d.area.hourly[U.slot][0]}h</b><span>About <b>${nf(near)}</b> visitors per hour in front of the property</span><span class="sub">· dashed 300m circle = trade area</span>`);
 }
 function setSlot(i, auto) {
   if (!auto && U.playing) togglePlay();
@@ -1674,7 +1772,7 @@ function respBlock(x) {
   if (!CP) return '';
   const p = getP(CP.pid); if (!p) return '';
   const r = (p.responses || {})[x.id], tours = (p.tours || []).filter(t => t.lid === x.id), dis = CP.preview ? 'disabled' : '';
-  return `<div class="resp ${r ? 'r-' + r.v : ''}"><div class="resp-top"><div><b>이 물건 어떠세요?</b><span class="sub">${r ? `${fmtStamp(r.at)} 회신 · 담당자에게 전달됨` : '선택하면 담당자에게 바로 전달됩니다'}</span></div><div class="sp"></div>
+  return `<div class="resp ${r ? 'r-' + r.v : ''}"><div class="resp-top"><div><b>이 물건 어떠세요?</b><span class="sub">${r ? LG(`${fmtStamp(r.at)} 회신 · 담당자에게 전달됨`, `Replied ${fmtStamp(r.at)} · sent to your advisor`) : '선택하면 담당자에게 바로 전달됩니다'}</span></div><div class="sp"></div>
       <div class="resp-btns">${RESP.map(([k, l]) => `<button class="rb rb-${k} ${r?.v === k ? 'on' : ''}" ${dis} onclick="respond('${x.id}','${k}')">${ric(k)}${l}</button>`).join('')}</div></div>
     ${r ? `<div class="resp-c"><input class="in" ${dis} maxlength="80" placeholder="한 줄 코멘트 (선택)" value="${esc(r.comment || '')}" onkeydown="if(event.key==='Enter')this.blur()" onchange="respComment('${x.id}',this.value)"></div>` : ''}
     <div class="resp-tour">${tours.map(t => `<span class="chip blue">답사 요청 · ${+t.date.slice(5, 7)}/${+t.date.slice(8)} ${t.slot} · ${t.people}명</span>`).join('')}<div class="sp"></div><button class="btn sm" ${dis} onclick="openModal({type:'tour',lid:'${x.id}'})">현장 답사 요청</button></div>
@@ -1727,7 +1825,7 @@ function coverMap(P, hd) {
   return `<div class="cvm">${hd}
     <div class="cvm-box"><div class="map cvmap" data-key="cover"></div><div class="cvm-list">
       ${hq ? `<div class="cvm-hq"><i>★</i><div><b>${esc(hq.name)}</b><span>기준 위치</span></div></div>` : ''}
-      ${pts.map(o => `<button class="cvm-i" onclick="goPage(${o.i + 1})"><span class="n" style="--c:${FP_C[o.i % 8]}">${pad2(o.i + 1)}</span><div><b>${esc(o.x.title)}</b><span>${o.x.geo.stn ? esc(o.x.geo.stn[0]) + ' 인근' : ''}${hq ? ` · 기준 위치에서 ${km(hq, o.x.geo).toFixed(1)}km` : ''}</span></div></button>`).join('')}</div></div></div>`;
+      ${pts.map(o => `<button class="cvm-i" onclick="goPage(${o.i + 1})"><span class="n" style="--c:${FP_C[o.i % 8]}">${pad2(o.i + 1)}</span><div><b>${esc(o.x.title)}</b><span>${o.x.geo.stn ? LG(esc(o.x.geo.stn[0]) + ' 인근', 'Near ' + esc(o.x.geo.stn[0])) : ''}${hq ? LG(` · 기준 위치에서 ${km(hq, o.x.geo).toFixed(1)}km`, ` · ${km(hq, o.x.geo).toFixed(1)}km from reference point`) : ''}</span></div></button>`).join('')}</div></div></div>`;
 }
 /* page-view analytics (simulated beacon) */
 let PV = null;
@@ -1764,7 +1862,8 @@ function rentBlock(x, fx) {
   const b = x.area.bench, m = myRentM2(x); if (!m) return '';
   const d = benchDiff(x), mx = Math.max(m, b.rent) * 1.1, vs = b.vac.map(v => v[1]);
   return `<section class="sec"><div class="sec-h"><h3>임대료 수준</h3><span class="chip line">예시 데이터</span><div class="sp"></div><span class="sub">한국부동산원 임대동향 · ${esc(b.name)} 상권 · ${b.vac[b.vac.length - 1][0]}</span></div>
-    <p class="lead">제안 임대료는 ㎡당 <b>${krw(m)}</b>으로 ${esc(b.name)} 상권 평균(${krw(b.rent)})보다 <b class="${d > 0 ? 'neg' : 'pos'}">${pct(d)}</b> ${d > 0 ? '높습니다' : '낮습니다'}. 상권 공실률은 ${vs[0]}% → ${vs[vs.length - 1]}%로 ${vs[vs.length - 1] < vs[0] ? '낮아지는' : '높아지는'} 추세입니다.</p>
+    <p class="lead">${LG(`제안 임대료는 ㎡당 <b>${krw(m)}</b>으로 ${esc(b.name)} 상권 평균(${krw(b.rent)})보다 <b class="${d > 0 ? 'neg' : 'pos'}">${pct(d)}</b> ${d > 0 ? '높습니다' : '낮습니다'}. 상권 공실률은 ${vs[0]}% → ${vs[vs.length - 1]}%로 ${vs[vs.length - 1] < vs[0] ? '낮아지는' : '높아지는'} 추세입니다.`,
+      `Proposed rent is <b>${krw(m)}</b> per ㎡, <b class="${d > 0 ? 'neg' : 'pos'}">${pct(d)}</b> ${d > 0 ? 'above' : 'below'} the ${esc(b.name)} market average (${krw(b.rent)}). Vacancy has moved from ${vs[0]}% to ${vs[vs.length - 1]}%, a ${vs[vs.length - 1] < vs[0] ? 'falling' : 'rising'} trend.`)}</p>
     <div class="two-col"><div class="chart"><h5>㎡당 월 임대료</h5>
       <div class="cmpbar"><div><span>상권 평균</span><i style="--w:${b.rent / mx * 100}%;background:#c9c7bf"></i><b>${krw(b.rent)}</b></div><div><span>이 물건</span><i style="--w:${m / mx * 100}%"></i><b>${krw(m)}</b></div></div>
       <div class="sub" style="margin-top:8px">부동산원 수치는 전체 층 평균입니다. 이 물건 값은 임대료 ÷ 전체 임대면적입니다.</div></div>
@@ -1774,8 +1873,8 @@ function compBlock(x) {
   if (!MODS.comp || !x.area) return '';
   const a = x.area, c = catOf(a), n = compCount(a), br = compBrands(a);
   return `<section class="sec"><div class="sec-h"><h3>동종 업종 경쟁점</h3><span class="chip line">예시 데이터</span><div class="sp"></div><span class="sub">소상공인시장진흥공단 상가정보 · 반경 300m</span></div>
-    <p class="lead">반경 300m 안에 <b>${c}</b> 매장이 <b>${n}곳</b> 있습니다. 상권 전체 점포의 ${(a.stores.find(st => st[0] === c) || a.stores[0])[1]}%로, 위 지도에 주황색 점으로 표시했습니다.</p>
-    <div class="two-col"><div class="tiles" style="grid-template-columns:1fr 1fr;margin:0"><div class="tile"><span>300m 내 ${c}</span><b>${n}곳</b></div><div class="tile"><span>500m 내 (추정)</span><b>${Math.round(n * 2.6)}곳</b></div><div class="tile"><span>300m 내 전체 점포</span><b>${nf(a.stores300)}곳</b></div><div class="tile"><span>비중</span><b>${(a.stores.find(st => st[0] === c) || a.stores[0])[1]}%</b></div></div>
+    <p class="lead">${LG(`반경 300m 안에 <b>${c}</b> 매장이 <b>${n}곳</b> 있습니다. 상권 전체 점포의 ${(a.stores.find(st => st[0] === c) || a.stores[0])[1]}%로, 위 지도에 주황색 점으로 표시했습니다.`, `There are <b>${n}</b> <b>${c}</b> stores within 300m — ${(a.stores.find(st => st[0] === c) || a.stores[0])[1]}% of all stores in the area, shown as orange dots on the map above.`)}</p>
+    <div class="two-col"><div class="tiles" style="grid-template-columns:1fr 1fr;margin:0"><div class="tile"><span>${LG(`300m 내 ${c}`, `${c} within 300m`)}</span><b>${n}곳</b></div><div class="tile"><span>500m 내 (추정)</span><b>${Math.round(n * 2.6)}곳</b></div><div class="tile"><span>300m 내 전체 점포</span><b>${nf(a.stores300)}곳</b></div><div class="tile"><span>비중</span><b>${(a.stores.find(st => st[0] === c) || a.stores[0])[1]}%</b></div></div>
     <div class="chart"><h5>브랜드 · 유형별 (곳)</h5>${hbars(br, v => v + '곳')}</div></div></section>`;
 }
 function siteBlock(x) {
@@ -1784,7 +1883,7 @@ function siteBlock(x) {
   const y0 = Math.floor(yr(h[0][0])), y1 = Math.ceil(yr('현재')), span = y1 - y0 || 1;
   const done = h.filter(r => r[1] !== '현재' && r[2] !== '공실'), avg = done.length ? done.reduce((t, r) => t + yr(r[1]) - yr(r[0]), 0) / done.length : null;
   return `<section class="sec"><div class="sec-h"><h3>이 자리의 업종 이력</h3><span class="chip line">예시 데이터</span><div class="sp"></div><span class="sub">지방행정 인허가데이터 · ${esc(x.address)}</span></div>
-    <p class="lead">${y0}년 이후 <b>${h.length}번</b> 바뀌었습니다.${avg ? ` 이전 점포의 평균 영업 기간은 <b>${avg.toFixed(1)}년</b>입니다.` : ''} 현재는 ${esc(h[h.length - 1][2])}입니다.</p>
+    <p class="lead">${LG(`${y0}년 이후 <b>${h.length}번</b> 바뀌었습니다.${avg ? ` 이전 점포의 평균 영업 기간은 <b>${avg.toFixed(1)}년</b>입니다.` : ''} 현재는 ${esc(h[h.length - 1][2])}입니다.`, `<b>${h.length}</b> tenant${h.length > 1 ? 's' : ''} since ${y0}.${avg ? ` Previous stores lasted <b>${avg.toFixed(1)} years</b> on average.` : ''} Currently: ${esc(h[h.length - 1][2])}.`)}</p>
     <div class="sh-tl"><div class="sh-axis">${Array.from({length: span + 1}, (_, i) => y0 + i).filter((y, i, arr) => span <= 8 || i % 2 === 0 || i === arr.length - 1).map(y => `<span style="left:${(y - y0) / span * 100}%">${y}</span>`).join('')}</div>
       ${h.map((r, i) => `<div class="sh-row"><div class="sh-bar ${r[2] === '공실' ? 'vac' : ''} ${r[1] === '현재' ? 'now' : ''}" style="left:${(yr(r[0]) - y0) / span * 100}%;width:${Math.max(2, (yr(r[1]) - yr(r[0])) / span * 100)}%;--i:${i}"><b>${esc(r[2])}</b><span>${r[0]} – ${r[1]}</span></div></div>`).join('')}</div></section>`;
 }
@@ -1804,9 +1903,9 @@ function areaExtras(a) {
   const out = [];
   if (MODS.change && a.change) { const c = a.change, desc = {'상권확장': '신규 진입이 늘고 있는 성장 국면', '다이나믹': '진입과 폐업이 모두 활발한 변동 국면', '정체': '진입과 폐업이 모두 적은 안정 국면', '상권축소': '폐업이 진입보다 많은 위축 국면'}[c.stage];
     out.push(`<div class="xsec"><div class="xs-h"><h4>상권 변화 단계</h4><span class="sub">서울시 상권분석서비스</span></div><div class="stage"><b>${c.stage}</b><span>${desc}</span></div>
-      <div class="tiles"><div class="tile"><span>운영 점포 평균 영업</span><b>${c.run}개월</b></div><div class="tile"><span>폐업 점포 평균 영업</span><b>${c.closed}개월</b></div><div class="tile"><span>${catOf(a)} 개업률</span><b>${c.open}%</b></div><div class="tile"><span>${catOf(a)} 폐업률</span><b>${c.close}%</b></div></div></div>`); }
+      <div class="tiles"><div class="tile"><span>운영 점포 평균 영업</span><b>${c.run}개월</b></div><div class="tile"><span>폐업 점포 평균 영업</span><b>${c.closed}개월</b></div><div class="tile"><span>${LG(`${catOf(a)} 개업률`, `${catOf(a)} opening rate`)}</span><b>${c.open}%</b></div><div class="tile"><span>${LG(`${catOf(a)} 폐업률`, `${catOf(a)} closure rate`)}</span><b>${c.close}%</b></div></div></div>`); }
   if (MODS.subway && a.subway) { const sw = a.subway, sl = a.hourly.map(h => h[0]);
-    out.push(`<div class="xsec"><div class="xs-h"><h4>${esc(sw.name)} 시간대별 승하차</h4><span class="sub">서울 열린데이터광장 · 일평균 ${nf(sw.daily)}명</span></div><div class="two-col"><div class="tiles" style="grid-template-columns:1fr 1fr;margin:0"><div class="tile"><span>일평균 승하차</span><b>${nf(sw.daily)}명</b></div><div class="tile"><span>평일 피크</span><b>${sl[sw.wk.indexOf(Math.max(...sw.wk))]}시</b></div><div class="tile"><span>주말 피크</span><b>${sl[sw.we.indexOf(Math.max(...sw.we))]}시</b></div><div class="tile"><span>주말/평일</span><b>${Math.round(sw.we.reduce((x, y) => x + y) / sw.wk.reduce((x, y) => x + y) * 100)}%</b></div></div><div class="chart"><h5>시간대별 승하차 (천 명)</h5>${line2(sl.map((k, i) => [k, sw.wk[i]]), sl.map((k, i) => [k, sw.we[i]]), '천 명')}</div></div></div>`); }
+    out.push(`<div class="xsec"><div class="xs-h"><h4>${LG(`${esc(sw.name)} 시간대별 승하차`, `${esc(sw.name)} riders by hour`)}</h4><span class="sub">${LG(`서울 열린데이터광장 · 일평균 ${nf(sw.daily)}명`, `Seoul Open Data Plaza · ${nf(sw.daily)} riders/day`)}</span></div><div class="two-col"><div class="tiles" style="grid-template-columns:1fr 1fr;margin:0"><div class="tile"><span>일평균 승하차</span><b>${nf(sw.daily)}명</b></div><div class="tile"><span>평일 피크</span><b>${sl[sw.wk.indexOf(Math.max(...sw.wk))]}시</b></div><div class="tile"><span>주말 피크</span><b>${sl[sw.we.indexOf(Math.max(...sw.we))]}시</b></div><div class="tile"><span>주말/평일</span><b>${Math.round(sw.we.reduce((x, y) => x + y) / sw.wk.reduce((x, y) => x + y) * 100)}%</b></div></div><div class="chart"><h5>시간대별 승하차 (천 명)</h5>${line2(sl.map((k, i) => [k, sw.wk[i]]), sl.map((k, i) => [k, sw.we[i]]), '천 명')}</div></div></div>`); }
   if (MODS.sales && a.salesAge) {
     out.push(`<div class="xsec"><div class="xs-h"><h4>성별 · 연령대별 매출</h4><span class="sub">서울시 상권분석서비스 추정매출</span></div><div class="two-col"><div class="chart"><h5>연령대별 매출 (%)</h5>${cols(a.salesAge, '%')}</div>
       <div class="chart"><h5>성별 매출</h5><div class="stack"><i style="width:${a.female}%;background:var(--accent)" title="여성 ${a.female}%"></i><i style="width:${100 - a.female}%;background:var(--series-2)" title="남성 ${100 - a.female}%"></i></div><div class="legend"><span><i style="background:var(--accent)"></i>여성 ${a.female}%</span><span><i style="background:var(--series-2)"></i>남성 ${100 - a.female}%</span></div></div></div></div>`); }
@@ -1852,8 +1951,8 @@ function listingPage(x, i, n, fx) {
         ${x.exclArea ? `<tr><td colspan="2" class="sub">전용면적</td><td class="num">${valCell(areaMain(x.exclArea), areaSub(x.exclArea))}</td></tr>` : ''}
         </tbody></table></section>
       <section class="sec"><div class="sec-h"><h3>건물 정보</h3></div><div class="spec">
-        ${specRow('주소', valCell(esc(x.address)))}${specRow('용도', valCell(esc(x.use || '–')))}${specRow('지상', valCell((x.above ?? '–') + '층'))}
-        ${x.below ? specRow('지하', valCell(x.below + '층')) : ''}${specRow('연면적', valCell(areaMain(x.gfa), areaSub(x.gfa)))}${x.year ? specRow('준공', valCell(x.year + '년')) : ''}
+        ${specRow('주소', valCell(esc(x.address)))}${specRow('용도', valCell(esc(x.use || '–')))}${specRow('지상', valCell(LG((x.above ?? '–') + '층', (x.above ?? '–') + ' floors')))}
+        ${x.below ? specRow('지하', valCell(LG(x.below + '층', x.below + ' floors'))) : ''}${specRow('연면적', valCell(areaMain(x.gfa), areaSub(x.gfa)))}${x.year ? specRow('준공', valCell(x.year + '년')) : ''}
       </div></section>
     </div>
     ${calcBlock(x, fx)}
@@ -1942,7 +2041,7 @@ function fitOf(x, c) {
     ['지역', c.regions ? c.regions.some(r => hay.includes(r)) : null],
     ['1층 면적', c.min1F ? (x.area1 != null && x.area1 >= c.min1F) : null],
     ['전체 면적', c.totalMin ? (x.leaseArea >= c.totalMin && x.leaseArea <= (c.totalMax || 1e9)) : null],
-    ['입주 시기', c.moveBy ? (ho?.s === 'now' ? true : ho?.s === 'v' ? ho.v <= c.moveBy : null) : null],
+    ['입주 시기', c.moveBy ? (ho?.s === 'now' ? true : (ho?.s === 'v' || ho?.s === 'est') ? ho.v <= c.moveBy : null) : null],
   ].filter(([, v]) => v !== undefined);
 }
 const fitAll = f => f && f.every(([, v]) => v === true);
@@ -1952,13 +2051,13 @@ function coverPage(P, fx) {
   const nm = o => `<b>${pad2(o.i + 1)} ${esc(o.x.title)}</b>`;
   const by = (arr, f, dir) => arr.filter(o => f(o) != null).sort((a, b) => dir * (f(a) - f(b)))[0];
   const rng = (vals, f) => { const v = vals.filter(x => x != null); if (!v.length) return '–'; const mn = Math.min(...v), mx = Math.max(...v); return mn === mx ? f(mn) : `${f(mn)}<i>–</i>${f(mx)}`; };
-  const eff = o => effMonthly(o.x), a1 = o => o.x.area1, hoKey = o => o.x.handover?.s === 'now' ? 0 : o.x.handover?.s === 'v' ? +o.x.handover.v.replace(/-/g, '') : null;
+  const eff = o => effMonthly(o.x), a1 = o => o.x.area1, hoKey = o => o.x.handover?.s === 'now' ? 0 : (o.x.handover?.s === 'v' || o.x.handover?.s === 'est') ? +o.x.handover.v.replace(/-/g, '') : null;
   const fits = act.map(o => ({...o, fit: fitOf(o.x, c)})), nFit = fits.filter(o => fitAll(o.fit)).length;
   const cheap = by(act, eff, 1), big = by(act, a1, -1), small = by(act, a1, 1), soon = by(act, hoKey, 1);
   const hq = P.cover.hq, near = hq ? by(act.filter(o => o.x.geo), o => km(hq, o.x.geo), 1) : null, far = hq ? by(act.filter(o => o.x.geo), o => km(hq, o.x.geo), -1) : null;
   const withA = act.filter(o => o.x.area), busy = by(withA, o => o.x.area.pop[2][1], -1), wknd = by(withA, o => o.x.area.week[1], -1);
   const photos = P.items.map(x => x.photos?.[0]).filter(Boolean).slice(0, 4);
-  const short = p => !p ? '–' : (STATE_LBL[p.s] || (typeof p.v === 'string' ? fmtDate(p.v) : krw(p.v)));
+  const short = p => !p ? '–' : p.s === 'est' ? `${fmtDate(p.v)} 예상` : (STATE_LBL[p.s] || (typeof p.v === 'string' ? fmtDate(p.v) : krw(p.v)));
   const sub = p => p && p.s === 'v' && typeof p.v === 'number' ? `<small>${fxOf(p.v, fx)}</small>` : '';
   const pp = CP ? getP(CP.pid) : null, resp = pp?.responses || {}, tours = pp?.tours || [];
   const fitChips = f => f ? `<div class="fit">${f.map(([k, v]) => `<span class="${v === true ? 'ok' : v === false ? 'no' : 'q'}">${v === true ? '✓' : v === false ? '✕' : '?'} ${k}</span>`).join('')}</div>` : '';
@@ -1971,14 +2070,14 @@ function coverPage(P, fx) {
           <div class="cv-need">${[['희망 지역', P.cover.region], ['면적', P.cover.size], ['입주 시기', P.cover.moveIn]].map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div></div>
           <div class="cv-bk"><span>담당</span><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><small>${esc(P.broker.phone)}</small><small>${esc(P.broker.email)}</small></div></div></div></div>
     <div class="hl">
-      <div><span>후보 물건</span><b>${act.length}<em>곳</em></b>${c ? `<small>${nFit}곳이 요청 조건 모두 충족</small>` : ''}</div>
-      <div><span>1층 임대면적</span><b>${rng(act.map(a1), v => nf(v) + '㎡')}</b>${c?.min1F ? `<small>요청 ${nf(c.min1F)}㎡ 이상</small>` : ''}</div>
+      <div><span>후보 물건</span><b>${act.length}<em>곳</em></b>${c ? `<small>${LG(`${nFit}곳이 요청 조건 모두 충족`, `${nFit} meet all requirements`)}</small>` : ''}</div>
+      <div><span>1층 임대면적</span><b>${rng(act.map(a1), v => nf(v) + '㎡')}</b>${c?.min1F ? `<small>${LG(`요청 ${nf(c.min1F)}㎡ 이상`, `Required ${nf(c.min1F)}㎡+`)}</small>` : ''}</div>
       <div><span>실질 월 비용</span><b>${rng(act.map(eff), krw)}</b><small>${U.calc.term}개월 · 렌트프리 ${U.calc.rf}개월 기준</small></div>
       <div><span>가장 빠른 인도</span><b>${soon ? short(soon.x.handover) : '협의'}</b>${soon ? `<small>${esc(soon.x.title)}</small>` : ''}</div>
     </div>`;
 
   /* 01 candidates */
-  h += `<section class="cv-sec">${secHead(1, '후보 물건', c ? `${act.length}곳 중 <b>${nFit}곳</b>이 요청 조건을 모두 충족합니다.${fits.filter(o => !fitAll(o.fit)).map(o => ` ${nm(o)}은 ${o.fit.filter(([, v]) => v !== true).map(([k, v]) => `${k} ${v === false ? '미충족' : '확인 필요'}`).join(', ')}.`).join('')}` : `${act.length}곳을 제안드립니다.`)}
+  h += `<section class="cv-sec">${secHead(1, '후보 물건', c ? LG(`${act.length}곳 중 <b>${nFit}곳</b>이 요청 조건을 모두 충족합니다.`, `<b>${nFit}</b> of ${act.length} candidates meet all your requirements.`) + fits.filter(o => !fitAll(o.fit)).map(o => LG(` ${nm(o)}은 `, ` ${nm(o)}: `) + o.fit.filter(([, v]) => v !== true).map(([k, v]) => `${k} ${v === false ? '미충족' : '확인 필요'}`).join(', ') + '.').join('') : LG(`${act.length}곳을 제안드립니다.`, `${act.length} candidates proposed.`))}
     <div class="picks">${P.items.map((x, i) => { const f = fitOf(x, c);
       return `<button class="pk ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})">
       <div class="pk-ph" style="background-image:url('${x.photos?.[0] || ''}')"><span class="pk-n">${pad2(i + 1)}</span>${x.ended ? '<span class="chip dark">제안 종료</span>' : respChip(x.id)}</div>
@@ -1987,7 +2086,8 @@ function coverPage(P, fx) {
 
   /* 02 cost */
   const benchLow = MODS.rent ? by(act.filter(o => benchDiff(o.x) != null), o => benchDiff(o.x), 1) : null;
-  h += `<section class="cv-sec">${secHead(2, '비용 비교', cheap ? `실질 월 비용이 가장 낮은 곳은 ${nm(cheap)} (${krw(eff(cheap))}, 평당 ${krw(eff(cheap) / (cheap.x.leaseArea * PYR))})입니다.${benchLow ? ` 상권 평균 임대료 대비로는 ${nm(benchLow)}이 ${pct(benchDiff(benchLow.x))}로 가장 유리합니다.` : ''} 금액은 원화 기준이며 외화는 참고용입니다.` : '')}
+  h += `<section class="cv-sec">${secHead(2, '비용 비교', cheap ? LG(`실질 월 비용이 가장 낮은 곳은 ${nm(cheap)} (${krw(eff(cheap))}, 평당 ${krw(eff(cheap) / (cheap.x.leaseArea * PYR))})입니다.${benchLow ? ` 상권 평균 임대료 대비로는 ${nm(benchLow)}이 ${pct(benchDiff(benchLow.x))}로 가장 유리합니다.` : ''} 금액은 원화 기준이며 외화는 참고용입니다.`,
+      `${nm(cheap)} has the lowest effective monthly cost (${krw(eff(cheap))}, ${krw(eff(cheap) / cheap.x.leaseArea)} per ㎡).${benchLow ? ` Against market-average rent, ${nm(benchLow)} is the best value at ${pct(benchDiff(benchLow.x))}.` : ''} Amounts are in KRW; foreign-currency figures are for reference.`) : '')}
     <div class="row cmp-ctl"><span class="sub">${U.calc.term}개월 · 렌트프리 ${U.calc.rf}개월 기준 · 물건 페이지의 총비용 계산에서 조건 변경</span><div class="sp"></div><span class="sub">외화</span>${curSelect()}</div>
     <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num hi">실질 월 비용</th>${MODS.rent ? '<th class="num">상권 평균 대비<small class="th-s">㎡당 임대료</small></th>' : ''}<th class="num">월 임대료</th><th class="num">보증금</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
     ${P.items.map((x, i) => { const o = {x, i};
@@ -2002,24 +2102,27 @@ function coverPage(P, fx) {
     </tbody></table></div></section>`;
 
   /* 03 location */
-  const mapHtml = coverMap(P, secHead(3, '위치', near ? `${esc(P.cover.hq.name)}에서 가장 가까운 곳은 ${nm(near)} (${km(hq, near.x.geo).toFixed(1)}km), 가장 먼 곳은 ${nm(far)} (${km(hq, far.x.geo).toFixed(1)}km)입니다. 번호를 누르면 해당 물건으로 이동합니다.` : '번호를 누르면 해당 물건으로 이동합니다.'));
+  const mapHtml = coverMap(P, secHead(3, '위치', near ? LG(`${esc(P.cover.hq.name)}에서 가장 가까운 곳은 ${nm(near)} (${km(hq, near.x.geo).toFixed(1)}km), 가장 먼 곳은 ${nm(far)} (${km(hq, far.x.geo).toFixed(1)}km)입니다. 번호를 누르면 해당 물건으로 이동합니다.`,
+      `From ${esc(P.cover.hq.name)}, the closest is ${nm(near)} (${km(hq, near.x.geo).toFixed(1)}km) and the farthest is ${nm(far)} (${km(hq, far.x.geo).toFixed(1)}km). Tap a number to open the property.`) : LG('번호를 누르면 해당 물건으로 이동합니다.', 'Tap a number to open the property.')));
   if (mapHtml) h += `<section class="cv-sec">${mapHtml}</section>`;
 
   /* 04 space */
-  const fpHtml = fpCompare(P, secHead(4, '공간 · 동일 축척', big && small ? `1층이 가장 넓은 곳은 ${nm(big)} (${nf(big.x.area1)}㎡), 가장 좁은 곳은 ${nm(small)} (${nf(small.x.area1)}㎡)입니다. 복층 물건도 1층 기준으로 비교합니다.` : ''));
+  const fpHtml = fpCompare(P, secHead(4, '공간 · 동일 축척', big && small ? LG(`1층이 가장 넓은 곳은 ${nm(big)} (${nf(big.x.area1)}㎡), 가장 좁은 곳은 ${nm(small)} (${nf(small.x.area1)}㎡)입니다. 복층 물건도 1층 기준으로 비교합니다.`,
+      `${nm(big)} has the largest ground floor (${nf(big.x.area1)}㎡) and ${nm(small)} the smallest (${nf(small.x.area1)}㎡). Multi-floor properties are compared on the ground floor.`) : ''));
   if (fpHtml) h += `<section class="cv-sec">${fpHtml}</section>`;
 
   /* 05 trade area */
-  const xaHtml = areaCompare(P, secHead(5, '상권', busy ? `일평균 유동인구는 ${nm(busy)} 상권이 ${nf(busy.x.area.pop[2][1])}명으로 가장 많고, 주말 매출 비중은 ${nm(wknd)} 상권이 ${wknd.x.area.week[1]}%로 가장 높습니다. (서울시 상권분석서비스 기준 · 예시 데이터)` : ''));
+  const xaHtml = areaCompare(P, secHead(5, '상권', busy ? LG(`일평균 유동인구는 ${nm(busy)} 상권이 ${nf(busy.x.area.pop[2][1])}명으로 가장 많고, 주말 매출 비중은 ${nm(wknd)} 상권이 ${wknd.x.area.week[1]}%로 가장 높습니다. (서울시 상권분석서비스 기준 · 예시 데이터)`,
+      `${nm(busy)} has the most daily visitors (${nf(busy.x.area.pop[2][1])}), and ${nm(wknd)} the highest weekend sales share (${wknd.x.area.week[1]}%). (Seoul Trade Area Analysis Service · sample data)`) : ''));
   if (xaHtml) h += `<section class="cv-sec">${xaHtml}</section>`;
 
   /* 06 next steps */
   const st = act.map(o => ({...o, r: resp[o.x.id], t: tours.filter(t => t.lid === o.x.id)}));
   const nr = st.filter(o => o.r).length, exp = pp?.expiresAt;
-  h += `<section class="cv-sec">${secHead(6, '다음 단계', nr ? `${act.length}곳 중 ${nr}곳에 회신해 주셨습니다. 나머지 물건도 각 페이지에서 관심 여부를 알려주시면 답사 일정을 조율해 드리겠습니다.` : '각 물건 페이지에서 관심 여부를 알려주시거나 현장 답사를 요청해 주세요.')}
+  h += `<section class="cv-sec">${secHead(6, '다음 단계', nr ? LG(`${act.length}곳 중 ${nr}곳에 회신해 주셨습니다. 나머지 물건도 각 페이지에서 관심 여부를 알려주시면 답사 일정을 조율해 드리겠습니다.`, `You've replied on ${nr} of ${act.length} candidates. Let us know about the rest on each property page and we'll arrange site visits.`) : LG('각 물건 페이지에서 관심 여부를 알려주시거나 현장 답사를 요청해 주세요.', 'Tell us your interest on each property page or request a site visit.'))}
     <div class="ns">
       <div class="ns-list">${st.map(o => `<button class="ns-i" onclick="goPage(${o.i + 1})"><span class="n" style="--c:${FP_C[o.i % 8]}">${pad2(o.i + 1)}</span><div><b>${esc(o.x.title)}</b>${o.r?.comment ? `<span>“${esc(o.r.comment)}”</span>` : ''}${o.t.length ? `<span>답사 요청 · ${o.t.map(t => `${+t.date.slice(5, 7)}/${+t.date.slice(8)} ${t.slot}`).join(', ')}</span>` : ''}</div><div class="sp"></div>${o.r ? `<span class="chip rc-${o.r.v}">${SEC_STATE[o.r.v]}</span>` : '<span class="chip line">회신 전</span>'}</button>`).join('')}</div>
-      <div class="ns-bk"><span>담당</span><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><small>${esc(P.broker.phone)}</small><small>${esc(P.broker.email)}</small>${exp ? `<em>이 제안서는 ${fmtDate(exp)}까지 유효합니다</em>` : ''}</div>
+      <div class="ns-bk"><span>담당</span><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><small>${esc(P.broker.phone)}</small><small>${esc(P.broker.email)}</small>${exp ? `<em>${LG(`이 제안서는 ${fmtDate(exp)}까지 유효합니다`, `This proposal is valid until ${fmtDate(exp)}`)}</em>` : ''}</div>
     </div></section>`;
   return h;
 }
@@ -2032,20 +2135,20 @@ function clientPage(snap, genAt, link, pid, preview) {
   const pages = U.printAll
     ? [coverPage(P, fx), ...P.items.map((x, i) => listingPage(x, i, n, fx))].map((h, i) => `<div class="${i ? 'pbreak' : ''}">${h}</div>`).join('')
     : `<div class="pg ${U.pgAnim > 0 ? 'in-r' : U.pgAnim < 0 ? 'in-l' : ''}">${pg === 0 ? coverPage(P, fx) : listingPage(P.items[pg - 1], pg - 1, n, fx)}</div>`;
-  return `<div class="cp ${U.printAll ? 'printing' : ''}">
-    <div class="cp-bar noprint"><div class="cp-brand">C&amp;W Advisory<span>업데이트 ${fmtStamp(genAt)}</span></div>${exp ? `<span class="chip ${left <= 3 ? 'warn' : 'line'}">${fmtDate(exp)}까지 유효${left <= 3 ? ` · D-${left}` : ''}</span>` : ''}<div class="sp"></div><button class="pdf-btn" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button>
+  return tr(`<div class="cp ${U.printAll ? 'printing' : ''}">
+    <div class="cp-bar noprint"><div class="cp-brand">C&amp;W Advisory<span>업데이트 ${fmtStamp(genAt)}</span></div>${exp ? `<span class="chip ${left <= 3 ? 'warn' : 'line'}">${LG(`${fmtDate(exp)}까지 유효`, `Valid until ${fmtDate(exp)}`)}${left <= 3 ? ` · D-${left}` : ''}</span>` : ''}<div class="sp"></div><div class="seg sm lang">${[['ko', '한국어'], ['en', 'EN']].map(([k, l]) => `<button class="${U.lang === k ? 'on' : ''}" onclick="U.lang='${k}';rerenderClient()">${l}</button>`).join('')}</div><button class="pdf-btn" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button>
       <nav class="ptabs">${tabs}</nav></div>
     <div class="cp-wrap">
-      <div class="print-stamp">${esc(P.client)} 임차 후보지 제안 · ${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 링크에서 확인하세요${link ? ' · ' + esc(link) : ''}</div>
+      <div class="print-stamp">${LG(`${esc(P.client)} 임차 후보지 제안 · ${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 링크에서 확인하세요`, `${esc(tv(P.client))} — Tenant Site Proposal · as of ${fmtDate(genAt.slice(0, 10))} · see the link for the latest version`)}${link ? ' · ' + esc(link) : ''}</div>
       ${pages}
       ${U.printAll ? '' : `<div class="pnav noprint"><button class="btn" ${pg === 0 ? 'disabled' : ''} onclick="goPage(${pg - 1})">← 이전</button><span>${pg === 0 ? '표지' : pad2(pg)} / ${pad2(n)}</span><button class="btn" ${pg === n ? 'disabled' : ''} onclick="goPage(${pg + 1})">다음 →</button></div>`}
-      ${U.printAll ? '' : `<div class="pdf-cta noprint"><div class="pc-ico">${DL_ICON}</div><div class="pc-t"><b>제안서를 PDF로 저장</b><span>사내 보고 · 공유용 · ${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 이 링크에서 확인하세요</span></div><button class="pdf-btn lg" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button></div>`}
+      ${U.printAll ? '' : `<div class="pdf-cta noprint"><div class="pc-ico">${DL_ICON}</div><div class="pc-t"><b>제안서를 PDF로 저장</b><span>${LG(`사내 보고 · 공유용 · ${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 이 링크에서 확인하세요`, `For internal review and sharing · as of ${fmtDate(genAt.slice(0, 10))} · the link always has the latest version`)}</span></div><button class="pdf-btn lg" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button></div>`}
       ${U.printAll ? '' : `<div class="dock noprint">
         <div class="dock-c"><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><a href="tel:${P.broker.phone.replace(/-/g, '')}">${PHONE_ICON}${esc(P.broker.phone)}</a><a href="mailto:${esc(P.broker.email)}">${MAIL_ICON}${esc(P.broker.email)}</a></div>
         <button class="dock-b" onclick="this.parentNode.classList.toggle('open')">${PHONE_ICON}<span>담당자 연락</span></button>
         <button class="pdf-btn" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button></div>`}
-      <div class="cp-foot">참고 환율 1 ${U.cur} = ${nf(fx.rates[U.cur], 2)}원 (${fx.month.replace('-', '년 ')}월 평균, 월 1회 갱신) · 모든 금액은 원화 기준이며 외화는 참고용입니다.<br>금액은 부가세 별도이며, 조건은 임대인과의 협의에 따라 바뀔 수 있습니다. 이 페이지는 항상 최신 정보를 보여줍니다.</div>
-    </div></div>`;
+      <div class="cp-foot">${LG(`참고 환율 1 ${U.cur} = ${nf(fx.rates[U.cur], 2)}원 (${fx.month.replace('-', '년 ')}월 평균, 월 1회 갱신) · 모든 금액은 원화 기준이며 외화는 참고용입니다.<br>금액은 부가세 별도이며, 조건은 임대인과의 협의에 따라 바뀔 수 있습니다. 이 페이지는 항상 최신 정보를 보여줍니다.`, `Reference FX: 1 ${U.cur} = KRW ${nf(fx.rates[U.cur], 2)} (${MON[+fx.month.slice(5) - 1]} ${fx.month.slice(0, 4)} average, updated monthly) · All amounts are in KRW; foreign-currency figures are for reference only.<br>Amounts exclude VAT and terms may change subject to landlord negotiation. This page always shows the latest information.`)}</div>
+    </div></div>`);
 }
 const PHONE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>';
 const MAIL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
@@ -2112,8 +2215,8 @@ function topbar() {
 function guide() {
   if (!U.guide) return '';
   return `<div class="guide"><div class="row" style="margin-bottom:8px"><b>시나리오</b><div class="sp"></div><button class="btn xs ghost" onclick="U.guide=false;render()">✕</button></div>
-  <h4>브로커A</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
-  <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
+  <h4>브로커-카페</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
+  <h4>브로커-패션</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
   <h4>클라이언트-카페 / 패션</h4><ol><li>PIN 0000</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>총비용 계산 · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
 }
@@ -2236,7 +2339,7 @@ function syncTotal() { const a = area1F(D.floors), t = $('#tt'), o = $('#t1'); i
 function setScope(i, s) { D.floors[i].scope = s; if (s === '전체') D.floors[i].poly = null; render(); }
 function setPlan(i, id) { D.floors[i].planId = id || null; D.floors[i].poly = null; render(); }
 function upd(path, v) { const ks = path.split('.'); let o = D; while (ks.length > 1) o = o[ks.shift()]; o[ks[0]] = v; }
-function setPS(k, s) { D[k] = s === 'v' ? P('v', D[k].v ?? '') : P(s); render(); }
+function setPS(k, s) { D[k] = s === 'v' || s === 'est' ? P(s, typeof D[k].v === 'string' || s === 'v' ? (D[k].v ?? '') : '') : P(s); render(); }
 function readImg(file, cb) {
   const r = new FileReader();
   r.onload = () => { if (file.type === 'image/svg+xml') return cb(r.result);
@@ -2267,7 +2370,7 @@ function importFrom(id) {
 function seg(opts, cur, fn) { return `<div class="seg sm">${opts.map(([k, l]) => `<button type="button" class="${cur === k ? 'on' : ''}" onclick="${fn}('${k}')">${l}</button>`).join('')}</div>`; }
 function priceRow(k, label, opts, isDate) {
   const p = D[k];
-  const input = p.s !== 'v' ? '' : isDate
+  const input = !(p.s === 'v' || (isDate && p.s === 'est')) ? '' : isDate
     ? `<input class="in" type="date" value="${p.v || ''}" oninput="D.${k}.v=this.value" style="max-width:200px">`
     : `<div class="ui" style="max-width:240px"><input class="in" type="number" value="${p.v === '' ? '' : p.v / 10000}" oninput="D.${k}.v=this.value===''?'':Math.round(this.value*10000)" placeholder="0"><span>만원</span></div>`;
   return `<div class="price-row"><b>${label}</b>${seg(opts, p.s, `(s=>setPS('${k}',s))`)}${input}</div>`;
@@ -2312,7 +2415,7 @@ function listingForm() {
     ${priceRow('rent', '월 임대료', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
     ${priceRow('mgmt', '월 관리비', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
     ${priceRow('keyMoney', '권리금', [['v', '금액'], ['none', '없음'], ['nego', '협의'], ['tbd', '미정']])}
-    ${priceRow('handover', '인도일', [['v', '날짜'], ['now', '즉시'], ['nego', '협의'], ['tbd', '미정']], true)}
+    ${priceRow('handover', '인도일', [['v', '확정일'], ['est', '예상일'], ['now', '즉시'], ['nego', '협의'], ['tbd', '미정']], true)}
     <div class="f" style="margin-top:12px"><label>비고 (공개)</label><input class="in" value="${esc(D.note)}" oninput="D.note=this.value" placeholder="예: 렌트프리 3개월 협의 가능"></div></div>
   <div class="panel a" style="--i:5"><h3>사진 <span class="sub">${D.photos.length}</span></h3><div class="thumbs">
     ${D.photos.map((p, i) => `<div class="thumb" style="background-image:url('${p}')"><button onclick="rmPhoto(${i})">✕</button>${i === 0 ? '<em>대표</em>' : ''}</div>`).join('')}
@@ -2351,7 +2454,7 @@ function saveListing() {
   D.leaseArea = sumArea(D.floors);
   const miss = D.floors.find(f => f.scope === '일부' && !f.poly);
   if (miss) return toast(`${fmtF(miss.floor)} 영역을 칠하세요`);
-  for (const k of ['deposit', 'rent', 'mgmt', 'keyMoney', 'handover']) if (D[k].s === 'v' && (D[k].v === '' || D[k].v == null)) return toast('금액/날짜가 비어 있습니다', '협의 또는 미정으로 바꿀 수 있습니다');
+  for (const k of ['deposit', 'rent', 'mgmt', 'keyMoney', 'handover']) if ((D[k].s === 'v' || D[k].s === 'est') && (D[k].v === '' || D[k].v == null)) return toast('금액/날짜가 비어 있습니다', '협의 또는 미정으로 바꿀 수 있습니다');
   const B = ensureBuilding(D.pnu);
   const data = clone(D); delete data.pnu; delete data.q; delete data.range; delete data.from;
   data.buildingId = B.id;
@@ -2618,6 +2721,7 @@ function renderModal() {
     const p = getP(m.pid);
     h = `<div class="modal full"><div class="mh" style="background:#fff"><b>클라이언트 화면</b><span class="sub">${linkOf(p)}</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>${clientPage(p.snap, p.genAt, null, p.id, true)}</div>`;
   }
+  if (m.type === 'tour') h = tr(h);
   root.innerHTML = `<div class="back" onclick="if(event.target===this)closeModal()">${h}</div>`;
   initMaps();
 }
