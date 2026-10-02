@@ -1648,7 +1648,7 @@ function calcBlock(x, fx) {
     <div class="calc-in noprint"><div class="f"><label>계약 기간</label>${seg([['12', '1년'], ['24', '2년'], ['36', '3년'], ['60', '5년']], String(t), "(v=>{U.calc.term=+v;rerenderClient()})")}</div>
       <div class="f"><label>렌트프리</label><div class="stepper"><button onclick="U.calc.rf=Math.max(0,U.calc.rf-1);rerenderClient()">−</button><b>${rf}개월</b><button onclick="U.calc.rf=Math.min(12,U.calc.rf+1);rerenderClient()">+</button></div></div></div>
     <div class="print-only sub" style="margin-bottom:8px">${t}개월 · 렌트프리 ${rf}개월 기준</div>
-    <table class="ctbl"><thead><tr><th></th><th>원화 (KRW)</th><th>외화 (${U.cur})</th></tr></thead><tbody>
+    <table class="ctbl"><thead><tr><th></th><th>원화 (KRW)</th><th class="fxh">외화 ${curSelect()}</th></tr></thead><tbody>
       <tr><td class="lbl">총 임대료</td><td>${valCell(krw(tr), `${krw(rent)} × ${t - rf}개월`)}</td><td>${valCell(fxOf(tr, fx))}</td></tr>
       <tr><td class="lbl">총 관리비</td><td>${mg ? valCell(krw(tm), `${krw(mg)} × ${t}개월`) : valCell('–', '관리비 미정 · 제외')}</td><td>${mg ? valCell(fxOf(tm, fx)) : '–'}</td></tr>
       <tr class="tot"><td class="lbl">총 점유비용</td><td>${valCell(krw(tot))}</td><td>${valCell(fxOf(tot, fx))}</td></tr>
