@@ -496,6 +496,32 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 .pk-kv{grid-template-columns:repeat(4,1fr)!important}
 .pk-kv b{font-size:14px!important}.pk-kv small{font-size:11px;color:var(--muted)}
 .print-only{display:none}
+.cv-sec{margin-bottom:48px}
+.sh{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
+.sh-n{font-size:12px;font-weight:800;color:var(--accent);background:var(--accent-soft);border-radius:8px;padding:4px 8px;font-variant-numeric:tabular-nums;margin-top:2px}
+.sh h3{margin:0;font-size:20px;letter-spacing:-.035em}
+.sh p{margin:6px 0 0;font-size:14px;color:var(--ink2);line-height:1.6;max-width:780px}
+.sh p b{color:var(--ink)}
+.hl small{font-size:12px;color:var(--muted)}
+.hl{margin-bottom:56px}
+.fit{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}
+.fit span{font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;background:#f1f0ec;color:var(--ink2)}
+.fit span.ok{background:var(--ok-soft);color:var(--ok)}.fit span.no{background:var(--danger-soft);color:var(--danger)}.fit span.q{background:var(--warn-soft);color:var(--warn)}
+.cmp-ctl{margin-bottom:10px}
+.cmp th.hi,.cmp td.hi{background:#f2f7fd}
+.cmp td.hi .val b{color:var(--accent-2)}
+.best{display:inline-block;font-style:normal;font-size:10px;font-weight:700;color:#fff;background:var(--accent);border-radius:5px;padding:1px 5px;margin-top:3px}
+.cmp td.num .best{margin-left:4px}
+.fp-ctl{margin-bottom:12px}.fp-ctl .seg+.seg{margin-left:6px}
+.ns{display:grid;grid-template-columns:1fr 280px;gap:14px}
+.ns-list{background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px}
+.ns-i{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;padding:10px;border-radius:12px;text-align:left;transition:background .2s}
+.ns-i:hover{background:#f7f7f4}
+.ns-i .n{width:28px;height:28px;border-radius:50%;background:var(--c);color:#fff;font-weight:800;font-size:11.5px;display:flex;align-items:center;justify-content:center;flex:none}
+.ns-i b{display:block;font-size:14px}.ns-i span:not(.n):not(.chip){display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.ns-bk{background:var(--ink);color:#fff;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:3px}
+.ns-bk span{font-size:12px;opacity:.7}.ns-bk b{font-size:18px}.ns-bk small{font-size:13px;opacity:.85}
+.ns-bk em{font-style:normal;margin-top:auto;padding-top:14px;font-size:12px;opacity:.75;border-top:1px solid rgba(255,255,255,.18)}
 /* response */
 .resp{border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:18px;background:#fff;transition:border-color .3s,background .3s}
 .resp.r-yes{border-color:#9fd6bd;background:#f4fbf7}.resp.r-hold{border-color:#efd59a;background:#fffbf0}.resp.r-no{border-color:#e4c6c5;background:#fdf6f6}
@@ -611,7 +637,8 @@ details.area[open] summary .chev{transform:rotate(180deg)}
   .hl{margin-bottom:22px}.hl b{font-size:18px}
   .picks{grid-template-columns:1fr 1fr!important}
   .sec,.kpi,.kpis,.cm,.chart,.tile,.tiles,.insight,.store,.hl,.pk,.cv-hero,.mapwrap,.pmedia figure,.ctbl tr,.ftbl tr,.cmp tr,.spec-r{break-inside:avoid}
-  .sec-h,.sec-t{break-after:avoid}
+  .sec-h,.sec-t,.sh{break-after:avoid}
+  .cv-sec{margin-bottom:22px}.sh h3{font-size:16px}.sh p{font-size:11.5px}.ns{grid-template-columns:1fr 200px}.ns-list,.ns-bk,.fit{break-inside:avoid}
   .specs{display:block}.specs .sec{margin-bottom:12px}
   .sec{padding:14px 16px;margin-bottom:12px}
   .map{height:330px}
@@ -644,7 +671,7 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 /* =========================================================
    LeaseDesk prototype — single file, in-memory + localStorage
    ========================================================= */
-const KEY = 'leasedesk-proto-v4';
+const KEY = 'leasedesk-proto-v5';
 const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -994,7 +1021,8 @@ function seed() {
   L.forEach(l => l.leaseArea = sumArea(l.floors));
   const tok = mkToken();
   const props = [{id: 'P1', ownerId: 'brokerA', clientId: 'clientA', clientName: '모먼트커피',
-    cover: {region: '성수 · 가로수길 · 한남 · 명동', size: '1층 100㎡ 이상 · 총 250–2,300㎡', moveIn: '2027년 상반기', hq: {name: '모먼트커피 성수 본점', lat: 37.5447, lng: 127.0503}},
+    cover: {region: '성수 · 가로수길 · 한남 · 명동', size: '1층 100㎡ 이상 · 총 250–2,300㎡', moveIn: '2027년 상반기', hq: {name: '모먼트커피 성수 본점', lat: 37.5447, lng: 127.0503},
+      crit: {regions: ['성수', '가로수길', '한남', '명동'], min1F: 100, totalMin: 250, totalMax: 2300, moveBy: '2027-06-30'}},
     items: [
       {listingId: 'L1', comment: '가로수길 메인 동선 코너 자리로 1층 전면 폭이 11m입니다. 2층은 로스터리 쇼룸으로 쓸 수 있습니다.', addedAt: '2026-09-20T10:00:00'},
       {listingId: 'L3', comment: '전면 테라스가 있는 한남동 F&B 입지입니다. 주말 매출 비중이 높아 브랜드 체험형 매장에 적합합니다.', addedAt: '2026-09-20T10:00:00'},
@@ -1474,11 +1502,11 @@ function calcBlock(x, fx) {
     </tbody></table></section>`;
 }
 function km(a, b) { const R = 6371, dLa = (b.lat - a.lat) * Math.PI / 180, dLn = (b.lng - a.lng) * Math.PI / 180; const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
-function coverMap(P) {
+function coverMap(P, hd) {
   const pts = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended && o.x.geo); if (!pts.length) return '';
   const hq = P.cover.hq;
   MAPS.cover = {multi: true, hq, pts: pts.map(o => ({lat: o.x.geo.lat, lng: o.x.geo.lng, i: o.i, title: o.x.title}))};
-  return `<div class="cvm"><div class="row" style="margin-bottom:12px"><h3 class="sec-t" style="margin:0">후보지 위치</h3><span class="sub">번호를 누르면 해당 물건으로 이동</span></div>
+  return `<div class="cvm">${hd}
     <div class="cvm-box"><div class="map cvmap" data-key="cover"></div><div class="cvm-list">
       ${hq ? `<div class="cvm-hq"><i>★</i><div><b>${esc(hq.name)}</b><span>기준 위치</span></div></div>` : ''}
       ${pts.map(o => `<button class="cvm-i" onclick="goPage(${o.i + 1})"><span class="n" style="--c:${FP_C[o.i % 8]}">${pad2(o.i + 1)}</span><div><b>${esc(o.x.title)}</b><span>${o.x.geo.stn ? esc(o.x.geo.stn[0]) + ' 인근' : ''}${hq ? ` · 기준 위치에서 ${km(hq, o.x.geo).toFixed(1)}km` : ''}</span></div></button>`).join('')}</div></div></div>`;
@@ -1565,7 +1593,7 @@ function footprint(x, mode) {
   if (img) { img.x -= minX; img.y -= minY; }
   return {pts, img, w: Math.max(...pts.map(p => p[0])), h: Math.max(...pts.map(p => p[1])), area, floor: f.floor, multi: fs.length > 1};
 }
-function fpCompare(P) {
+function fpCompare(P, hd) {
   const shape = U.fpShape || 'plan', side = U.fpMode === 'side';
   const items = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended).map(o => ({...o, fp: footprint(o.x, shape)})).filter(o => o.fp);
   if (items.length < 2) return '';
@@ -1580,15 +1608,14 @@ function fpCompare(P) {
   const shp = o => { const c = FP_C[o.i % 8], pts = o.fp.pts.map(([u, v]) => `${(u + tx(o)).toFixed(2)},${(v + ty(o)).toFixed(2)}`).join(' ');
     return `<g class="fp-s ${showImg ? 'withimg' : ''}" style="--c:${c}"><title>${pad2(o.i + 1)} ${o.x.title} · ${fmtF(o.fp.floor)} ${nf(o.fp.area)}㎡</title><polygon points="${pts}"/></g>`; };
   const ctl = (k, cur, opts) => `<div class="seg sm noprint">${opts.map(([v, l]) => `<button class="${cur === v ? 'on' : ''}" onclick="U.${k}='${v}';rerenderClient()">${l}</button>`).join('')}</div>`;
-  return `<div class="fp"><div class="row" style="margin-bottom:12px"><h3 class="sec-t" style="margin:0">면적 비교 · 동일 축척</h3><span class="sub">1층 기준 · 복층 매물도 1층만 비교 · 격자 5m</span><div class="sp"></div>
-      ${ctl('fpShape', shape, [['plan', '도면 형태'], ['rect', '사각형 환산']])}${ctl('fpMode', side ? 'side' : 'overlay', [['overlay', '겹쳐 보기'], ['side', '나란히 보기']])}</div>
+  return `<div class="fp">${hd}<div class="row fp-ctl">${ctl('fpShape', shape, [['plan', '도면 형태'], ['rect', '사각형 환산']])}${ctl('fpMode', side ? 'side' : 'overlay', [['overlay', '겹쳐 보기'], ['side', '나란히 보기']])}<div class="sp"></div><span class="sub">1층 기준 · 격자 5m</span></div>
     <div class="fp-box"><svg class="fp-svg" viewBox="0 0 ${W.toFixed(1)} ${H.toFixed(1)}" preserveAspectRatio="xMinYMax meet"><g class="fp-grid">${grid.join('')}</g>${imgs}${items.map(shp).join('')}</svg>
       <div class="fp-leg">${items.map(o => `<div class="fp-li" style="--c:${FP_C[o.i % 8]}"><i></i><div><b>${pad2(o.i + 1)} ${esc(o.x.title)}</b><span>${fmtF(o.fp.floor)} ${nf(o.fp.area)}㎡ · ${nf(o.fp.area * PYR, 1)}평${o.fp.multi ? ` · 전체 ${nf(o.x.leaseArea)}㎡` : ''}</span></div></div>`).join('')}
       ${shape === 'plan' ? '<div class="sub" style="margin-top:4px">도면 형태: 1층 임대 범위의 실제 윤곽. 나란히 보기에서 도면이 함께 보입니다.</div>' : '<div class="sub" style="margin-top:4px">사각형 환산: 같은 면적의 사각형으로 크기만 비교합니다.</div>'}</div></div></div>`;
 }
 
 /* ---------- trade-area cross comparison ---------- */
-function areaCompare(P) {
+function areaCompare(P, hd) {
   const rows = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended);
   if (!rows.some(o => o.x.area)) return '';
   const A = rows.filter(o => o.x.area).map(o => o.x.area);
@@ -1596,7 +1623,7 @@ function areaCompare(P) {
   const fl = a => a.pop[2][1], sl = a => a.sales[a.sales.length - 1][1], we = a => a.week[1];
   const top = arr => arr.reduce((m, v) => v[1] > m[1] ? v : m);
   const bar = (v, m, lbl) => `<div class="xb"><b>${lbl}</b><span><i style="--w:${(v / m) * 100}%"></i></span></div>`;
-  return `<div class="xa"><div class="row" style="margin-bottom:12px"><h3 class="sec-t" style="margin:0">상권 비교</h3><span class="sub">서울시 상권분석서비스 기준 · 예시 데이터</span></div>
+  return `<div class="xa">${hd}
     <div class="cmp"><table class="tbl xt"><thead><tr><th></th><th>상권</th><th>유형</th><th>일평균 유동인구</th><th>분기 추정 매출</th><th>주말 매출 비중</th><th>유동 피크</th><th>주 연령대</th><th>최다 업종</th></tr></thead><tbody>
     ${rows.map(({x, i}) => { const a = x.area;
       if (!a) return `<tr><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">서울 외 지역</div></td><td colspan="7" class="sub">상권 데이터 없음</td></tr>`;
@@ -1611,39 +1638,93 @@ function areaCompare(P) {
 
 /* ---------- cover ---------- */
 function respChip(lid) { if (!CP) return ''; const r = (getP(CP.pid)?.responses || {})[lid]; return r ? `<span class="chip rc-${r.v}">${RESP.find(z => z[0] === r.v)[1]}</span>` : ''; }
+const SEC_STATE = {yes: '관심 있음', hold: '보류', no: '관심 없음'};
+function fitOf(x, c) {
+  if (!c || x.ended) return null;
+  const hay = `${x.address} ${x.area?.name || ''} ${x.title}`;
+  const ho = x.handover;
+  return [
+    ['지역', c.regions ? c.regions.some(r => hay.includes(r)) : null],
+    ['1층 면적', c.min1F ? (x.area1 != null && x.area1 >= c.min1F) : null],
+    ['전체 면적', c.totalMin ? (x.leaseArea >= c.totalMin && x.leaseArea <= (c.totalMax || 1e9)) : null],
+    ['입주 시기', c.moveBy ? (ho?.s === 'now' ? true : ho?.s === 'v' ? ho.v <= c.moveBy : null) : null],
+  ].filter(([, v]) => v !== undefined);
+}
+const fitAll = f => f && f.every(([, v]) => v === true);
+function secHead(n, title, lead) { return `<div class="sh"><span class="sh-n">${pad2(n)}</span><div><h3>${title}</h3>${lead ? `<p>${lead}</p>` : ''}</div></div>`; }
 function coverPage(P, fx) {
-  const act = P.items.filter(x => !x.ended);
-  const rng = (arr, f) => { const v = arr.filter(x => x != null); if (!v.length) return '–'; const mn = Math.min(...v), mx = Math.max(...v); return mn === mx ? f(mn) : `${f(mn)}<i>–</i>${f(mx)}`; };
-  const ds = act.filter(x => x.handover?.s === 'v').map(x => x.handover.v).sort();
-  const ho = act.some(x => x.handover?.s === 'now') ? '즉시' : ds[0] ? fmtDate(ds[0]) : '협의';
+  const act = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended), c = P.cover.crit;
+  const nm = o => `<b>${pad2(o.i + 1)} ${esc(o.x.title)}</b>`;
+  const by = (arr, f, dir) => arr.filter(o => f(o) != null).sort((a, b) => dir * (f(a) - f(b)))[0];
+  const rng = (vals, f) => { const v = vals.filter(x => x != null); if (!v.length) return '–'; const mn = Math.min(...v), mx = Math.max(...v); return mn === mx ? f(mn) : `${f(mn)}<i>–</i>${f(mx)}`; };
+  const eff = o => effMonthly(o.x), a1 = o => o.x.area1, hoKey = o => o.x.handover?.s === 'now' ? 0 : o.x.handover?.s === 'v' ? +o.x.handover.v.replace(/-/g, '') : null;
+  const fits = act.map(o => ({...o, fit: fitOf(o.x, c)})), nFit = fits.filter(o => fitAll(o.fit)).length;
+  const cheap = by(act, eff, 1), big = by(act, a1, -1), small = by(act, a1, 1), soon = by(act, hoKey, 1);
+  const hq = P.cover.hq, near = hq ? by(act.filter(o => o.x.geo), o => km(hq, o.x.geo), 1) : null, far = hq ? by(act.filter(o => o.x.geo), o => km(hq, o.x.geo), -1) : null;
+  const withA = act.filter(o => o.x.area), busy = by(withA, o => o.x.area.pop[2][1], -1), wknd = by(withA, o => o.x.area.week[1], -1);
   const photos = P.items.map(x => x.photos?.[0]).filter(Boolean).slice(0, 4);
   const short = p => !p ? '–' : (STATE_LBL[p.s] || (typeof p.v === 'string' ? fmtDate(p.v) : krw(p.v)));
   const sub = p => p && p.s === 'v' && typeof p.v === 'number' ? `<small>${fxOf(p.v, fx)}</small>` : '';
-  return `<div class="cv-hero"><div class="cv-mosaic n${photos.length}">${photos.map((p, i) => `<i style="background-image:url('${p}');--i:${i}"></i>`).join('')}</div><div class="cv-shade"></div>
+  const pp = CP ? getP(CP.pid) : null, resp = pp?.responses || {}, tours = pp?.tours || [];
+  const fitChips = f => f ? `<div class="fit">${f.map(([k, v]) => `<span class="${v === true ? 'ok' : v === false ? 'no' : 'q'}">${v === true ? '✓' : v === false ? '✕' : '?'} ${k}</span>`).join('')}</div>` : '';
+  const tag = (o, ref, t) => ref && ref.i === o.i ? `<em class="best">${t}</em>` : '';
+
+  /* hero + summary */
+  let h = `<div class="cv-hero"><div class="cv-mosaic n${photos.length}">${photos.map((p, i) => `<i style="background-image:url('${p}');--i:${i}"></i>`).join('')}</div><div class="cv-shade"></div>
       <div class="cv-in"><div class="cv-top"><span class="cv-brand">C&amp;W Advisory</span><span>임차 후보지 제안</span></div>
         <div class="cv-main"><div><h1>${esc(P.client)}<span>귀중</span></h1>
           <div class="cv-need">${[['희망 지역', P.cover.region], ['면적', P.cover.size], ['입주 시기', P.cover.moveIn]].map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join('')}</div></div>
           <div class="cv-bk"><span>담당</span><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><small>${esc(P.broker.phone)}</small><small>${esc(P.broker.email)}</small></div></div></div></div>
     <div class="hl">
-      <div><span>후보 물건</span><b>${act.length}<em>곳</em></b></div>
-      <div><span>1층 임대면적</span><b>${rng(act.map(x => x.area1), v => nf(v) + '㎡')}</b></div>
-      <div><span>월 임대료</span><b>${rng(act.map(x => x.rent?.s === 'v' ? x.rent.v : null), krw)}</b></div>
-      <div><span>가장 빠른 인도</span><b>${ho}</b></div>
-    </div>
-    ${coverMap(P)}
-    ${fpCompare(P)}
-    ${areaCompare(P)}
-    <h3 class="sec-t">후보 물건</h3>
-    <div class="picks">${P.items.map((x, i) => `<button class="pk ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})">
+      <div><span>후보 물건</span><b>${act.length}<em>곳</em></b>${c ? `<small>${nFit}곳이 요청 조건 모두 충족</small>` : ''}</div>
+      <div><span>1층 임대면적</span><b>${rng(act.map(a1), v => nf(v) + '㎡')}</b>${c?.min1F ? `<small>요청 ${nf(c.min1F)}㎡ 이상</small>` : ''}</div>
+      <div><span>실질 월 비용</span><b>${rng(act.map(eff), krw)}</b><small>${U.calc.term}개월 · 렌트프리 ${U.calc.rf}개월 기준</small></div>
+      <div><span>가장 빠른 인도</span><b>${soon ? short(soon.x.handover) : '협의'}</b>${soon ? `<small>${esc(soon.x.title)}</small>` : ''}</div>
+    </div>`;
+
+  /* 01 candidates */
+  h += `<section class="cv-sec">${secHead(1, '후보 물건', c ? `${act.length}곳 중 <b>${nFit}곳</b>이 요청 조건을 모두 충족합니다.${fits.filter(o => !fitAll(o.fit)).map(o => ` ${nm(o)}은 ${o.fit.filter(([, v]) => v !== true).map(([k, v]) => `${k} ${v === false ? '미충족' : '확인 필요'}`).join(', ')}.`).join('')}` : `${act.length}곳을 제안드립니다.`)}
+    <div class="picks">${P.items.map((x, i) => { const f = fitOf(x, c);
+      return `<button class="pk ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})">
       <div class="pk-ph" style="background-image:url('${x.photos?.[0] || ''}')"><span class="pk-n">${pad2(i + 1)}</span>${x.ended ? '<span class="chip dark">제안 종료</span>' : respChip(x.id)}</div>
       <div class="pk-b"><b>${esc(x.title)}</b><small>${esc(x.address)} · ${esc(x.floorsTxt)}</small>
-      ${x.ended ? '' : `<div class="pk-kv"><div><span>1층</span><b>${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</b></div><div><span>전체</span><b>${nf(x.leaseArea)}㎡</b></div><div><span>월 임대료</span><b>${short(x.rent)}</b>${sub(x.rent)}</div><div><span>인도</span><b>${short(x.handover)}</b></div></div>`}</div></button>`).join('')}</div>
-    <div class="row" style="margin-bottom:12px"><h3 class="sec-t" style="margin:0">조건 비교</h3><div class="sp"></div><span class="sub">외화</span>${curSelect()}</div>
-    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num">보증금</th><th class="num">월 임대료</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">실질 월 비용<small class="th-s">${U.calc.term}개월 · RF ${U.calc.rf}개월</small></th><th class="num">인도</th></tr></thead><tbody>
-    ${P.items.map((x, i) => x.ended
+      ${x.ended ? '' : `${fitChips(f)}<div class="pk-kv"><div><span>1층</span><b>${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</b></div><div><span>전체</span><b>${nf(x.leaseArea)}㎡</b></div><div><span>실질 월 비용</span><b>${effMonthly(x) ? krw(effMonthly(x)) : short(x.rent)}</b>${effMonthly(x) ? `<small>${fxOf(effMonthly(x), fx)}</small>` : ''}</div><div><span>인도</span><b>${short(x.handover)}</b></div></div>`}</div></button>`; }).join('')}</div></section>`;
+
+  /* 02 cost */
+  h += `<section class="cv-sec">${secHead(2, '비용 비교', cheap ? `실질 월 비용이 가장 낮은 곳은 ${nm(cheap)} (${krw(eff(cheap))}, 평당 ${krw(eff(cheap) / (cheap.x.leaseArea * PYR))})입니다. 금액은 원화 기준이며 외화는 참고용입니다.` : '')}
+    <div class="row cmp-ctl"><span class="sub">${U.calc.term}개월 · 렌트프리 ${U.calc.rf}개월 기준 · 물건 페이지의 총비용 계산에서 조건 변경</span><div class="sp"></div><span class="sub">외화</span>${curSelect()}</div>
+    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num hi">실질 월 비용</th><th class="num">월 임대료</th><th class="num">보증금</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
+    ${P.items.map((x, i) => { const o = {x, i};
+      return x.ended
       ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td colspan="8"><span class="chip dark">제안 종료</span></td></tr>`
-      : `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td class="num">${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</td><td class="num">${nf(x.leaseArea)}㎡</td>${['deposit', 'rent', 'mgmt', 'keyMoney'].map(k => `<td class="num"><div class="val"><b>${short(x[k])}</b>${sub(x[k])}</div></td>`).join('')}<td class="num">${effMonthly(x) ? `<div class="val"><b>${krw(effMonthly(x))}</b><small>${fxOf(effMonthly(x), fx)}</small></div>` : '–'}</td><td class="num">${short(x.handover)}</td></tr>`).join('')}
-    </tbody></table></div>`;
+      : `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td>
+        <td class="num">${x.area1 != null ? nf(x.area1) + '㎡' : '–'}${tag(o, big, '최대')}</td><td class="num">${nf(x.leaseArea)}㎡</td>
+        <td class="num hi">${effMonthly(x) ? `<div class="val"><b>${krw(effMonthly(x))}</b><small>${fxOf(effMonthly(x), fx)}</small></div>${tag(o, cheap, '최저')}` : '–'}</td>
+        ${['rent', 'deposit', 'mgmt', 'keyMoney'].map(k => `<td class="num"><div class="val"><b>${short(x[k])}</b>${sub(x[k])}</div></td>`).join('')}
+        <td class="num">${short(x.handover)}${tag(o, soon, '최단')}</td></tr>`; }).join('')}
+    </tbody></table></div></section>`;
+
+  /* 03 location */
+  const mapHtml = coverMap(P, secHead(3, '위치', near ? `${esc(P.cover.hq.name)}에서 가장 가까운 곳은 ${nm(near)} (${km(hq, near.x.geo).toFixed(1)}km), 가장 먼 곳은 ${nm(far)} (${km(hq, far.x.geo).toFixed(1)}km)입니다. 번호를 누르면 해당 물건으로 이동합니다.` : '번호를 누르면 해당 물건으로 이동합니다.'));
+  if (mapHtml) h += `<section class="cv-sec">${mapHtml}</section>`;
+
+  /* 04 space */
+  const fpHtml = fpCompare(P, secHead(4, '공간 · 동일 축척', big && small ? `1층이 가장 넓은 곳은 ${nm(big)} (${nf(big.x.area1)}㎡), 가장 좁은 곳은 ${nm(small)} (${nf(small.x.area1)}㎡)입니다. 복층 물건도 1층 기준으로 비교합니다.` : ''));
+  if (fpHtml) h += `<section class="cv-sec">${fpHtml}</section>`;
+
+  /* 05 trade area */
+  const xaHtml = areaCompare(P, secHead(5, '상권', busy ? `일평균 유동인구는 ${nm(busy)} 상권이 ${nf(busy.x.area.pop[2][1])}명으로 가장 많고, 주말 매출 비중은 ${nm(wknd)} 상권이 ${wknd.x.area.week[1]}%로 가장 높습니다. (서울시 상권분석서비스 기준 · 예시 데이터)` : ''));
+  if (xaHtml) h += `<section class="cv-sec">${xaHtml}</section>`;
+
+  /* 06 next steps */
+  const st = act.map(o => ({...o, r: resp[o.x.id], t: tours.filter(t => t.lid === o.x.id)}));
+  const nr = st.filter(o => o.r).length, exp = pp?.expiresAt;
+  h += `<section class="cv-sec">${secHead(6, '다음 단계', nr ? `${act.length}곳 중 ${nr}곳에 회신해 주셨습니다. 나머지 물건도 각 페이지에서 관심 여부를 알려주시면 답사 일정을 조율해 드리겠습니다.` : '각 물건 페이지에서 관심 여부를 알려주시거나 현장 답사를 요청해 주세요.')}
+    <div class="ns">
+      <div class="ns-list">${st.map(o => `<button class="ns-i" onclick="goPage(${o.i + 1})"><span class="n" style="--c:${FP_C[o.i % 8]}">${pad2(o.i + 1)}</span><div><b>${esc(o.x.title)}</b>${o.r?.comment ? `<span>“${esc(o.r.comment)}”</span>` : ''}${o.t.length ? `<span>답사 요청 · ${o.t.map(t => `${+t.date.slice(5, 7)}/${+t.date.slice(8)} ${t.slot}`).join(', ')}</span>` : ''}</div><div class="sp"></div>${o.r ? `<span class="chip rc-${o.r.v}">${SEC_STATE[o.r.v]}</span>` : '<span class="chip line">회신 전</span>'}</button>`).join('')}</div>
+      <div class="ns-bk"><span>담당</span><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><small>${esc(P.broker.phone)}</small><small>${esc(P.broker.email)}</small>${exp ? `<em>이 제안서는 ${fmtDate(exp)}까지 유효합니다</em>` : ''}</div>
+    </div></section>`;
+  return h;
 }
 function clientPage(snap, genAt, link, pid, preview) {
   CP = pid ? {pid, preview: !!preview} : null;
