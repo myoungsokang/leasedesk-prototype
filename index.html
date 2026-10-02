@@ -856,7 +856,7 @@ b.neg{color:var(--danger)}b.pos{color:var(--ok)}
 /* =========================================================
    LeaseDesk prototype — single file, in-memory + localStorage
    ========================================================= */
-const KEY = 'leasedesk-proto-v6';
+const KEY = 'leasedesk-proto-v7';
 const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1107,8 +1107,10 @@ const USERS = {
   brokerB: {name: '이서연', short: '브로커B', title: '차장 · 임차자문팀', phone: '010-7730-5521', email: 'seoyeon.lee@cw-advisory.kr'},
   admin: {name: '박정호', short: '관리자', title: '상무 · 임차자문 총괄'},
 };
-const CLIENTS = {clientA: '모먼트커피'};
-const ROLES = [['brokerA', '브로커A'], ['brokerB', '브로커B'], ['admin', '관리자'], ['clientA', '클라이언트A']];
+const CLIENTS = {clientA: {name: '모먼트커피', team: '점포개발팀', label: '클라이언트-카페'}, clientB: {name: '어반스레드', team: '리테일 전략팀', label: '클라이언트-패션'}};
+const ROLES = [['brokerA', '브로커A'], ['brokerB', '브로커B'], ['admin', '관리자'], ...Object.entries(CLIENTS).map(([k, c]) => [k, c.label])];
+const isClient = r => r.startsWith('client');
+const clientOpts = sel => Object.entries(CLIENTS).map(([k, c]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${c.name} (${c.label})</option>`).join('');
 
 /* ---------- optional data modules (per proposal) ---------- */
 const MODULES = [
@@ -1233,6 +1235,19 @@ function seed() {
     responses: {L1: {v: 'yes', comment: '2층 쇼룸 활용도가 좋아 보여요. 답사 희망합니다.', at: '2026-09-29T10:22:00'}, L3: {v: 'hold', comment: '주차 가능 여부 확인 부탁드립니다.', at: '2026-09-29T10:31:00'}},
     tours: [{lid: 'L1', date: '2026-10-07', slot: '오후', people: 3, memo: '인테리어 업체 동행', at: '2026-09-29T10:24:00'}],
     pv: [['2026-09-21T09:12:00', 'cover', 95], ['2026-09-21T09:14:00', 'L1', 210], ['2026-09-21T09:18:00', 'L3', 150], ['2026-09-21T09:21:00', 'L5', 25], ['2026-09-21T14:40:00', 'cover', 40], ['2026-09-21T14:41:00', 'L1', 180], ['2026-09-21T14:44:00', 'L2', 60], ['2026-09-29T10:05:00', 'cover', 20], ['2026-09-29T10:06:00', 'L1', 60], ['2026-09-29T10:20:00', 'L3', 90], ['2026-09-29T10:29:00', 'L1', 30], ['2026-09-29T10:33:00', 'L2', 15], ['2026-09-29T10:34:00', 'L3', 40]].map(([at, key, dur]) => ({at, key, dur}))}];
+  const tok2 = mkToken();
+  props.push({id: 'P2', ownerId: 'brokerB', clientId: 'clientB', clientName: '어반스레드',
+    cover: {region: '가로수길 · 한남 · 판교', size: '1층 110㎡ 이상 · 총 240–400㎡', moveIn: '2027년 1분기', hq: {name: '어반스레드 성수 쇼룸', lat: 37.5465, lng: 127.0560},
+      crit: {regions: ['가로수길', '한남', '판교'], min1F: 110, totalMin: 240, totalMax: 400, moveBy: '2027-03-31'}, category: '패션·잡화'},
+    modules: {...DEFAULT_MODS, sales: true, foreign: true},
+    items: [
+      {listingId: 'L1', comment: '가로수길 메인 동선 코너, 전면 폭 11m라 쇼윈도 노출이 가장 좋습니다. 같은 자리에 의류 매장이 10년 가까이 이어진 자리입니다.', addedAt: '2026-09-25T11:00:00'},
+      {listingId: 'L3', comment: '1층 일부 + 2층 구성으로 쇼룸과 피팅 공간을 나누기 좋습니다. 30대 매출 비중이 높은 상권입니다.', addedAt: '2026-09-25T11:00:00'},
+      {listingId: 'L8', comment: '판교역 지하 연결 동선의 몰 1층입니다. 평일 직장인 수요를 겨냥한 대안입니다.', addedAt: '2026-09-25T11:00:00'},
+    ],
+    pin: '7315', token: tok2, oldTokens: [], views: [{at: '2026-09-26T16:20:00'}], expiresAt: '2026-11-15', responses: {L1: {v: 'hold', comment: '권리금 조건 확인 후 결정하겠습니다.', at: '2026-09-27T09:40:00'}}, tours: [],
+    pv: [['2026-09-26T16:20:00', 'cover', 80], ['2026-09-26T16:22:00', 'L1', 240], ['2026-09-26T16:26:00', 'L3', 120], ['2026-09-26T16:28:00', 'L8', 45]].map(([at, key, dur]) => ({at, key, dur})),
+    snap: null, genAt: null, createdAt: '2026-09-25T10:30:00'});
   return {
     today: '2026-10-01', buildings: b, listings: L, proposals: props, log: [],
     hist: [
@@ -1251,10 +1266,12 @@ function seed() {
     notes: [
       {to: 'brokerB', text: '김민준님이 <b>한남 234 · 1F 일부 · 2F</b>를 모먼트커피 제안서에 추가했습니다', at: '2026-09-20T10:00:00', read: false},
       {to: 'brokerA', text: '<b>연무장 45</b> 용역 만료 D-14', at: '2026-09-28T09:00:00', read: false},
+      {to: 'brokerA', text: '이서연님이 <b>가로수 24 · 1F–2F</b>를 어반스레드 제안서에 추가했습니다', at: '2026-09-25T11:00:00', read: false},
     ],
     msgs: [
       {client: 'clientA', pid: 'P1', from: 'brokerA', token: 'Qm7xV2kPz9Ra', at: '2026-09-18T17:05:00', text: '요청하신 후보지를 보내드립니다.'},
       {client: 'clientA', pid: 'P1', from: 'brokerA', token: tok, at: '2026-09-20T10:10:00', text: '링크가 바뀌었습니다. 이 링크로 접속해 주세요.'},
+      {client: 'clientB', pid: 'P2', from: 'brokerB', token: tok2, at: '2026-09-25T11:10:00', text: '어반스레드 플래그십 후보지를 보내드립니다. PIN은 문자로 전달드렸습니다.'},
     ],
   };
 }
@@ -1262,7 +1279,7 @@ function seed() {
 /* ---------- state ---------- */
 let S;
 try { S = JSON.parse(store.getItem(KEY)); } catch (e) { S = null; }
-const U = {role: store.getItem(KEY + '-role') || 'brokerA', tab: {brokerA: 'mine', brokerB: 'mine', admin: 'over', clientA: 'inbox'},
+const U = {role: store.getItem(KEY + '-role') || 'brokerA', tab: {brokerA: 'mine', brokerB: 'mine', admin: 'over', clientA: 'inbox', clientB: 'inbox'},
   prop: null, modal: null, client: {pid: null, token: null, ok: false}, unit: 'sqm', cur: 'USD', slot: 4, playing: null, calc: {term: 24, rf: 0}, fpShape: 'plan', fpMode: 'overlay', guide: false, open: {}, page: 0, pgAnim: 0, printAll: false};
 let D = null; // listing draft
 let lastView = '';
@@ -2039,7 +2056,7 @@ document.addEventListener('scroll', e => {
 const DL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>';
 function goPage(i) {
   U.pgAnim = i > U.page ? 1 : -1; U.page = i; rerenderClient(); U.pgAnim = 0;
-  if (CP && !CP.preview && U.role === 'clientA') { const P = JSON.parse(getP(CP.pid).snap); pvStart(CP.pid, i === 0 ? 'cover' : P.items[i - 1].id); }
+  if (CP && !CP.preview && isClient(U.role)) { const P = JSON.parse(getP(CP.pid).snap); pvStart(CP.pid, i === 0 ? 'cover' : P.items[i - 1].id); }
   const m = document.querySelector('.modal.full'); if (m) m.scrollTo({top: 0}); else window.scrollTo({top: 0});
 }
 function printPDF() {
@@ -2098,7 +2115,7 @@ function guide() {
   <h4>브로커A</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
   <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
-  <h4>클라이언트A</h4><ol><li>최신 링크 · PIN 4821</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>총비용 계산 · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
+  <h4>클라이언트-카페 / 패션</h4><ol><li>카페 PIN 4821 · 패션 PIN 7315</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>총비용 계산 · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
 }
 window.addEventListener('beforeunload', () => pvFlush());
 function setRole(r) { pvFlush(); U.role = r; U.prop = null; D = null; U.modal = null; U.client = {pid: null, token: null, ok: false}; save(); render(); renderModal(); window.scrollTo({top: 0}); }
@@ -2110,7 +2127,7 @@ function render() {
   const key = [role, tab, D ? 'edit' : '', U.prop, U.client.pid, U.client.ok, U.client.token, U.page].join('|');
   const anim = key !== lastView; lastView = key;
   let body;
-  if (role === 'clientA') body = clientView();
+  if (isClient(role)) body = clientView();
   else body = `<div class="layout"><aside class="side noprint">${sideNav()}</aside><main class="main">${role === 'admin' ? adminView() : brokerView()}</main></div>`;
   $('#app').innerHTML = topbar() + `<div class="${anim ? 'anim view' : ''}">${body}</div>` + guide();
   initMaps();
@@ -2406,12 +2423,12 @@ function setComment(pid, i, v) { getP(pid).items[i].comment = v; const n = commi
 function setMod(pid, k, v) { const p = getP(pid); p.modules = {...DEFAULT_MODS, ...(p.modules || {}), [k]: v}; const n = commit(`데이터 ${v ? '추가' : '제외'}: ${MODULES.find(m => m[0] === k)[1]}`); toast(`${MODULES.find(m => m[0] === k)[1]} ${v ? 'ON' : 'OFF'}`, n ? '클라이언트 페이지 갱신' : ''); }
 function setExp(pid, v) { getP(pid).expiresAt = v || null; save(); render(); toast(v ? `${fmtDate(v)}까지 유효` : '유효기간 해제'); }
 function createDup(form) {
-  const src = getP(form.pid.value), c = form.client.value, name = c === 'clientA' ? CLIENTS.clientA : form.cname.value.trim();
+  const src = getP(form.pid.value), c = form.client.value, name = CLIENTS[c] ? CLIENTS[c].name : form.cname.value.trim();
   if (!name) return toast('클라이언트명을 입력하세요');
-  const p = {id: uid('P'), ownerId: me(), clientId: c === 'clientA' ? 'clientA' : null, clientName: name, cover: clone(src.cover),
+  const p = {id: uid('P'), ownerId: me(), clientId: CLIENTS[c] ? c : null, clientName: name, cover: clone(src.cover),
     items: src.items.map(it => ({listingId: it.listingId, comment: form.keep.checked ? it.comment : '', addedAt: stamp()})), modules: {...DEFAULT_MODS, ...(src.modules || {})},
     pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], pv: [], responses: {}, tours: [], expiresAt: null, snap: null, genAt: null, createdAt: stamp()};
-  if (c !== 'clientA') delete p.cover.hq;
+  if (c !== src.clientId) delete p.cover.hq;
   S.proposals.unshift(p);
   if (p.clientId) S.msgs.push({client: p.clientId, pid: p.id, from: me(), token: p.token, at: stamp(), text: '후보지 제안드립니다.'});
   U.modal = null; renderModal(); commit('최초 발행'); openProp(p.id); toast('제안서 복제', `${name} · PIN ${p.pin}`);
@@ -2433,9 +2450,9 @@ function reissue(pid) {
   save(); render(); toast('새 링크 발급', '이전 링크 즉시 차단');
 }
 function createProp(form) {
-  const c = form.client.value, name = c === 'clientA' ? CLIENTS.clientA : form.cname.value.trim();
+  const c = form.client.value, name = CLIENTS[c] ? CLIENTS[c].name : form.cname.value.trim();
   if (!name) return toast('클라이언트명을 입력하세요');
-  const p = {id: uid('P'), ownerId: me(), clientId: c === 'clientA' ? 'clientA' : null, clientName: name,
+  const p = {id: uid('P'), ownerId: me(), clientId: CLIENTS[c] ? c : null, clientName: name,
     cover: {region: form.region.value || '—', size: form.size.value || '—', moveIn: form.moveIn.value || '—'},
     items: [], modules: {...DEFAULT_MODS}, pin: String(Math.floor(1000 + Math.random() * 9000)), token: mkToken(), oldTokens: [], views: [], pv: [], responses: {}, tours: [], expiresAt: null, snap: null, genAt: null, createdAt: stamp()};
   S.proposals.unshift(p);
@@ -2525,8 +2542,8 @@ function clientView() {
       <button class="btn ghost sm" onclick="U.client={};render()">취소</button></div></div>`;
     return clientPage(p.snap, p.genAt, linkOf(p), p.id);
   }
-  const ms = S.msgs.filter(m => m.client === 'clientA').slice().reverse();
-  return `<div class="main" style="max-width:720px;margin:0 auto"><div class="head"><h1>받은 메시지</h1><span class="sub">${CLIENTS.clientA} · 총무팀</span></div>
+  const ms = S.msgs.filter(m => m.client === U.role).slice().reverse(), cl = CLIENTS[U.role];
+  return `<div class="main" style="max-width:720px;margin:0 auto"><div class="head"><h1>받은 메시지</h1><span class="sub">${cl.name} · ${cl.team}</span></div>
     ${ms.map((m, i) => `<div class="mail a" style="--i:${i}" onclick="openLink('${m.token}')"><div class="av">${USERS[m.from].name[0]}</div><div style="flex:1;min-width:0"><div class="row"><b>${USERS[m.from].name}</b><span class="sub">C&amp;W Advisory</span><div class="sp"></div><span class="sub">${fmtStamp(m.at)}</span></div><div style="margin-top:4px">${esc(m.text)}</div><div class="url">https://p.cw-advisory.kr/${m.token}</div></div></div>`).join('')}</div>`;
 }
 function openLink(t) { pvFlush(); U.client = {token: t, ok: false}; U.page = 0; render(); setTimeout(() => document.querySelector('.pin input')?.focus(), 50); window.scrollTo({top: 0}); }
@@ -2565,7 +2582,7 @@ function renderModal() {
   } else if (m.type === 'newProp') {
     h = `<div class="modal"><div class="mh"><b>새 제안서</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <form class="mb" onsubmit="event.preventDefault();createProp(this)"><div class="fg" style="grid-template-columns:1fr 1fr">
-      <div class="f"><label>클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value==='clientA'"><option value="clientA">한빛테크 (클라이언트A)</option><option value="other">직접 입력</option></select></div>
+      <div class="f"><label>클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value!=='other'">${clientOpts('clientA')}<option value="other">직접 입력</option></select></div>
       <div class="f"><label>클라이언트명</label><input class="in" name="cname" disabled placeholder="회사명"></div>
       <div class="f"><label>희망 지역</label><input class="in" name="region" placeholder="성수 · 강남"></div>
       <div class="f"><label>면적</label><input class="in" name="size" placeholder="1,000–1,500㎡"></div>
@@ -2592,7 +2609,7 @@ function renderModal() {
     const src = getP(m.pid);
     h = `<div class="modal"><div class="mh"><b>제안서 복제</b><span class="sub">${esc(src.clientName)} · 물건 ${src.items.length}건</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <form class="mb" onsubmit="event.preventDefault();createDup(this)"><input type="hidden" name="pid" value="${src.id}"><div class="fg" style="grid-template-columns:1fr 1fr">
-      <div class="f"><label>새 클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value==='clientA'"><option value="other">직접 입력</option><option value="clientA">모먼트커피 (클라이언트A)</option></select></div>
+      <div class="f"><label>새 클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value!=='other'"><option value="other">직접 입력</option>${clientOpts()}</select></div>
       <div class="f"><label>클라이언트명</label><input class="in" name="cname" placeholder="회사명"></div></div>
       <label class="chk"><input type="checkbox" name="keep" checked> 물건별 코멘트도 복사</label>
       <div class="sub" style="margin-top:8px">표지 요구조건과 물건 구성이 복사됩니다. 링크 · PIN · 응답 · 열람 기록은 새로 시작합니다.</div>
@@ -2624,7 +2641,7 @@ document.addEventListener('keydown', e => {
   }
   if (e.key === 'Escape' && U.modal) return closeModal();
   if (e.target.closest('input,textarea,select')) return;
-  const onClient = U.modal?.type === 'preview' || (U.role === 'clientA' && U.client.ok && !U.modal);
+  const onClient = U.modal?.type === 'preview' || (isClient(U.role) && U.client.ok && !U.modal);
   if (!onClient || !document.querySelector('.ptabs')) return;
   const n = document.querySelectorAll('.ptab').length - 1;
   if (e.key === 'ArrowRight' && U.page < n) goPage(U.page + 1);
