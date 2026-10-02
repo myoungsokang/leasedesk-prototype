@@ -1112,7 +1112,7 @@ const USERS = {
 const CLIENTS = {clientA: {name: '모먼트커피', team: '점포개발팀', label: '클라이언트-카페', hidden: true}, clientB: {name: '어반스레드', team: '리테일 전략팀', label: '클라이언트-패션'}};
 const ROLES = [['brokerA', '브로커-카페'], ['brokerB', '브로커-패션'], ['admin', '관리자'], ...Object.entries(CLIENTS).filter(([, c]) => !c.hidden).map(([k, c]) => [k, c.label])];
 const isClient = r => r.startsWith('client');
-const clientOpts = sel => Object.entries(CLIENTS).map(([k, c]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${c.name} (${c.label})</option>`).join('');
+const clientOpts = sel => Object.entries(CLIENTS).filter(([, c]) => !c.hidden).map(([k, c]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${c.name} (${c.label})</option>`).join('');
 
 /* ---------- i18n (client page) ---------- */
 const LG = (ko, en) => U.lang === 'en' ? en : ko;
@@ -1795,28 +1795,6 @@ function submitTour() {
   note(p.ownerId, `${esc(p.clientName)}: <b>${esc(snapTitle(p.id, m.lid))}</b> 답사 요청 ${fmtDate(m.date).slice(5)} ${m.slot}`);
   U.modal = null; save(); renderModal(); render(); toast('답사 요청 전달됨', `${fmtDate(m.date)} ${m.slot}`);
 }
-function effMonthly(x) {
-  if (x.rent?.s !== 'v') return null;
-  const t = U.calc.term, rf = 0, mg = x.mgmt?.s === 'v' ? x.mgmt.v : 0;
-  return (x.rent.v * (t - rf) + mg * t) / t;
-}
-function calcBlock(x, fx) {
-  if (x.rent?.s !== 'v') return '';
-  const t = U.calc.term, rf = 0, rent = x.rent.v, mg = x.mgmt?.s === 'v' ? x.mgmt.v : 0;
-  const tr = rent * (t - rf), tm = mg * t, tot = tr + tm, eff = tot / t;
-  const init = (x.deposit?.s === 'v' ? x.deposit.v : 0) + (x.keyMoney?.s === 'v' ? x.keyMoney.v : 0);
-  return `<section class="sec calc"><div class="sec-h"><h3>총비용 계산</h3><span class="sub">조건을 바꾸면 모든 물건에 같이 적용됩니다</span></div>
-    <div class="calc-in noprint"><div class="f"><label>계약 기간</label>${seg([['12', '1년'], ['24', '2년'], ['36', '3년'], ['60', '5년']], String(t), "(v=>{U.calc.term=+v;rerenderClient()})")}</div>
-</div>
-    <div class="print-only sub" style="margin-bottom:8px">${t}개월 계약 기준</div>
-    <table class="ctbl"><thead><tr><th></th><th>원화 (KRW)</th><th class="fxh">외화 ${curSelect()}</th></tr></thead><tbody>
-      <tr><td class="lbl">총 임대료</td><td>${valCell(krw(tr), `${krw(rent)} × ${t - rf}개월`)}</td><td>${valCell(fxOf(tr, fx))}</td></tr>
-      <tr><td class="lbl">총 관리비</td><td>${mg ? valCell(krw(tm), `${krw(mg)} × ${t}개월`) : valCell('–', '관리비 미정 · 제외')}</td><td>${mg ? valCell(fxOf(tm, fx)) : '–'}</td></tr>
-      <tr class="tot"><td class="lbl">총 점유비용</td><td>${valCell(krw(tot))}</td><td>${valCell(fxOf(tot, fx))}</td></tr>
-      <tr class="hi"><td class="lbl">실질 월 비용</td><td>${valCell(krw(eff), `평당 ${krw(eff / (x.leaseArea * PYR))}`)}</td><td>${valCell(fxOf(eff, fx))}</td></tr>
-      ${init ? `<tr><td class="lbl">초기 비용</td><td>${valCell(krw(init), x.keyMoney?.s === 'v' ? '보증금 + 권리금 · 보증금은 반환' : '보증금 · 계약 종료 시 반환')}</td><td>${valCell(fxOf(init, fx))}</td></tr>` : ''}
-    </tbody></table></section>`;
-}
 function km(a, b) { const R = 6371, dLa = (b.lat - a.lat) * Math.PI / 180, dLn = (b.lng - a.lng) * Math.PI / 180; const h = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLn / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); }
 function coverMap(P, hd) {
   const pts = P.items.map((x, i) => ({x, i})).filter(o => !o.x.ended && o.x.geo); if (!pts.length) return '';
@@ -1955,7 +1933,6 @@ function listingPage(x, i, n, fx) {
         ${x.below ? specRow('지하', valCell(LG(x.below + '층', x.below + ' floors'))) : ''}${specRow('연면적', valCell(areaMain(x.gfa), areaSub(x.gfa)))}${x.year ? specRow('준공', valCell(x.year + '년')) : ''}
       </div></section>
     </div>
-    ${calcBlock(x, fx)}
     ${rentBlock(x, fx)}
     ${siteBlock(x)}
     ${plans.length ? `<section class="sec plans-sec"><div class="sec-h"><h3>도면</h3><span class="sub">파란 영역 = 임대 범위</span></div><div class="screen-only">${mosaic(key, plans, 'plans', '도면')}<div class="plan-list">${plans.map(m => `<div class="pl-i"><b>${esc(m.cap)}</b>${metaHtml(m)}</div>`).join('')}</div></div>${printMedia(plans, 'one')}</section>` : ''}
@@ -2051,7 +2028,7 @@ function coverPage(P, fx) {
   const nm = o => `<b>${pad2(o.i + 1)} ${esc(o.x.title)}</b>`;
   const by = (arr, f, dir) => arr.filter(o => f(o) != null).sort((a, b) => dir * (f(a) - f(b)))[0];
   const rng = (vals, f) => { const v = vals.filter(x => x != null); if (!v.length) return '–'; const mn = Math.min(...v), mx = Math.max(...v); return mn === mx ? f(mn) : `${f(mn)}<i>–</i>${f(mx)}`; };
-  const eff = o => effMonthly(o.x), a1 = o => o.x.area1, hoKey = o => o.x.handover?.s === 'now' ? 0 : (o.x.handover?.s === 'v' || o.x.handover?.s === 'est') ? +o.x.handover.v.replace(/-/g, '') : null;
+  const eff = o => o.x.rent?.s === 'v' ? o.x.rent.v : null, a1 = o => o.x.area1, hoKey = o => o.x.handover?.s === 'now' ? 0 : (o.x.handover?.s === 'v' || o.x.handover?.s === 'est') ? +o.x.handover.v.replace(/-/g, '') : null;
   const fits = act.map(o => ({...o, fit: fitOf(o.x, c)})), nFit = fits.filter(o => fitAll(o.fit)).length;
   const cheap = by(act, eff, 1), big = by(act, a1, -1), small = by(act, a1, 1), soon = by(act, hoKey, 1);
   const hq = P.cover.hq, near = hq ? by(act.filter(o => o.x.geo), o => km(hq, o.x.geo), 1) : null, far = hq ? by(act.filter(o => o.x.geo), o => km(hq, o.x.geo), -1) : null;
@@ -2072,7 +2049,7 @@ function coverPage(P, fx) {
     <div class="hl">
       <div><span>후보 물건</span><b>${act.length}<em>곳</em></b>${c ? `<small>${LG(`${nFit}곳이 요청 조건 모두 충족`, `${nFit} meet all requirements`)}</small>` : ''}</div>
       <div><span>1층 임대면적</span><b>${rng(act.map(a1), v => nf(v) + '㎡')}</b>${c?.min1F ? `<small>${LG(`요청 ${nf(c.min1F)}㎡ 이상`, `Required ${nf(c.min1F)}㎡+`)}</small>` : ''}</div>
-      <div><span>실질 월 비용</span><b>${rng(act.map(eff), krw)}</b><small>${U.calc.term}개월 계약 기준</small></div>
+      <div><span>월 임대료</span><b>${rng(act.map(eff), krw)}</b><small>${LG('부가세 별도', 'excl. VAT')}</small></div>
       <div><span>가장 빠른 인도</span><b>${soon ? short(soon.x.handover) : '협의'}</b>${soon ? `<small>${esc(soon.x.title)}</small>` : ''}</div>
     </div>`;
 
@@ -2082,22 +2059,22 @@ function coverPage(P, fx) {
       return `<button class="pk ${x.ended ? 'ended' : ''}" onclick="goPage(${i + 1})">
       <div class="pk-ph" style="background-image:url('${x.photos?.[0] || ''}')"><span class="pk-n">${pad2(i + 1)}</span>${x.ended ? '<span class="chip dark">제안 종료</span>' : respChip(x.id)}</div>
       <div class="pk-b"><b>${esc(x.title)}</b><small>${esc(x.address)} · ${esc(x.floorsTxt)}</small>
-      ${x.ended ? '' : `${fitChips(f)}<div class="pk-kv"><div><span>1층</span><b>${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</b></div><div><span>전체</span><b>${nf(x.leaseArea)}㎡</b></div><div><span>실질 월 비용</span><b>${effMonthly(x) ? krw(effMonthly(x)) : short(x.rent)}</b>${effMonthly(x) ? `<small>${fxOf(effMonthly(x), fx)}</small>` : ''}</div><div><span>인도</span><b>${short(x.handover)}</b></div></div>`}</div></button>`; }).join('')}</div></section>`;
+      ${x.ended ? '' : `${fitChips(f)}<div class="pk-kv"><div><span>1층</span><b>${x.area1 != null ? nf(x.area1) + '㎡' : '–'}</b></div><div><span>전체</span><b>${nf(x.leaseArea)}㎡</b></div><div><span>월 임대료</span><b>${short(x.rent)}</b>${sub(x.rent)}</div><div><span>인도</span><b>${short(x.handover)}</b></div></div>`}</div></button>`; }).join('')}</div></section>`;
 
   /* 02 cost */
   const benchLow = MODS.rent ? by(act.filter(o => benchDiff(o.x) != null), o => benchDiff(o.x), 1) : null;
-  h += `<section class="cv-sec">${secHead(2, '비용 비교', cheap ? LG(`실질 월 비용이 가장 낮은 곳은 ${nm(cheap)} (${krw(eff(cheap))}, 평당 ${krw(eff(cheap) / (cheap.x.leaseArea * PYR))})입니다.${benchLow ? ` 상권 평균 임대료 대비로는 ${nm(benchLow)}이 ${pct(benchDiff(benchLow.x))}로 가장 유리합니다.` : ''} 금액은 원화 기준이며 외화는 참고용입니다.`,
-      `${nm(cheap)} has the lowest effective monthly cost (${krw(eff(cheap))}, ${krw(eff(cheap) / cheap.x.leaseArea)} per ㎡).${benchLow ? ` Against market-average rent, ${nm(benchLow)} is the best value at ${pct(benchDiff(benchLow.x))}.` : ''} Amounts are in KRW; foreign-currency figures are for reference.`) : '')}
-    <div class="row cmp-ctl"><span class="sub">${U.calc.term}개월 계약 기준 · 물건 페이지의 총비용 계산에서 기간 변경</span><div class="sp"></div><span class="sub">외화</span>${curSelect()}</div>
-    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num hi">실질 월 비용</th>${MODS.rent ? '<th class="num">상권 평균 대비<small class="th-s">㎡당 임대료</small></th>' : ''}<th class="num">월 임대료</th><th class="num">보증금</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
+  h += `<section class="cv-sec">${secHead(2, '비용 비교', cheap ? LG(`월 임대료가 가장 낮은 곳은 ${nm(cheap)} (${krw(eff(cheap))}, 평당 ${krw(eff(cheap) / (cheap.x.leaseArea * PYR))})입니다.${benchLow ? ` 상권 평균 임대료 대비로는 ${nm(benchLow)}이 ${pct(benchDiff(benchLow.x))}로 가장 유리합니다.` : ''} 금액은 원화 기준이며 외화는 참고용입니다.`,
+      `${nm(cheap)} has the lowest monthly rent (${krw(eff(cheap))}, ${krw(eff(cheap) / cheap.x.leaseArea)} per ㎡).${benchLow ? ` Against market-average rent, ${nm(benchLow)} is the best value at ${pct(benchDiff(benchLow.x))}.` : ''} Amounts are in KRW; foreign-currency figures are for reference.`) : '')}
+    <div class="row cmp-ctl"><div class="sp"></div><span class="sub">외화</span>${curSelect()}</div>
+    <div class="cmp"><table class="tbl"><thead><tr><th></th><th>물건</th><th class="num">1층</th><th class="num">전체</th><th class="num hi">월 임대료</th>${MODS.rent ? '<th class="num">상권 평균 대비<small class="th-s">㎡당 임대료</small></th>' : ''}<th class="num">보증금</th><th class="num">월 관리비</th><th class="num">권리금</th><th class="num">인도</th></tr></thead><tbody>
     ${P.items.map((x, i) => { const o = {x, i};
       return x.ended
-      ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td colspan="${MODS.rent ? 9 : 8}"><span class="chip dark">제안 종료</span></td></tr>`
+      ? `<tr class="ended go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td class="tn"><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td><td colspan="${MODS.rent ? 8 : 7}"><span class="chip dark">제안 종료</span></td></tr>`
       : `<tr class="go" onclick="goPage(${i + 1})"><td>${pad2(i + 1)}</td><td><b>${esc(x.title)}</b><div class="sub">${esc(x.floorsTxt)}</div></td>
         <td class="num">${x.area1 != null ? nf(x.area1) + '㎡' : '–'}${tag(o, big, '최대')}</td><td class="num">${nf(x.leaseArea)}㎡</td>
-        <td class="num hi">${effMonthly(x) ? `<div class="val"><b>${krw(effMonthly(x))}</b><small>${fxOf(effMonthly(x), fx)}</small></div>${tag(o, cheap, '최저')}` : '–'}</td>
+        <td class="num hi"><div class="val"><b>${short(x.rent)}</b>${sub(x.rent)}</div>${tag(o, cheap, '최저')}</td>
         ${MODS.rent ? `<td class="num">${benchDiff(x) != null ? `<b class="${benchDiff(x) > 0 ? 'neg' : 'pos'}">${pct(benchDiff(x))}</b><div class="sub">${esc(x.area.bench.name)}</div>` : '–'}</td>` : ''}
-        ${['rent', 'deposit', 'mgmt', 'keyMoney'].map(k => `<td class="num"><div class="val"><b>${short(x[k])}</b>${sub(x[k])}</div></td>`).join('')}
+        ${['deposit', 'mgmt', 'keyMoney'].map(k => `<td class="num"><div class="val"><b>${short(x[k])}</b>${sub(x[k])}</div></td>`).join('')}
         <td class="num">${short(x.handover)}${tag(o, soon, '최단')}</td></tr>`; }).join('')}
     </tbody></table></div></section>`;
 
@@ -2218,7 +2195,7 @@ function guide() {
   <h4>브로커-카페</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
   <h4>브로커-패션</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
-  <h4>클라이언트-카페 / 패션</h4><ol><li>PIN 0000</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>총비용 계산 · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
+  <h4>클라이언트-패션</h4><ol><li>PIN 0000</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>한국어/EN · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
 }
 window.addEventListener('beforeunload', () => pvFlush());
 function setRole(r) { pvFlush(); U.role = r; U.prop = null; D = null; U.modal = null; U.client = {pid: null, token: null, ok: false}; save(); render(); renderModal(); window.scrollTo({top: 0}); }
@@ -2685,8 +2662,8 @@ function renderModal() {
   } else if (m.type === 'newProp') {
     h = `<div class="modal"><div class="mh"><b>새 제안서</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <form class="mb" onsubmit="event.preventDefault();createProp(this)"><div class="fg" style="grid-template-columns:1fr 1fr">
-      <div class="f"><label>클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value!=='other'">${clientOpts('clientA')}<option value="other">직접 입력</option></select></div>
-      <div class="f"><label>클라이언트명</label><input class="in" name="cname" disabled placeholder="회사명"></div>
+      <div class="f"><label>클라이언트</label><select class="in" name="client" onchange="this.form.cname.disabled=this.value!=='other'"><option value="other">직접 입력</option>${clientOpts()}</select></div>
+      <div class="f"><label>클라이언트명</label><input class="in" name="cname" placeholder="회사명"></div>
       <div class="f"><label>희망 지역</label><input class="in" name="region" placeholder="성수 · 강남"></div>
       <div class="f"><label>면적</label><input class="in" name="size" placeholder="1,000–1,500㎡"></div>
       <div class="f"><label>입주 시기</label><input class="in" name="moveIn" placeholder="2027년 상반기"></div></div>
