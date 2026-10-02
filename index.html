@@ -858,7 +858,7 @@ b.neg{color:var(--danger)}b.pos{color:var(--ok)}
 /* =========================================================
    LeaseDesk prototype — single file, in-memory + localStorage
    ========================================================= */
-const KEY = 'leasedesk-proto-v9';
+const KEY = 'leasedesk-proto-v10';
 const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -1109,7 +1109,7 @@ const USERS = {
   brokerB: {name: '이서연', short: '브로커B', title: '차장 · 임차자문팀', phone: '010-7730-5521', email: 'seoyeon.lee@cw-advisory.kr'},
   admin: {name: '박정호', short: '관리자', title: '상무 · 임차자문 총괄'},
 };
-const CLIENTS = {clientA: {name: '모먼트커피', team: '점포개발팀', label: '클라이언트-카페', hidden: true}, clientB: {name: '어반스레드', team: '리테일 전략팀', label: '클라이언트-패션'}};
+const CLIENTS = {clientA: {name: '모먼트커피', team: '점포개발팀', label: '클라이언트A'}, clientB: {name: '어반스레드', team: '리테일 전략팀', label: '클라이언트-패션', hidden: true}};
 const ROLES = [['brokerA', '브로커A'], ['brokerB', '브로커B'], ['admin', '관리자'], ...Object.entries(CLIENTS).filter(([, c]) => !c.hidden).map(([k, c]) => [k, c.label])];
 const isClient = r => r.startsWith('client');
 const clientOpts = sel => Object.entries(CLIENTS).filter(([, c]) => !c.hidden).map(([k, c]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${c.name} (${c.label})</option>`).join('');
@@ -1332,7 +1332,7 @@ function seed() {
     tours: [{lid: 'L1', date: '2026-10-07', slot: '오후', people: 3, memo: '인테리어 업체 동행', at: '2026-09-29T10:24:00'}],
     pv: [['2026-09-21T09:12:00', 'cover', 95], ['2026-09-21T09:14:00', 'L1', 210], ['2026-09-21T09:18:00', 'L3', 150], ['2026-09-21T09:21:00', 'L5', 25], ['2026-09-21T14:40:00', 'cover', 40], ['2026-09-21T14:41:00', 'L1', 180], ['2026-09-21T14:44:00', 'L2', 60], ['2026-09-29T10:05:00', 'cover', 20], ['2026-09-29T10:06:00', 'L1', 60], ['2026-09-29T10:20:00', 'L3', 90], ['2026-09-29T10:29:00', 'L1', 30], ['2026-09-29T10:33:00', 'L2', 15], ['2026-09-29T10:34:00', 'L3', 40]].map(([at, key, dur]) => ({at, key, dur}))}];
   const tok2 = mkToken();
-  props.push({id: 'P2', ownerId: 'brokerB', clientId: 'clientB', clientName: '어반스레드',
+  props.push({id: 'P2', hidden: true, ownerId: 'brokerB', clientId: 'clientB', clientName: '어반스레드',
     cover: {region: '가로수길 · 한남 · 판교', size: '1층 110㎡ 이상 · 총 240–400㎡', moveIn: '2027년 1분기', hq: {name: '어반스레드 성수 쇼룸', lat: 37.5465, lng: 127.0560},
       crit: {regions: ['가로수길', '한남', '판교'], min1F: 110, totalMin: 240, totalMax: 400, moveBy: '2027-03-31'}, category: '패션·잡화'},
     modules: {...DEFAULT_MODS, sales: true, foreign: true},
@@ -1362,7 +1362,6 @@ function seed() {
     notes: [
       {to: 'brokerB', text: '김민준님이 <b>한남 234 · 1F 일부 · 2F</b>를 모먼트커피 제안서에 추가했습니다', at: '2026-09-20T10:00:00', read: false},
       {to: 'brokerA', text: '<b>연무장 45</b> 용역 만료 D-14', at: '2026-09-28T09:00:00', read: false},
-      {to: 'brokerA', text: '이서연님이 <b>가로수 24 · 1F–2F</b>를 어반스레드 제안서에 추가했습니다', at: '2026-09-25T11:00:00', read: false},
     ],
     msgs: [
       {client: 'clientA', pid: 'P1', from: 'brokerA', token: 'Qm7xV2kPz9Ra', at: '2026-09-18T17:05:00', text: '요청하신 후보지를 보내드립니다.'},
@@ -1387,6 +1386,7 @@ function save() {
 const getL = id => S.listings.find(x => x.id === id);
 const getB = id => S.buildings.find(x => x.id === id);
 const getP = id => S.proposals.find(x => x.id === id);
+const visProps = () => S.proposals.filter(p => !p.hidden);
 const me = () => U.role;
 
 function bInfo(L) {
@@ -2195,7 +2195,7 @@ function guide() {
   <h4>브로커A</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
   <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
-  <h4>클라이언트-패션</h4><ol><li>PIN 0000</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>한국어/EN · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
+  <h4>클라이언트A</h4><ol><li>PIN 0000</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>한국어/EN · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
 }
 window.addEventListener('beforeunload', () => pvFlush());
 function setRole(r) { pvFlush(); U.role = r; U.prop = null; D = null; U.modal = null; U.client = {pid: null, token: null, ok: false}; save(); render(); renderModal(); window.scrollTo({top: 0}); }
@@ -2455,7 +2455,7 @@ function saveListing() {
 /* ---------- proposals ---------- */
 const linkOf = p => `https://p.cw-advisory.kr/${p.token}`;
 function propsView() {
-  const ps = S.proposals.filter(p => p.ownerId === me());
+  const ps = visProps().filter(p => p.ownerId === me());
   return `<div class="head"><h1>제안서</h1><span class="sub">${ps.length}건</span><div class="sp"></div><button class="btn pri" onclick="openModal({type:'newProp'})">+ 새 제안서</button></div>
   <div class="grid">${ps.map((p, i) => { const ph = p.items.map(it => getL(it.listingId)).filter(Boolean).slice(0, 3);
     return `<div class="card hov a" style="--i:${i}" onclick="openProp('${p.id}')"><div class="ph" style="display:grid;grid-template-columns:2fr 1fr;gap:2px;background:#ddd">${ph.map((L, j) => `<div style="background:url('${L.photos[0]}') center/cover;${j === 0 ? 'grid-row:span 2' : ''}"></div>`).join('')}</div>
@@ -2546,7 +2546,7 @@ function notesView() {
   return `<div class="head"><h1>알림</h1></div><div class="panel"><div class="list">${ns.map((n, i) => `<div class="li a" style="--i:${i}"><span class="d ${n.read ? 'read' : ''}"></span><span>${n.text}</span><time>${fmtStamp(n.at)}</time></div>`).join('') || '<div class="empty">알림 없음</div>'}</div></div>`;
 }
 function logView() {
-  const ls = me() === 'admin' ? S.log : S.log.filter(l => l.owner === me());
+  const hid = new Set(S.proposals.filter(p => p.hidden).map(p => p.id)), ls = (me() === 'admin' ? S.log : S.log.filter(l => l.owner === me())).filter(l => !hid.has(l.pid));
   return `<div class="head"><h1>발행 로그</h1><span class="sub">클라이언트 페이지 자동 재생성 기록</span></div>
   <div class="panel"><table class="tbl"><thead><tr><th>시각</th><th>제안서</th>${me() === 'admin' ? '<th>담당</th>' : ''}<th>사유</th></tr></thead><tbody>
   ${ls.slice(0, 60).map(l => `<tr><td style="font-variant-numeric:tabular-nums;white-space:nowrap">${fmtStamp(l.at)}</td><td><b>${esc(l.client)}</b></td>${me() === 'admin' ? `<td>${USERS[l.owner].name}</td>` : ''}<td>${esc(l.reason)}</td></tr>`).join('') || '<tr><td colspan="4" class="sub">기록 없음</td></tr>'}</tbody></table></div>`;
@@ -2574,10 +2574,10 @@ function adminView() {
 }
 function adminOver() {
   const act = S.listings.filter(L => L.status === 'active'), cf = conflicts();
-  const month = S.today.slice(0, 7), views = S.proposals.reduce((s, p) => s + p.views.filter(v => v.at.slice(0, 7) === month).length, 0);
+  const month = S.today.slice(0, 7), views = visProps().reduce((s, p) => s + p.views.filter(v => v.at.slice(0, 7) === month).length, 0);
   const soon = act.filter(L => diffDays(L.mEnd, S.today) <= 30);
   return `<div class="head"><h1>개요</h1></div>
-  <div class="stats">${[['진행 매물', act.length], ['공유 비율', Math.round(act.filter(l => l.visibility === 'shared').length / Math.max(act.length, 1) * 100) + '%'], ['제안서', S.proposals.length], ['이번 달 열람', views]].map(([l, v], i) => `<div class="stat a" style="--i:${i}"><span>${l}</span><b>${v}</b></div>`).join('')}</div>
+  <div class="stats">${[['진행 매물', act.length], ['공유 비율', Math.round(act.filter(l => l.visibility === 'shared').length / Math.max(act.length, 1) * 100) + '%'], ['제안서', visProps().length], ['이번 달 열람', views]].map(([l, v], i) => `<div class="stat a" style="--i:${i}"><span>${l}</span><b>${v}</b></div>`).join('')}</div>
   <div class="panel a" style="--i:4"><h3>층 중복 <span class="chip ${cf.length ? 'warn' : 'ok'}">${cf.length}</span></h3>
     ${cf.map(c => `<div class="conf"><span style="font-size:20px">⚠︎</span><div style="flex:1"><b>${esc(bInfo(c.a).name)}</b> · ${c.ov.join(', ')}F<div class="sub">${USERS[c.a.ownerId].name} (${esc(floorLabel(c.a.floors, c.a.leaseType))}, ${c.a.visibility === 'shared' ? '공유' : '나만'}) ↔ ${USERS[c.b.ownerId].name} (${esc(floorLabel(c.b.floors, c.b.leaseType))}, ${c.b.visibility === 'shared' ? '공유' : '나만'})</div></div><button class="btn sm" onclick="U.tab.admin='bld';U.open['${c.a.buildingId}']=true;render()">보기</button></div>`).join('') || '<div class="sub">중복 없음</div>'}</div>
   <div class="panel a" style="--i:5"><h3>용역 만료 30일 이내 <span class="chip">${soon.length}</span></h3>
@@ -2605,7 +2605,7 @@ function adminHand() {
 }
 function grant(lid, u) { const L = getL(lid); L.grants = [...(L.grants || []), u]; logHist(lid, 'admin', '이관 권한 부여', [{label: '복사 권한', from: '–', to: USERS[u].name}]); note(u, `<b>${esc(bInfo(L).name)}</b> 이전 매물 복사 권한을 받았습니다`); save(); render(); toast('이관 권한 부여', USERS[u].name); }
 function adminViews() {
-  const rows = S.proposals.flatMap(p => p.views.map(v => ({...v, p}))).sort((a, b) => b.at.localeCompare(a.at));
+  const rows = visProps().flatMap(p => p.views.map(v => ({...v, p}))).sort((a, b) => b.at.localeCompare(a.at));
   return `<div class="head"><h1>열람</h1><span class="sub">링크 단위 기록</span></div><div class="panel"><table class="tbl"><thead><tr><th>시각</th><th>클라이언트</th><th>담당</th></tr></thead><tbody>
   ${rows.map(r => `<tr><td style="font-variant-numeric:tabular-nums">${fmtStamp(r.at)}</td><td><b>${esc(r.p.clientName)}</b></td><td>${USERS[r.p.ownerId].name}</td></tr>`).join('') || '<tr><td class="sub">없음</td></tr>'}</tbody></table></div>`;
 }
@@ -2655,7 +2655,7 @@ function renderModal() {
     h = `<div class="modal"><div class="mh"><b>물건 추가</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
       ${avail.map(L => `<div class="pick"><div class="pi" style="background-image:url('${L.photos[0]}')"></div><div style="flex:1"><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span><div class="pick-kv"><span>1층 <b>${area1F(L.floors) != null ? nf(area1F(L.floors)) + '㎡' : '–'}</b></span><span>전체 <b>${nf(L.leaseArea)}㎡</b></span><span>임대료 <b>${priceShort(L.rent)}</b></span>${L.ownerId !== me() ? `<span>담당 <b>${USERS[L.ownerId].name}</b></span>` : ''}</div></div><button class="btn sm" onclick="addItem('${p.id}','${L.id}');renderModal()">추가</button></div>`).join('') || '<div class="empty">추가할 물건 없음</div>'}</div></div>`;
   } else if (m.type === 'toProp') {
-    const ps = S.proposals.filter(p => p.ownerId === me()), L = getL(m.lid);
+    const ps = visProps().filter(p => p.ownerId === me()), L = getL(m.lid);
     h = `<div class="modal"><div class="mh"><b>${esc(bInfo(L).name)} → 제안서</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
       ${ps.map(p => { const has = p.items.some(x => x.listingId === m.lid); return `<div class="pick"><div style="flex:1"><b>${esc(p.clientName)}</b><div class="sub">${p.items.length}건</div></div>${has ? '<span class="chip ok">포함됨</span>' : `<button class="btn sm" onclick="addItem('${p.id}','${m.lid}');renderModal()">추가</button>`}</div>`; }).join('') || '<div class="empty">제안서가 없습니다</div>'}
       <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'newProp'})">+ 새 제안서</button></div></div>`;
