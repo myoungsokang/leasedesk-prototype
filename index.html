@@ -622,6 +622,161 @@ details.area[open] summary .chev{transform:rotate(180deg)}
 .lb-fig figcaption{flex-direction:column;align-items:center;gap:6px}
 .lb-t{display:flex;gap:14px}
 .lb .pmeta{color:#d8d6cf;justify-content:center}.lb .pmeta em{color:#8f8d86}
+/* ---------- PDF buttons ---------- */
+.pdf-btn{display:inline-flex;align-items:center;gap:7px;border:0;background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:9px 16px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.18);transition:transform .2s var(--ease),box-shadow .2s,background .2s}
+.pdf-btn:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.22);background:#2b2b2b}
+.pdf-btn:active{transform:scale(.97)}
+.pdf-btn.lg{padding:13px 22px;font-size:14.5px}
+.pdf-cta{display:flex;align-items:center;gap:16px;margin-top:36px;padding:20px 22px;border-radius:20px;background:linear-gradient(135deg,#eef4fc,#f7f7f4);border:1px solid #dbe6f5}
+.pc-ico{width:46px;height:46px;border-radius:14px;background:#fff;color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 2px 8px rgba(42,120,214,.15)}
+.pc-ico svg{width:22px;height:22px}
+.pc-t{flex:1;min-width:0}.pc-t b{display:block;font-size:16px;letter-spacing:-.02em}.pc-t span{display:block;font-size:12.5px;color:var(--ink2);margin-top:3px}
+.ed-grid{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}
+.cmp .tbl{min-width:780px}
+.xt{min-width:860px!important}
+
+/* floating dock */
+.dock{position:fixed;right:24px;bottom:24px;z-index:70;display:flex;align-items:center;gap:8px;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .3s var(--ease),transform .35s var(--ease)}
+.dock.show{opacity:1;transform:none;pointer-events:auto}
+.dock .pdf-btn{padding:12px 20px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.dock-b{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:rgba(255,255,255,.95);backdrop-filter:blur(10px);color:var(--ink);font-weight:700;font-size:14px;padding:11px 18px;border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.12);transition:transform .2s var(--ease)}
+.dock-b:hover{transform:translateY(-1px)}
+.dock-c{position:absolute;right:0;bottom:calc(100% + 10px);width:260px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,.16);display:flex;flex-direction:column;gap:6px;opacity:0;transform:translateY(8px) scale(.98);transform-origin:bottom right;pointer-events:none;transition:all .25s var(--ease)}
+.dock.open .dock-c{opacity:1;transform:none;pointer-events:auto}
+.dock-c b{font-size:15px}.dock-c small{color:var(--muted);font-size:12px;margin-bottom:4px}
+.dock-c a{display:flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none;font-size:13px;padding:8px 10px;border-radius:10px;background:#f7f7f4;transition:background .2s}
+.dock-c a:hover{background:var(--accent-soft);color:var(--accent-2)}
+.modal .dock{right:max(24px,calc((100vw - 1200px) / 2 + 24px));bottom:54px}
+
+/* ---------- responsive: tablet ---------- */
+@media (max-width:900px){
+  .top{position:relative;flex-wrap:wrap;gap:10px;padding:10px 14px}
+  .top .seg{order:3;flex-basis:100%;overflow-x:auto;scrollbar-width:none}
+  .top .seg button{flex:none}
+  .tools{margin-left:auto}
+  .cp-bar{top:0!important}
+  .layout{grid-template-columns:1fr}
+  .side{position:static;height:auto;padding:10px 12px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto}
+  .side .me{display:none}
+  .nav{flex-direction:row;gap:4px}
+  .nav button{white-space:nowrap;padding:8px 12px}
+  .main{padding:20px 16px 80px}
+  .ed-grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .hl{grid-template-columns:repeat(2,1fr)}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .specs{grid-template-columns:1fr}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .charts{grid-template-columns:1fr}
+  .stores{grid-template-columns:repeat(2,1fr)}
+  .cvm-box,.fp-box,.ns{grid-template-columns:1fr}
+  .cvm-list{border-left:0;border-top:1px solid var(--line2)}
+  .fp-svg{height:240px}
+  .cv-hero{height:auto;min-height:420px}
+  .cv-in{position:relative;inset:auto;min-height:420px;gap:24px;padding:22px}
+  .cv-main{flex-direction:column;align-items:stretch;gap:18px}
+  .cv-bk{align-items:flex-start}
+  .cv-hero h1{font-size:40px}
+  .vw-grid{grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));padding:16px}
+  .guide{width:min(300px,calc(100vw - 24px));right:12px}
+}
+
+/* ---------- responsive: mobile ---------- */
+@media (max-width:600px){
+  body{font-size:13.5px}
+  .logo{font-size:16px}
+  .tools .today{font-size:12.5px;padding:0 4px}
+  .tools .btn.sm{padding:5px 7px}
+  h1{font-size:20px}
+  .head{flex-wrap:wrap}
+  .grid{grid-template-columns:1fr}
+  .ft{flex-wrap:wrap}
+  .panel{padding:16px;overflow-x:auto}
+  .panel .tbl{min-width:560px}
+  .fg{grid-template-columns:1fr 1fr}
+  .price-row{grid-template-columns:1fr;gap:8px}
+  .fl-head{display:none!important}
+  .fl-row{display:flex!important;flex-wrap:wrap;gap:8px}
+  .fl-row .fn{width:36px}.fl-row .ui{width:120px}.fl-row select{flex:1 1 140px}
+  .totals{justify-content:space-between}
+  .sticky-foot{padding:12px 0}
+  .stats{gap:10px}.stat b{font-size:22px}
+  /* client */
+  .cp-bar{padding:10px 14px;gap:8px}
+  .cp-brand span{display:none}
+  .cp-bar .chip{font-size:11px}
+  .pdf-btn{padding:8px 13px;font-size:12.5px}
+  .ptabs .ptab{padding:4px 10px 4px 4px;font-size:12.5px}
+  .pt-ph,.pt-cover{width:26px;height:26px}
+  .cp-wrap{padding:20px 14px 60px}
+  .cv-hero{border-radius:18px;min-height:460px}
+  .cv-in{min-height:460px;padding:18px}
+  .cv-hero h1{font-size:32px;margin-bottom:14px}.cv-hero h1 span{font-size:17px;margin-left:8px}
+  .cv-need{flex-direction:column;gap:10px}
+  .cv-mosaic{grid-template-columns:1fr 1fr!important;grid-template-rows:1fr 1fr!important}
+  .cv-mosaic i:first-child{grid-row:auto!important}.cv-mosaic.n4 i:nth-child(4){grid-column:auto!important}
+  .hl{gap:8px;margin-bottom:36px}.hl div{padding:14px}.hl b{font-size:16px}
+  .sh h3{font-size:18px}.sh p{font-size:13px}
+  .cv-sec{margin-bottom:36px}
+  .picks{grid-template-columns:1fr!important}
+  .pk-kv{grid-template-columns:repeat(2,1fr)!important;row-gap:10px}
+  .cvmap{height:300px}
+  .lp-h h2{font-size:26px}
+  .gal{grid-template-columns:1fr 1fr!important;grid-auto-rows:120px!important}
+  .gal.n3 .gcell:first-child{grid-column:1/-1;grid-row:auto}
+  .gal.n3{grid-auto-rows:110px!important}.gal.n3 .gcell:first-child{height:220px}
+  .gal.n1{grid-template-columns:1fr!important;grid-auto-rows:240px!important}
+  .gall{right:8px;bottom:8px;padding:6px 10px;font-size:11.5px}
+  .kpis{gap:8px}.kpi{padding:12px}.kpi b{font-size:17px}
+  .sec{padding:14px;border-radius:14px}
+  .spec-r{grid-template-columns:82px 1fr}
+  .ctbl td.lbl{width:76px}
+  .resp-top{flex-direction:column;align-items:stretch}
+  .resp-btns{display:grid;grid-template-columns:repeat(3,1fr)}
+  .rb{justify-content:center;padding:9px 6px}
+  .calc-in{gap:14px}
+  .map{height:340px}
+  .map-time{max-width:calc(100% - 24px);overflow-x:auto;scrollbar-width:none}
+  .map-time button{flex:none;padding:6px 8px;font-size:12px}
+  .map-leg{bottom:8px;left:8px;padding:6px 10px}
+  .map-note{flex-wrap:wrap}
+  .stores{grid-template-columns:1fr}
+  .tiles{gap:8px}.tile b{font-size:16px}
+  .plan-list{grid-template-columns:1fr}
+  .pmeta{gap:3px 10px}
+  .pnav .btn{padding:8px 12px}
+  .pdf-cta{flex-direction:column;align-items:stretch;text-align:left;padding:18px}
+  .ed-item{flex-direction:column}.ed-item>div:first-child{width:100%!important;aspect-ratio:16/9!important}
+  .r-line{flex-wrap:wrap}
+  .cv-shade{background:linear-gradient(180deg,rgba(10,12,16,.5) 0%,rgba(10,12,16,.55) 40%,rgba(10,12,16,.88) 100%)}
+  .pdf-cta .pc-ico{display:none}
+  .pdf-cta .pdf-btn{justify-content:center}
+  .ns-bk{padding:16px}
+  /* modals → bottom sheets */
+  #modal-root .back{padding:0;align-items:flex-end}
+  .modal{width:100%;max-height:92vh;border-radius:18px 18px 0 0}
+  .modal.full,.modal.wide{height:100vh;max-height:100vh;border-radius:0}
+  .mh{padding:12px 14px;flex-wrap:wrap}
+  .mb{padding:14px}
+  .days{grid-template-columns:repeat(5,1fr);gap:4px}.day b{font-size:16px}
+  .ch{grid-template-columns:1fr;gap:2px}.ch-a{display:none}
+  .gate .card{width:100%;padding:28px 20px}
+  .pin input{width:48px;height:56px}
+  .vw-h{padding:12px 14px}
+  .vw-grid{grid-template-columns:1fr;gap:10px;padding:12px}
+  .lb{gap:0}
+  .lb-nav{position:absolute;bottom:24px;width:52px;height:52px}.lb-nav.l{left:calc(50% - 64px)}.lb-nav.r{right:calc(50% - 64px)}
+  .lb-fig img{max-width:96vw;max-height:70vh}
+  .lb-fig.plan svg{width:96vw}
+  .lb-fig figcaption{padding:0 12px;text-align:center}
+  #toasts{left:12px;right:12px;bottom:84px}.toast{max-width:none}
+  .dock{left:0;right:0!important;bottom:0!important;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:rgba(251,251,249,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);gap:8px}
+  .dock .pdf-btn,.dock-b{flex:1;justify-content:center;box-shadow:none;padding:12px 10px;font-size:13.5px}
+  .dock-c{left:12px;right:12px;width:auto;bottom:calc(100% + 8px)}
+  .cp-wrap{padding-bottom:110px}
+}
+@media (hover:none){.thumb button{opacity:1}}
+
 @media print{
   @page{size:A4;margin:12mm 11mm 14mm}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -1735,15 +1890,27 @@ function clientPage(snap, genAt, link, pid, preview) {
     ? [coverPage(P, fx), ...P.items.map((x, i) => listingPage(x, i, n, fx))].map((h, i) => `<div class="${i ? 'pbreak' : ''}">${h}</div>`).join('')
     : `<div class="pg ${U.pgAnim > 0 ? 'in-r' : U.pgAnim < 0 ? 'in-l' : ''}">${pg === 0 ? coverPage(P, fx) : listingPage(P.items[pg - 1], pg - 1, n, fx)}</div>`;
   return `<div class="cp ${U.printAll ? 'printing' : ''}">
-    <div class="cp-bar noprint"><div class="cp-brand">C&amp;W Advisory<span>업데이트 ${fmtStamp(genAt)}</span></div>${exp ? `<span class="chip ${left <= 3 ? 'warn' : 'line'}">${fmtDate(exp)}까지 유효${left <= 3 ? ` · D-${left}` : ''}</span>` : ''}<div class="sp"></div><button class="btn sm" onclick="printPDF()">PDF</button>
+    <div class="cp-bar noprint"><div class="cp-brand">C&amp;W Advisory<span>업데이트 ${fmtStamp(genAt)}</span></div>${exp ? `<span class="chip ${left <= 3 ? 'warn' : 'line'}">${fmtDate(exp)}까지 유효${left <= 3 ? ` · D-${left}` : ''}</span>` : ''}<div class="sp"></div><button class="pdf-btn" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button>
       <nav class="ptabs">${tabs}</nav></div>
     <div class="cp-wrap">
       <div class="print-stamp">${esc(P.client)} 임차 후보지 제안 · ${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 링크에서 확인하세요${link ? ' · ' + esc(link) : ''}</div>
       ${pages}
       ${U.printAll ? '' : `<div class="pnav noprint"><button class="btn" ${pg === 0 ? 'disabled' : ''} onclick="goPage(${pg - 1})">← 이전</button><span>${pg === 0 ? '표지' : pad2(pg)} / ${pad2(n)}</span><button class="btn" ${pg === n ? 'disabled' : ''} onclick="goPage(${pg + 1})">다음 →</button></div>`}
+      ${U.printAll ? '' : `<div class="pdf-cta noprint"><div class="pc-ico">${DL_ICON}</div><div class="pc-t"><b>제안서를 PDF로 저장</b><span>사내 보고 · 공유용 · ${fmtDate(genAt.slice(0, 10))} 기준 · 최신 정보는 이 링크에서 확인하세요</span></div><button class="pdf-btn lg" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button></div>`}
+      ${U.printAll ? '' : `<div class="dock noprint">
+        <div class="dock-c"><b>${esc(P.broker.name)}</b><small>${esc(P.broker.title)}</small><a href="tel:${P.broker.phone.replace(/-/g, '')}">${PHONE_ICON}${esc(P.broker.phone)}</a><a href="mailto:${esc(P.broker.email)}">${MAIL_ICON}${esc(P.broker.email)}</a></div>
+        <button class="dock-b" onclick="this.parentNode.classList.toggle('open')">${PHONE_ICON}<span>담당자 연락</span></button>
+        <button class="pdf-btn" onclick="printPDF()">${DL_ICON}<span>PDF 다운로드</span></button></div>`}
       <div class="cp-foot">참고 환율 1 ${U.cur} = ${nf(fx.rates[U.cur], 2)}원 (${fx.month.replace('-', '년 ')}월 평균, 월 1회 갱신) · 모든 금액은 원화 기준이며 외화는 참고용입니다.<br>금액은 부가세 별도이며, 조건은 임대인과의 협의에 따라 바뀔 수 있습니다. 이 페이지는 항상 최신 정보를 보여줍니다.</div>
     </div></div>`;
 }
+const PHONE_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>';
+const MAIL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>';
+document.addEventListener('scroll', e => {
+  const t = e.target === document ? document.scrollingElement : e.target, d = document.querySelector('.dock');
+  if (d && t && (t === document.scrollingElement || t.classList?.contains('modal'))) d.classList.toggle('show', t.scrollTop > 260);
+}, true);
+const DL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>';
 function goPage(i) {
   U.pgAnim = i > U.page ? 1 : -1; U.page = i; rerenderClient(); U.pgAnim = 0;
   if (CP && !CP.preview && U.role === 'clientA') { const P = JSON.parse(getP(CP.pid).snap); pvStart(CP.pid, i === 0 ? 'cover' : P.items[i - 1].id); }
@@ -2076,7 +2243,7 @@ function openProp(id) { U.prop = id; render(); window.scrollTo({top: 0}); }
 function propEditor(p) {
   const item = (it, i) => {
     const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId), rsp = (p.responses || {})[L.id], tr = (p.tours || []).filter(t => t.lid === L.id);
-    return `<div class="panel a" style="--i:${i + 2};display:flex;gap:16px;${ok ? '' : 'opacity:.55'}">
+    return `<div class="panel a ed-item" style="--i:${i + 2};display:flex;gap:16px;${ok ? '' : 'opacity:.55'}">
       <div style="width:120px;flex:none;border-radius:10px;background:url('${L.photos[0]}') center/cover;aspect-ratio:4/3"></div>
       <div style="flex:1;min-width:0"><div class="row"><b>${esc(I.name)}</b><span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span>${L.ownerId !== me() ? `<span class="chip blue">${USERS[L.ownerId].name}</span>` : ''}${ok ? '' : '<span class="chip dark">제안 종료</span>'}<div class="sp"></div>
         <button class="btn xs ghost" ${i === 0 ? 'disabled' : ''} onclick="moveItem('${p.id}',${i},-1)">↑</button><button class="btn xs ghost" ${i === p.items.length - 1 ? 'disabled' : ''} onclick="moveItem('${p.id}',${i},1)">↓</button><button class="btn xs ghost danger" onclick="rmItem('${p.id}',${i})">✕</button></div>
@@ -2086,7 +2253,7 @@ function propEditor(p) {
   };
   return `<div class="head"><button class="btn ghost icon" onclick="U.prop=null;render()">←</button><h1>${esc(p.clientName)}</h1><span class="sub">업데이트 ${fmtStamp(p.genAt)}</span><div class="sp"></div>
     <button class="btn" onclick="openModal({type:'dup',pid:'${p.id}'})">복제</button><button class="btn" onclick="openModal({type:'preview',pid:'${p.id}'})">미리보기</button><button class="btn pri" onclick="copyLink('${p.id}')">링크 복사</button></div>
-  <div style="display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start">
+  <div class="ed-grid">
     <div>
       <div class="panel a" style="--i:0"><h3>표지</h3><div class="fg">
         <div class="f"><label>희망 지역</label><input class="in" value="${esc(p.cover.region)}" onchange="setCover('${p.id}','region',this.value)"></div>
