@@ -1110,7 +1110,7 @@ const USERS = {
   admin: {name: '박정호', short: '관리자', title: '상무 · 임차자문 총괄'},
 };
 const CLIENTS = {clientA: {name: '모먼트커피', team: '점포개발팀', label: '클라이언트-카페', hidden: true}, clientB: {name: '어반스레드', team: '리테일 전략팀', label: '클라이언트-패션'}};
-const ROLES = [['brokerA', '브로커-카페'], ['brokerB', '브로커-패션'], ['admin', '관리자'], ...Object.entries(CLIENTS).filter(([, c]) => !c.hidden).map(([k, c]) => [k, c.label])];
+const ROLES = [['brokerA', '브로커A'], ['brokerB', '브로커B'], ['admin', '관리자'], ...Object.entries(CLIENTS).filter(([, c]) => !c.hidden).map(([k, c]) => [k, c.label])];
 const isClient = r => r.startsWith('client');
 const clientOpts = sel => Object.entries(CLIENTS).filter(([, c]) => !c.hidden).map(([k, c]) => `<option value="${k}" ${sel === k ? 'selected' : ''}>${c.name} (${c.label})</option>`).join('');
 
@@ -2192,8 +2192,8 @@ function topbar() {
 function guide() {
   if (!U.guide) return '';
   return `<div class="guide"><div class="row" style="margin-bottom:8px"><b>시나리오</b><div class="sp"></div><button class="btn xs ghost" onclick="U.guide=false;render()">✕</button></div>
-  <h4>브로커-카페</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
-  <h4>브로커-패션</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
+  <h4>브로커A</h4><ol><li>제안서 → 응답 · 답사 · 열람 분석 · 복제</li><li>매물 카드 → 미리보기 · 이력</li><li>가로수 24 임대료 수정 → 업데이트 배지</li><li>내부 메모만 수정 → 재생성 없음</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li><li>제안서 링크 재발급</li></ol>
+  <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol>
   <h4>클라이언트-패션</h4><ol><li>PIN 0000</li><li>매물별 관심/보류/제외 · 답사 요청</li><li>한국어/EN · 외화 · PDF</li><li>이전 링크 → 차단 · +30일 → 기간 만료</li></ol></div>`;
 }
