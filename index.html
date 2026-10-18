@@ -407,7 +407,11 @@ textarea.in{resize:vertical;min-height:64px}
 .pc-o{display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid var(--line2)}.pc-o:first-of-type{border-top:0;padding-top:0}
 .pc-h{display:flex;align-items:center;gap:6px}.pc-h b{font-size:13.5px}.pc-on{color:#a85a12}.pc-o .btn{align-self:flex-start;margin-top:2px}
 .bld-p h3{font-size:14.5px}.bp-lead{margin:8px 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.6}.bp-lead b{color:var(--ink)}
-.bp-scroll{overflow-x:auto}.bp-t{min-width:720px}.bp-t tr.bp-sum td{border-top:1px solid var(--ink);font-weight:700}
+.bp-scroll{overflow-x:auto}.bp-t{min-width:760px}
+.bp-wc{white-space:nowrap}.bp-wc small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.bp-w{width:84px;display:inline-block}.bp-w .in{padding:4px 24px 4px 8px;text-align:right;font-weight:700}
+.bp-own .bp-w .in{border-color:#d9822b;background:#fff8f0}
+.bp-def{display:block;margin:3px 0 0 auto;border:0;background:none;color:var(--accent-2);font-size:11px;cursor:pointer;padding:0}.bp-t tr.bp-sum td{border-top:1px solid var(--ink);font-weight:700}
 .bp-rules{margin:12px 0 0;padding-left:18px;font-size:12.5px;color:var(--ink2);line-height:1.8}
 .lyr{position:absolute;left:10px;top:10px;z-index:2;display:flex;gap:4px}
 .lyr button{border:1px solid var(--line);background:rgba(255,255,255,.92);font-size:12px;font-weight:600;color:var(--muted);padding:5px 10px;border-radius:999px;cursor:pointer}
@@ -861,11 +865,21 @@ function storeCount(a, o) { // the official area's stores, and how many sit insi
   return SCACHE[key] = {all, inz};
 }
 function storeShare(a, o) { const c = storeCount(a, o); return c.all >= 5 ? c.inz / c.all : overlap(a.zone, o.poly); }
-/* the official areas a company master's data comes from: those its zone overlaps, give or take the admin's ticks */
+/* the official areas a company master's data comes from: those its zone overlaps, give or take the admin's ticks.
+   Each counts by the share of its stores inside the zone (one added without touching the zone counts in full),
+   unless the admin set a share by hand in a.wset (code → 0..1), which "기본값으로" removes again. */
+const defaultShare = (a, o) => overlap(a.zone, o.poly) > 0 || storeCount(a, o).inz ? storeShare(a, o) : 1;
 function areaLinks(a) {
-  const inc = a.incl || [], exc = new Set(a.excl || []);
+  const inc = a.incl || [], exc = new Set(a.excl || []), set = a.wset || {};
   return OFFICIAL.filter(o => o.osm === a.osm && !exc.has(o.code)).map(o => ({o, ov: overlap(a.zone, o.poly)}))
-    .filter(x => x.ov >= .05 || inc.includes(x.o.code)).map(x => ({o: x.o, w: x.ov > 0 || storeCount(a, x.o).inz ? storeShare(a, x.o) : 1})) // an added area that does not touch the zone counts in full.filter(u => u.w > 0).sort((x, y) => y.w - x.w);
+    .filter(x => x.ov >= .05 || inc.includes(x.o.code))
+    .map(x => { const def = defaultShare(a, x.o), own = x.o.code in set; return {o: x.o, def, own, w: own ? set[x.o.code] : def}; })
+    .filter(u => u.w > 0 || u.own).sort((x, y) => y.w - x.w);
+}
+function setShare(id, code, v) {
+  const a = getA(id); a.wset = a.wset || {};
+  if (v == null || v === '') delete a.wset[code]; else a.wset[code] = Math.min(100, Math.max(0, +v)) / 100;
+  commit();
 }
 const DCACHE = {};
 function areaData(a) { // the official figures added up by overlap: counts scale with the share, rates are weighted averages
@@ -2491,12 +2505,16 @@ function areaBuild(a) {
     return {u, sc, vis, sal, cv: Math.round(vis * u.w), cs: Math.round(sal * u.w), wk: u.o.data.week[1]}; });
   const tv = rows.reduce((t, r) => t + r.cv, 0), ts = rows.reduce((t, r) => t + r.cs, 0);
   const how = u => { const c = storeCount(a, u.o); return c.inz || overlap(a.zone, u.o.poly) > 0 ? `${c.inz} / ${c.all}곳` : '영역 밖 · 직접 추가'; };
-  return `<div class="panel bld-p"><div class="row"><h3 style="margin:0">상권 데이터 구성</h3><span class="sub">${esc(S.sync?.q || '')} · 예시 수치</span></div>
+  const own = rows.filter(r => r.u.own).length;
+  return `<div class="panel bld-p"><div class="row"><h3 style="margin:0">상권 데이터 구성</h3><span class="sub">${esc(S.sync?.q || '')} · 예시 수치</span><div class="sp"></div>${own ? `<span class="sub">반영 비율 ${own}곳 직접 조정</span><button class="btn xs" onclick="getA('${a.id}').wset={};commit()">모두 기본값으로</button>` : ''}</div>
     <p class="bp-lead"><b>${esc(a.name)}</b>의 상권 데이터는 겹치는 서울시 공식 상권 ${us.length}곳의 수치를 <b>각 공식 상권 점포 중 회사 영역 안에 있는 비율</b>만큼 가져와 합친 값입니다.</p>
     <div class="bp-scroll"><table class="tbl bp-t"><thead><tr><th>공식 상권</th><th>유형</th><th class="num">영역 안 점포</th><th class="num">반영 비율</th><th class="num">일평균 유동인구</th><th class="num">→ 반영</th><th class="num">분기 매출</th><th class="num">→ 반영</th></tr></thead><tbody>
-      ${rows.map(r => `<tr><td><b>${esc(r.u.o.name)}</b></td><td>${OTYPE[r.u.o.type]}</td><td class="num">${how(r.u)}</td><td class="num"><b>${Math.round(r.u.w * 100)}%</b></td><td class="num">${nf(r.vis)}명</td><td class="num">${nf(r.cv)}명</td><td class="num">${nf(r.sal)}억</td><td class="num">${nf(r.cs)}억</td></tr>`).join('')}
+      ${rows.map(r => `<tr class="${r.u.own ? 'bp-own' : ''}"><td><b>${esc(r.u.o.name)}</b></td><td>${OTYPE[r.u.o.type]}</td><td class="num">${how(r.u)}</td>
+        <td class="num bp-wc"><div class="ui bp-w"><input class="in" type="number" min="0" max="100" value="${Math.round(r.u.w * 100)}" onchange="setShare('${a.id}','${r.u.o.code}',this.value)"><span>%</span></div>
+          ${r.u.own ? `<button class="bp-def" onclick="setShare('${a.id}','${r.u.o.code}',null)" title="점포 비율로 계산한 기본값">기본값 ${Math.round(r.u.def * 100)}%로</button>` : '<small>기본값</small>'}</td><td class="num">${nf(r.vis)}명</td><td class="num">${nf(r.cv)}명</td><td class="num">${nf(r.sal)}억</td><td class="num">${nf(r.cs)}억</td></tr>`).join('')}
       <tr class="bp-sum"><td colspan="5">${esc(a.name)} 상권 데이터</td><td class="num">${nf(tv)}명</td><td></td><td class="num">${nf(ts)}억</td></tr></tbody></table></div>
-    <ul class="bp-rules"><li><b>인원 · 매출 · 세대 수</b>: 공식 상권 값 × 반영 비율을 모두 더합니다.</li>
+    <ul class="bp-rules"><li><b>반영 비율</b>: 기본값은 그 공식 상권 점포 중 회사 영역 안에 있는 비율입니다. 숫자를 바꾸면 그 값을 쓰고, "기본값으로"를 누르면 돌아갑니다.</li>
+      <li><b>인원 · 매출 · 세대 수</b>: 공식 상권 값 × 반영 비율을 모두 더합니다.</li>
       <li><b>비율 지표</b> (연령 · 시간대 · 주말 매출 비중 · 성별 · 외국인 비중): 반영 비율 × 유동인구로 가중 평균합니다. 예) 주말 매출 비중 ${rows.map(r => `${r.wk}%`).join(' · ')} → <b>${D.week[1]}%</b></li>
       <li><b>가까운 역</b>: 가장 많이 반영된 공식 상권의 역 (${esc(D.subway?.name || '–')})</li></ul></div>`;
 }
