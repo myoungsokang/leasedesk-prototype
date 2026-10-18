@@ -426,6 +426,14 @@ textarea.in{resize:vertical;min-height:64px}
 .pk-leg .d-fit{width:12px;height:12px;border:2.5px solid #141414;background:#fff}.pk-leg .d-no{width:12px;height:12px;border:2.5px solid #a3a39e;background:#ecece9}
 .pk-list{display:flex;flex-direction:column;gap:6px;max-height:640px;overflow:auto}
 .pk-new{justify-content:center;border-style:dashed}
+.lk{display:flex;flex-direction:column;gap:5px;margin:8px 0 6px}
+.lk-i{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;cursor:pointer}
+.lk-i.on{border-color:#d9822b;background:#fff8f0}
+.lk-i>span{flex:1;min-width:0}.lk-i small{display:block;color:var(--muted);font-size:11px}
+.lk-d{width:10px;height:10px;border:2px dashed #d9822b;flex:none}.lk-p{color:#b4691c}
+.lk-w{width:76px}.lk-w .in{padding:3px 22px 3px 6px;font-size:12px}
+.ofc-t{margin:0 0 0 8px;font-size:12.5px}
+.sync-p{display:flex;align-items:center;gap:12px;padding:14px 18px}.sync-p b{display:block;font-size:14px}
 .na-res{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:260px;overflow:auto}
 .na-i{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px}
 .na-i.on{border-color:var(--ink)}.na-i small{display:block;color:var(--muted);font-size:11.5px}
@@ -560,11 +568,12 @@ button.chip{border:0;cursor:pointer}
 <div id="toasts"></div>
 <div id="print-root"></div>
 <script src="map-data.js"></script>
+<script src="official-data.js"></script>
 <script>
 /* =========================================================
    LeaseDesk prototype — single file, in-memory + localStorage
    ========================================================= */
-const KEY = 'leasedesk-proto-v12';
+const KEY = 'leasedesk-proto-v13';
 // Prototype data must remain usable regardless of the demo calendar date.
 const AUTO_EXPIRY_ENABLED = false;
 const store = (() => { try { const t = '__t'; localStorage.setItem(t, t); localStorage.removeItem(t); return localStorage; } catch (e) { const m = {}; return {getItem: k => m[k] ?? null, setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, clear: () => {}}; } })();
@@ -799,6 +808,75 @@ const AREAS = {
     week: [61, 39], stores: [['음식점', 36], ['주점', 18], ['인쇄·제조', 15], ['카페·디저트', 13], ['기타', 10], ['생활서비스', 8]]},
 };
 
+/* ---------- official trade areas (서울시 상권분석서비스 영역-상권), synced in full every quarter ----------
+   The company draws its own zone; the data shown for it is the official areas the zone overlaps,
+   added up by the share of each official area that falls inside the zone. Polygons here are in the
+   metres of each OSM map; names and figures are sample data. */
+const OTYPE = {A: '골목상권', D: '발달상권', R: '전통시장', U: '관광특구'};
+function deriveUnit(key, f, seed) { // sample figures: a template area scaled and nudged per unit
+  const a = clone(AREAS[key]), j = (v, i) => Math.max(1, Math.round(v * (1 + (((seed * 7 + i * 13) % 11) - 5) / 40)));
+  const pct = rows => { const r = rows.map(([k, v], i) => [k, j(v, i)]), t = r.reduce((s, x) => s + x[1], 0); return r.map(([k, v]) => [k, Math.round(v / t * 100)]); };
+  a.pop = a.pop.map(([k, v], i) => [k, Math.round(j(v, i) * f)]); a.sales = a.sales.map(([k, v], i) => [k, Math.round(j(v, i) * f)]);
+  ['hourly', 'salesHourly', 'age', 'dow', 'salesAge', 'stores'].forEach(k => { a[k] = pct(a[k]); });
+  a.week = [100 - j(a.week[1], 1), j(a.week[1], 1)].map(v => Math.min(95, v)); a.week[0] = 100 - a.week[1];
+  a.female = Math.min(80, j(a.female, 2)); a.foreign = {...a.foreign, daily: Math.round(a.foreign.daily * f), share: +(a.foreign.share * (1 + (seed % 5 - 2) / 20)).toFixed(1)};
+  a.hinter = {...a.hinter, hh: Math.round(a.hinter.hh * f)};
+  return a;
+}
+const OSIZE = {U: 2.2, D: 1, A: .5, R: .35}; // sample figures grow with the official area's size and type
+const OFFICIAL = (window.OFFICIAL_AREAS || []).filter(o => AREAS[o.osm]).map(o => ({...o, data: deriveUnit(o.osm, Math.min(2.4, Math.max(.12, o.area / 150000)) * OSIZE[o.type], +o.code.slice(-3))}));
+const getO = code => OFFICIAL.find(o => o.code === code);
+const OCACHE = {};
+const polyArea = pts => Math.abs(pts.reduce((s, p, i) => { const q = pts[(i + 1) % pts.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
+function overlap(zone, poly) { // share of the official area inside the zone: 5 m samples over the zone, measured against the polygon's own area
+  const key = JSON.stringify(zone) + '|' + poly.length + ',' + poly[0]; if (key in OCACHE) return OCACHE[key];
+  if (zone.length < 3) return OCACHE[key] = 0;
+  const zx = zone.map(p => p[0]), zy = zone.map(p => p[1]), px = poly.map(p => p[0]), py = poly.map(p => p[1]);
+  const x0 = Math.max(Math.min(...zx), Math.min(...px)), x1 = Math.min(Math.max(...zx), Math.max(...px)), y0 = Math.max(Math.min(...zy), Math.min(...py)), y1 = Math.min(Math.max(...zy), Math.max(...py));
+  let both = 0;
+  for (let x = x0 + 2.5; x < x1; x += 5) for (let y = y0 + 2.5; y < y1; y += 5) if (inPoly(x, y, zone) && inPoly(x, y, poly)) both++;
+  return OCACHE[key] = Math.min(1, both * 25 / (polyArea(poly) || 1));
+}
+/* the official areas a company master draws on: automatic from its zone, or the admin's own picks and shares */
+const SCACHE = {};
+function storeShare(a, o) { // share of the official area's stores that sit inside the zone; falls back to its area share
+  const key = a.id + JSON.stringify(a.zone) + o.code; if (key in SCACHE) return SCACHE[key];
+  const d = window.MAP_DATA?.[o.osm]; let all = 0, inz = 0;
+  for (const [, p] of d ? d.buildings : []) { let x = 0, y = 0; for (let i = 0; i < p.length; i += 2) { x += p[i]; y += p[i + 1]; } x /= p.length / 2; y /= p.length / 2;
+    if (inPoly(x, y, o.poly)) { all++; if (inPoly(x, y, a.zone)) inz++; } }
+  return SCACHE[key] = all >= 5 ? inz / all : overlap(a.zone, o.poly);
+}
+/* the official areas a company master's data comes from: those its zone overlaps, give or take the admin's ticks */
+function areaLinks(a) {
+  const inc = a.incl || [], exc = new Set(a.excl || []);
+  return OFFICIAL.filter(o => o.osm === a.osm && !exc.has(o.code)).map(o => ({o, ov: overlap(a.zone, o.poly)}))
+    .filter(x => x.ov >= .05 || inc.includes(x.o.code)).map(x => ({o: x.o, w: x.ov >= .05 ? storeShare(a, x.o) : 1})).filter(u => u.w > 0).sort((x, y) => y.w - x.w);
+}
+const DCACHE = {};
+function areaData(a) { // the official figures added up by overlap: counts scale with the share, rates are weighted averages
+  const us = areaLinks(a); if (!us.length) return null;
+  const key = a.id + JSON.stringify(us.map(u => [u.o.code, +u.w.toFixed(3)])) + (S.sync?.q || ''); if (DCACHE[key]) return DCACHE[key];
+  const W = us.map(u => u.w * u.o.data.pop[2][1]), tw = W.reduce((s, v) => s + v, 0) || 1;
+  const sum = f => Math.round(us.reduce((s, u) => s + u.w * f(u.o.data), 0)), avg = f => us.reduce((s, u, i) => s + W[i] * f(u.o.data), 0) / tw;
+  const mix = k => { const m = {}; us.forEach((u, i) => u.o.data[k].forEach(([n, v]) => { m[n] = (m[n] || 0) + W[i] * v; })); const rows = Object.entries(m).map(([n, v]) => [n, v / tw]), t = rows.reduce((s, r) => s + r[1], 0);
+    const order = us[0].o.data[k].map(r => r[0]); rows.sort((x, y) => k === 'stores' ? y[1] - x[1] : order.indexOf(x[0]) - order.indexOf(y[0])); return rows.map(([n, v]) => [n, Math.round(v / t * 100)]); };
+  const lead = us[0].o.data, wk = Math.round(avg(d => d.week[1]));
+  return DCACHE[key] = {name: a.name, kind: OTYPE[us[0].o.type], q: S.sync?.q || lead.q, units: us.map(u => ({name: u.o.name, type: OTYPE[u.o.type], w: u.w})),
+    pop: lead.pop.map(([k], i) => [k, sum(d => d.pop[i][1])]), sales: lead.sales.map(([k], i) => [k, sum(d => d.sales[i][1])]),
+    hourly: mix('hourly'), salesHourly: mix('salesHourly'), age: mix('age'), dow: mix('dow'), salesAge: mix('salesAge'), stores: mix('stores'),
+    week: [100 - wk, wk], female: Math.round(avg(d => d.female)), subway: lead.subway,
+    foreign: {...lead.foreign, daily: sum(d => d.foreign.daily), share: +avg(d => d.foreign.share).toFixed(1), salesShare: Math.round(avg(d => d.foreign.salesShare))},
+    hinter: {hh: sum(d => d.hinter.hh), single: Math.round(avg(d => d.hinter.single)), income: Math.round(avg(d => d.hinter.income)), spend: Math.round(avg(d => d.hinter.spend))}};
+}
+const linkTxt = a => areaLinks(a).map(u => u.o.name).join(' · ');
+/* quarterly full sync: data lands two months after each quarter ends (end of Feb, May, Aug, Nov) */
+function nextSync(today) { const [y, m] = today.split('-').map(Number), due = [[2, 28], [5, 31], [8, 31], [11, 30]].map(([mm, dd]) => [y, mm, dd]).concat([[y + 1, 2, 28]]).find(([yy, mm, dd]) => `${yy}-${pad2(mm)}-${pad2(dd)}` > today); return `${due[0]}-${pad2(due[1])}-${pad2(due[2])}`; }
+function syncNow(quiet) {
+  const [y, m] = S.today.split('-').map(Number), qEnd = m <= 2 ? [y - 1, 4] : m <= 5 ? [y, 1] : m <= 8 ? [y, 2] : m <= 11 ? [y, 3] : [y, 4];
+  S.sync = {at: S.today, q: `${qEnd[0]}년 ${qEnd[1]}분기`, units: OFFICIAL.length};
+  Object.keys(DCACHE).forEach(k => delete DCACHE[k]); if (quiet) return; commit(); toast('상권 데이터 동기화', `공식 상권 ${OFFICIAL.length}곳 · ${S.sync.q} 데이터`);
+}
+
 const FX_BASE = {USD: 1372.4, JPY: 9.31, CNY: 192.6, EUR: 1528.1, GBP: 1836.5};
 function prevMonth(d) { const [y, m] = d.split('-').map(Number); const pm = m === 1 ? 12 : m - 1, py = m === 1 ? y - 1 : y; return `${py}-${String(pm).padStart(2, '0')}`; }
 function fxFor(month) {
@@ -885,7 +963,7 @@ const EN = {
   '답사 요청': 'Visit requested', '면적': 'Area', '곳': '', '기타': 'Other', '재생': 'Play', '외화 선택': 'Select currency', '사진': 'photos', '도면': 'floor plans',
   '상권 평균 임대료 대비로는': 'vs market rent', '시간당 유동인구': 'Visitors per hour',
   // deck
-  '상권 비교': 'Area comparison', '상권 개요': 'Area overview', '상권 데이터': 'Area data',
+  '출처': 'Source', '기준 추정': '(estimate)', '상권 비교': 'Area comparison', '상권 개요': 'Area overview', '상권 데이터': 'Area data',
   '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 구성 가능': 'Whole-building lease: roastery, cafe and office under one roof', '즉시 입주 가능': 'Available for immediate move-in',
   '평일 직장인 수요 중심의 오피스 1층 리테일': 'Ground-floor retail in an office tower, driven by weekday office workers', '관리비는 실비정산': 'CAM is utility charge only',
   '2층은 로스터리 쇼룸으로 활용 가능': 'The 2nd floor can serve as a roastery showroom', '권리금은 현 임차인과 협의 필요': 'Key money to be negotiated with the current tenant',
@@ -1029,6 +1107,25 @@ function seed() {
       grants: [], createdAt: '2026-09-20T09:00:00'},
   ];
   L.forEach(l => l.leaseArea = sumArea(l.floors));
+const SS30 = [["연무장길","28-12",37.543023,127.052313],["연무장5길","9-16",37.544414,127.052676],["연무장길","39-21",37.543421,127.053963],["연무장길","41-13",37.543199,127.054015],["연무장길","39-29",37.543598,127.054045],["연무장길","41-25",37.54346,127.054143],["연무장길","43-1",37.542866,127.054192],["연무장7길","3-1",37.543118,127.054325],["연무장7길","13",37.544198,127.054377],["연무장7길","7",37.543351,127.054437],["연무장7길","11",37.543797,127.05445],["연무장7길","12",37.543666,127.054855],["연무장7가길","5",37.543198,127.054993],["연무장7길","16",37.54397,127.055123],["연무장7가길","5-1",37.543161,127.055118],["연무장7가길","8",37.542945,127.055254],["연무장7가길","7",37.543107,127.055271],["성수일로6길","47",37.544278,127.055287],["연무장7가길","7-1",37.543074,127.055393],["연무장7가길","10-1",37.542869,127.05549],["연무장7가길","12",37.542836,127.055599],["연무장7가길","11",37.543,127.055643],["연무장9길","7",37.542957,127.055763],["연무장5가길","32",37.543076,127.055811],["아차산로","116",37.544027,127.056611],["성수이로","90",37.542992,127.056857],["연무장11길","15",37.54339,127.057311],["연무장11길","10",37.542929,127.057555],["성수이로20길","12",37.543119,127.057955],["성수이로20길","16",37.543022,127.058386]];
+  const rnd = (i, k) => ((i * 9301 + k * 49297 + 7) % 233280) / 233280, won = (v, u) => Math.round(v / u) * u;
+  const PSET = [[PH.shopFront, PH.shopIn, PH.cafe], [PH.brick, PH.shopLoft, PH.cafeBar], [PH.apparel, PH.apparel2, PH.shopIn], [PH.cafeSign, PH.cafe, PH.terrace], [PH.openSign, PH.shopLoft, PH.apparel3]];
+  const NOTES = ['연무장길 메인 동선 · 코너', '전면 폭 8m · 통유리', '팝업 운영 이력 다수', '테라스 사용 가능', '층고 4.2m', '', '', '대로변 가시성'];
+  const s30 = SS30.map(([road, no, lat, lng], i) => {
+    const r = k => rnd(i, k), B = {id: 'BS' + (i + 1), pnu: 'SS30-' + (i + 1), lat, lng, address: `서울 성동구 ${road} ${no}`, name: `${road} ${no}`, use: r(1) < .7 ? '제2종 근린생활시설' : '제1종 근린생활시설',
+      above: 2 + Math.floor(r(2) * 4), below: r(3) < .55 ? 1 : 0, gfa: 280 + Math.round(r(4) * 900), year: 1984 + Math.floor(r(5) * 39), status: '준공', area: 'seongsu'};
+    b.push(B);
+    const py1 = 16 + Math.round(r(6) * 50), m1 = Math.round(py1 / .3025), shape = r(7), main = road === '연무장길';
+    const floors = shape < .68 ? [F(1, m1)] : shape < .9 ? [F(1, m1), F(2, Math.round(m1 * .92))] : [F(-1, Math.round(m1 * 1.1)), F(1, m1)];
+    const perPy = (main ? 30 : 19) + r(8) * (main ? 9 : 9), upper = floors.filter(f => f.floor !== 1).reduce((t, f) => t + f.area * .3025, 0);
+    const rent = won((perPy * py1 + perPy * .42 * upper) * 10000, 100000), dep = won(rent * (r(9) < .5 ? 10 : 12), 10000000);
+    const km = r(10), mg = r(11), ho = r(12), own = i % 3 === 0 ? 'brokerB' : 'brokerA';
+    return {id: 'LS' + (i + 1), buildingId: B.id, ownerId: own, visibility: own === 'brokerB' || i % 2 ? 'shared' : 'private', status: 'active', leaseType: 'partial', floors, plans: [], photos: PSET[i % PSET.length],
+      exclArea: null, deposit: P('v', dep), rent: P('v', rent), mgmt: mg < .5 ? P('util') : mg < .8 ? P('v', won(1.4e4 * (py1 + upper), 10000)) : P('nego'),
+      keyMoney: km < .35 ? P('none') : km < .6 ? P('nego') : P('v', won(3e7 + r(13) * 2.2e8, 1e7)), handover: ho < .3 ? P('now') : ho < .6 ? P('est', `2027-0${1 + Math.floor(r(14) * 4)}-01`) : P('nego'),
+      note: NOTES[i % NOTES.length], mStart: '2026-09-01', mEnd: '2027-02-28', internal: {landlord: '', phone: '', fee: '임대료 1개월분', floor: '', memo: ''}, grants: [], createdAt: '2026-09-01T09:00:00'};
+  });
+  L.push(...s30); s30.forEach(l => l.leaseArea = sumArea(l.floors));
   const st = (font, size, color, pos) => ({font, size, color, pos});
   const G = (id, name, photo, style, items, areaId = null) => ({id, name, photo, style, areaId, mapHide: [], marks: [], items: items.map(([listingId, comment, layout = 2]) => ({listingId, comment, photo: null, layout}))});
   const props = [{id: 'P1', ownerId: 'brokerA', clientName: '모먼트커피', createdAt: '2026-09-18T17:00:00',
@@ -1057,21 +1154,25 @@ function seed() {
       G('G2', 'HANNAM', PH.garden, st('wide', 'L', '#ffffff', 'bl'), [['L3', 'Part of the ground floor plus the 2nd floor splits showroom and fitting areas']], 'A3'),
       G('G3', 'PANGYO', PH.mall, st('wide', 'L', '#ffffff', 'bl'), [['L8', 'An option aimed at weekday office workers']], 'none'),
     ]});
+  props.push({id: 'P3', ownerId: 'brokerA', clientName: '오브제 리테일', createdAt: '2026-10-01T10:00:00', lang: 'ko', cur: 'USD', fx: {month: '2026-09', rates: fxFor('2026-09')},
+    cover: {title: '성수 플래그십 후보지', region: 'SEOUL', date: '2026-10', photo: PH.brick}, crit: {regions: ['성수'], rentMax: 25000000, areaMin: 70, areaMax: 330},
+    slides: {summary: true, compare: false}, modules: {...DEFAULT_MODS},
+    groups: [G('G1', '성수', PH.brick, st('wide', 'L', '#ffffff', 'bl'), s30.map(l => [l.id, '', 4]), 'A1')]});
   props[0].groups[0].marks = [{id: 'MP1', kind: 'hl', name: '팝업 밀집 구역', pts: [[870, 470], [1015, 462], [1035, 545], [890, 560]]}];
   const M = (id, kind, x, y, name) => ({id, kind, x, y, name});
   const areas = [
-    {id: 'A1', photo: PH.brick, style: st('wide', 'L', '#ffffff', 'bl'), name: '성수', osm: 'seongsu', dataKey: 'seongsu', hidden: [], zone: [[430, 290], [1060, 320], [1250, 470], [1150, 560], [560, 520], [400, 420]],
+    {id: 'A1', photo: PH.brick, style: st('wide', 'L', '#ffffff', 'bl'), name: '성수', osm: 'seongsu', hidden: [], zone: [[430, 290], [1060, 320], [1250, 470], [1150, 560], [560, 520], [400, 420]],
       marks: [M('M11', 'brand', 700, 470, 'Blue Bottle'), M('M12', 'brand', 985, 455, 'Dior 성수'), M('M13', 'brand', 1090, 505, 'Kinfolk'), M('M14', 'brand', 615, 430, 'Musinsa Standard'), M('M15', 'brand', 905, 545, 'Tamburins'),
         M('M16', 'ours', 760, 395, 'Amore 성수'), M('M17', 'ours', 1150, 440, 'Fennec'), M('M18', 'text', 560, 250, '아차산로'), M('M19', 'text', 800, 250, '성수역'), M('M1a', 'text', 1010, 392, '연무장길')]},
-    {id: 'A2', photo: PH.seoulStreet, style: st('serif', 'M', '#ffffff', 'mc'), name: '가로수길', osm: 'sinsa', dataKey: 'sinsa', hidden: [], zone: [[760, 40], [1000, 40], [1000, 620], [760, 620]],
+    {id: 'A2', photo: PH.seoulStreet, style: st('serif', 'M', '#ffffff', 'mc'), name: '가로수길', osm: 'sinsa', hidden: [], zone: [[760, 40], [1000, 40], [1000, 620], [760, 620]],
       marks: [M('M21', 'brand', 905, 210, 'Apple 가로수길'), M('M22', 'brand', 905, 430, 'Aesop'), M('M23', 'brand', 790, 530, 'Tamburins'), M('M24', 'ours', 905, 300, 'Musinsa 가로수'), M('M25', 'text', 880, 665, '가로수길')]},
-    {id: 'A3', photo: PH.garden, style: st('sans', 'L', '#f2d16b', 'tl'), name: '한남', osm: 'hannam', dataKey: 'hannam', hidden: [], zone: [[560, 330], [900, 180], [980, 260], [950, 420], [640, 520], [520, 450]],
+    {id: 'A3', photo: PH.garden, style: st('sans', 'L', '#f2d16b', 'tl'), name: '한남', osm: 'hannam', hidden: [], zone: [[560, 330], [900, 180], [980, 260], [950, 420], [640, 520], [520, 450]],
       marks: [M('M31', 'brand', 760, 300, 'Le Labo'), M('M32', 'brand', 880, 240, 'Comme des Garçons'), M('M33', 'ours', 640, 430, 'Maison 한남'), M('M34', 'text', 909, 140, '한강진역')]},
-    {id: 'A4', photo: PH.seoulNeon, style: st('wide', 'M', '#ffffff', 'br'), name: '명동', osm: 'myeongdong', dataKey: 'myeongdong', hidden: [], zone: [[700, 190], [1000, 190], [1000, 540], [720, 560]],
+    {id: 'A4', photo: PH.seoulNeon, style: st('wide', 'M', '#ffffff', 'br'), name: '명동', osm: 'myeongdong', hidden: [], zone: [[700, 190], [1000, 190], [1000, 540], [720, 560]],
       marks: [M('M41', 'brand', 760, 300, 'Olive Young 명동'), M('M42', 'brand', 940, 330, 'Zara'), M('M43', 'brand', 880, 470, 'Uniqlo'), M('M44', 'ours', 790, 425, 'K-뷰티 플래그십'), M('M45', 'text', 954, 600, '명동역'), M('M46', 'text', 830, 250, '명동8길')]},
   ];
   return {
-    today: '2026-10-01', buildings: b, listings: L, proposals: props, areas,
+    today: '2026-10-01', buildings: b, listings: L, proposals: props, areas, sync: {at: '2026-08-31', q: '2026년 2분기', units: OFFICIAL.length},
     hist: [
       {lid: 'L1', at: '2026-07-03T09:00:00', by: 'brokerA', action: '등록', changes: []},
       {lid: 'L1', at: '2026-08-11T16:40:00', by: 'brokerA', action: '공개 범위', changes: [{label: '공개 범위', from: '나만 보기', to: '전체 공유'}]},
@@ -1192,6 +1293,7 @@ function advance(n) {
         S.listings.filter(L => L.buildingId === B.id).forEach(L => note(L.ownerId, `<b>${esc(B.name)}</b> 건축물대장 등록 · 연면적 ${nf(old)} → ${nf(B.gfa)}㎡`));
       }
     }
+    if (S.sync && S.today >= nextSync(S.sync.at)) { syncNow(true); note('admin', `상권 데이터 자동 동기화 · ${S.sync.q} · 공식 상권 ${S.sync.units}곳`); }
     if (S.today.slice(0, 7) !== prev.slice(0, 7)) {
       const m = prevMonth(S.today); S.fx = {month: m, rates: fxFor(m)};
       ['brokerA', 'brokerB', 'admin'].forEach(u => note(u, `참고 환율 갱신 · ${m.replace('-', '년 ')}월 평균 · 기존 제안서는 만들 때 환율 유지`));
@@ -1338,10 +1440,10 @@ const hasCrit = c => !!(c && (c.rentMax || c.areaMin || c.areaMax || c.regions?.
 const liveItems = (p, g) => g.items.filter(it => { const L = getL(it.listingId); return L && live(L, p.ownerId); });
 /* trade-area masters: the company's own area maps, shared by every proposal */
 const getA = id => S.areas.find(a => a.id === id);
-function autoMaster(g) { for (const it of g.items) { const L = getL(it.listingId), k = L && getB(L.buildingId).area, a = k && S.areas.find(x => x.dataKey === k); if (a) return a; } return null; }
+function autoMaster(g) { for (const it of g.items) { const L = getL(it.listingId), a = L && S.areas.find(x => inMaster(L, x)); if (a) return a; } return null; }
 function pinMaster(g) { if (!g.areaId) g.areaId = autoMaster(g)?.id || null; }
 const groupMaster = g => g.areaId === 'none' ? null : g.areaId ? getA(g.areaId) : autoMaster(g);
-const groupArea = g => { const a = groupMaster(g); return a && AREAS[a.dataKey] ? AREAS[a.dataKey] : null; };
+const groupArea = g => { const a = groupMaster(g); return a ? areaData(a) : null; };
 
 /* ---------- trade-area maps: OSM roads and outlines drawn as SVG, no map tiles ---------- */
 const MRW = [5, 9, 14, 22]; // road width in metres: service, local, collector, arterial
@@ -1435,10 +1537,13 @@ function mapSvg(a, o = {}) {
     <rect width="${d.w}" height="${d.h}" fill="#e7e7e4"/>${a.zone.length > 2 ? `<path d="${ppath(a.zone)}" fill="#d8d8d4"/>` : ''}${mapBase(a.osm)}
     <g>${blds.map(([id, p]) => `<path data-b="${id}" d="${mpath(p)}Z" ${hb.has(id) ? 'class="bh" fill="none" stroke="#c23b3a" stroke-width="1.5" stroke-dasharray="4 3"' : 'fill="#bfbfbb" stroke="#fff" stroke-width="1"'}/>`).join('')}</g>
     <g fill="none" stroke="#2f9e44" stroke-width="6">${d.rail.map(r => `<path d="${mpath(r)}"/>`).join('')}</g>
+    ${(o.official || []).sort((x, y) => x.w - y.w).map(u => { const hit = u.w >= .05, cx = u.poly.reduce((s, p) => s + p[0], 0) / u.poly.length, cy = u.poly.reduce((s, p) => s + p[1], 0) / u.poly.length;
+      return `<g class="ofc ${hit ? 'hit' : ''}"><path d="${ppath(u.poly)}" fill="${hit ? 'rgba(217,130,43,.05)' : 'none'}" stroke="${hit ? '#d9822b' : '#9b9b95'}" stroke-width="${(hit ? 2.2 : 1.2) * k}" stroke-dasharray="${12 * k} ${6 * k}"/>
+        <text x="${cx}" y="${cy}" text-anchor="middle" font-size="${(hit ? 16 : 13) * k}" font-weight="${hit ? 700 : 500}" fill="${hit ? '#a85a12' : '#8a8a84'}" paint-order="stroke" stroke="#fff" stroke-width="${4 * k}">${esc(u.name)}</text></g>`; }).join('')}
     ${o.dim && a.zone.length > 2 ? `<path d="M0 0H${d.w}V${d.h}H0Z${ppath(a.zone)}" fill="#fff" fill-opacity=".62" fill-rule="evenodd"/>` : ''}
     ${ed === 'zone' || ed === 'move' ? `<path d="${a.zone.length > 2 ? ppath(a.zone) : ''}" fill="none" stroke="#2a78d6" stroke-width="${2 * k}" stroke-dasharray="${10 * k} ${6 * k}"/>` : ''}
     ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '', k)).join('')}${(o.marks || []).map(m => markSvg(m, 'pr', '', k)).join('')}
-    ${(o.refs || []).map(q => `<g data-ref="${q.id}" class="rf" transform="${sc(q.x, q.y)}"><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/><text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text></g>`).join('')}
+    ${(o.refs || []).map(q => `<g data-ref="${q.id}" class="rf" transform="${sc(q.x, q.y)}"><title>${esc(q.label)}</title><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/>${o.refs.length <= 10 ? `<text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text>` : ''}</g>`).join('')}
     ${(() => { const cs = o.cands || [], R = pinR(cs.length), lab = cs.length <= 10, q = declutter(cs, R * k);
       return q.map(c => `${leader(c, k)}<g data-lid="${c.id}" class="cd" transform="${sc(c.x, c.y)}"><title>${esc(c.label)}</title>${c.st === 'in' ? `<circle r="${R}" fill="#141414" stroke="#fff" stroke-width="3"/><text y="${R * .37}" font-size="${R * 1.05}" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
         : `<circle r="${R * .7}" fill="${c.st === 'fit' ? '#fff' : '#ecece9'}" stroke="${c.st === 'fit' ? '#141414' : '#a3a39e'}" stroke-width="3.5"/>`}${lab ? `<text x="${R + 6}" y="7" font-size="18" font-weight="600" fill="${c.st === 'nofit' ? '#8a8a85' : '#141414'}" ${halo}>${esc(c.label)}</text>` : ''}</g>`).join(''); })()}
@@ -1476,7 +1581,7 @@ const MTOOLS_GROUP = [['move', '선택 · 이동'], ['hide', '회사 표시 숨�
 const MKIND = {brand: '브랜드', ours: '자사 중개', text: '글자', hl: '강조 영역'};
 const MHINT = {move: '표시를 끌어서 옮기고, 빈 곳을 끌면 지도가 움직입니다 · 휠이나 + − 로 확대 · 축소 · 파란 점은 매물 상세', zone: '지도를 눌러 꼭짓점을 찍고 완료를 누르세요. 영역 안의 건물만 지도에 그려집니다', bld: '건물을 누르면 숨기고, 다시 누르면 살립니다 (빨간 점선 = 숨김)',
   brand: '지도를 누른 곳에 브랜드 표시를 놓습니다', ours: '지도를 누른 곳에 자사 중개 표시(로고)를 놓습니다', text: '지도를 누른 곳에 글자를 놓습니다', hl: '꼭짓점을 찍고 완료를 누르세요', hide: '회사 표시를 누르면 이 제안서에서만 숨깁니다 (흐린 표시 = 숨김)'};
-let MED = {tool: 'move', draft: [], sel: null, drag: null};
+let MED = {tool: 'move', draft: [], sel: null, drag: null, off: true};
 function medCtx() {
   if (U.modal?.type === 'gmap') { const p = getP(U.modal.pid), g = p.groups[U.modal.gi]; return {kind: 'group', p, g, a: groupMaster(g), list: g.marks = g.marks || [], hide: g.mapHide = g.mapHide || []}; }
   const a = getA(U.amap); return a && {kind: 'area', a, list: a.marks = a.marks || []};
@@ -1490,18 +1595,19 @@ function mapEditor(c) {
   const pins = c.kind === 'group' ? groupPins(c.g, liveItems(c.p, c.g), c.a) : [];
   const refs = c.kind === 'area' ? S.listings.filter(L => L.status === 'active').map(L => { const xy = listingXY(L, c.a); return xy && {id: L.id, x: xy[0], y: xy[1], label: bInfo(L).name}; }).filter(Boolean) : [];
   const d = MAP_DATA[c.a.osm], zk = medZk(c), saved = c.kind === 'area' ? c.a.view : c.g.view;
-  const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : [], view: zkView(zk, d, saved || slideView(c.kind === 'group' ? c.g : null, c.a, pins)), zk, dim: c.kind === 'group' && c.g.mapDim});
+  const used = new Set(areaLinks(c.a).map(u => u.o.code)), official = MED.off ? OFFICIAL.filter(o => o.osm === c.a.osm).map(o => ({...o, w: used.has(o.code) ? 1 : 0})) : [];
+  const svg = mapSvg(c.a, {official, edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : [], view: zkView(zk, d, saved || slideView(c.kind === 'group' ? c.g : null, c.a, pins)), zk, dim: c.kind === 'group' && c.g.mapDim});
   const vwRow = `<div class="f"><label>지도 장에 보일 범위</label><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '자동 · 상권 영역과 매물이 다 보이게'}</div>
     <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '자동으로'}</button>` : ''}</div>
     ${c.kind === 'group' ? `<label class="chk" style="margin-top:6px"><input type="checkbox" ${c.g.mapDim ? 'checked' : ''} onchange="medCtx().g.mapDim=this.checked;medRefresh()"> 상권 영역 밖 흐리게</label>` : ''}</div>`;
   const row = m => `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="이름" onkeydown="if(event.key==='Enter')this.blur()" onchange="medName('${m.id}',this.value)"><button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`;
   return `<div class="med"><div class="med-main">
-      <div class="row">${seg(tools, t, '(v=>medTool(v))')}${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
+      <div class="row">${seg(tools, t, '(v=>medTool(v))')}<label class="chk ofc-t"><input type="checkbox" ${MED.off ? 'checked' : ''} onchange="MED.off=this.checked;medRefresh()"> 공식 상권 경계</label>${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
       <div class="sub">${MHINT[t]}</div>
       <div class="med-map t-${t}">${zoomCtl(zk, c.a.osm)}<div onwheel="mWheel(event,'${zk}','${c.a.osm}')" onpointerdown="medDown(event)" onpointermove="medMove(event)" onpointerup="medUp(event)">${svg}</div></div></div>
     <div class="med-side">
       ${c.kind === 'area' ? `<div class="f"><label>상권 이름</label><input class="in" value="${esc(c.a.name)}" onchange="getA('${c.a.id}').name=this.value;commit()"></div>
-        <div class="f"><label>상권 데이터</label><select class="in" onchange="getA('${c.a.id}').dataKey=this.value||null;commit()"><option value="">없음</option>${Object.entries(AREAS).map(([k, x]) => `<option value="${k}" ${c.a.dataKey === k ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
+        ${linkPanel(c.a)}
         <div class="f"><label>상권 표지 기본값</label>${thumb(groupCoverSlide({name: c.a.name, photo: c.a.photo, style: c.a.style || {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}}))}
           <div class="row"><label class="btn xs">업로드<input type="file" accept="image/*" hidden onchange="(f=>f&&readImg(f,src=>{getA('${c.a.id}').photo=src;commit()}))(this.files[0])"></label><button class="btn xs ghost" onclick="(a=>{a.photo=GROUP_PHOTOS[(GROUP_PHOTOS.indexOf(a.photo)+1)%GROUP_PHOTOS.length];commit()})(getA('${c.a.id}'))">샘플 바꾸기</button><span class="sub">새 제안서의 상권 표지로 복사</span></div></div>
         <div class="sub">파란 점 = 진행 중 매물 위치 · 건물 ${zoneBuildings(c.a).length - (c.a.hidden || []).length}개 표시 · ${(c.a.hidden || []).length}개 숨김 ${(c.a.hidden || []).length ? `<button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div>`
@@ -1510,6 +1616,19 @@ function mapEditor(c) {
       ${c.kind === 'area' ? `<button class="btn xs ghost danger" style="align-self:flex-start" onclick="rmArea('${c.a.id}')">상권 지도 삭제</button>` : ''}
       <b class="med-h">${c.kind === 'area' ? '회사 표시' : '이 제안서 표시'} <span class="sub">${c.list.length}</span></b>
       <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div>`;
+}
+function linkPanel(a) {
+  const on = new Set(areaLinks(a).map(u => u.o.code)), all = OFFICIAL.filter(o => o.osm === a.osm).map(o => ({o, ov: overlap(a.zone, o.poly)}));
+  const near = all.filter(x => x.ov >= .01 || on.has(x.o.code)).sort((x, y) => y.ov - x.ov), rest = all.filter(x => !near.includes(x)).sort((x, y) => x.o.name.localeCompare(y.o.name));
+  return `<div class="f"><label>상권 데이터</label><div class="sub">영역과 겹치는 서울시 공식 상권의 데이터를 합쳐 씁니다</div>
+    <div class="lk">${near.map(({o}) => `<label class="lk-i ${on.has(o.code) ? 'on' : ''}"><input type="checkbox" ${on.has(o.code) ? 'checked' : ''} onchange="toggleArea('${a.id}','${o.code}',this.checked)"><span><b>${esc(o.name)}</b><small>${OTYPE[o.type]}</small></span></label>`).join('') || '<div class="sub">영역과 겹치는 공식 상권이 없습니다</div>'}</div>
+    ${rest.length ? `<select class="in" onchange="this.value&&toggleArea('${a.id}',this.value,true)"><option value="">+ 다른 공식 상권 추가</option>${rest.map(({o}) => `<option value="${o.code}">${esc(o.name)} · ${OTYPE[o.type]}</option>`).join('')}</select>` : ''}
+    <div class="sub">주황 점선 = 쓰는 공식 상권 · 동기화 ${fmtDate(S.sync?.at || '')} (${S.sync?.q || '–'})</div></div>`;
+}
+function toggleArea(id, code, on) {
+  const a = getA(id); a.incl = (a.incl || []).filter(c => c !== code); a.excl = (a.excl || []).filter(c => c !== code);
+  const ov = overlap(a.zone, getO(code).poly) >= .05;
+  if (on && !ov) a.incl.push(code); if (!on && ov) a.excl.push(code); commit();
 }
 const medZk = c => c.kind === 'area' ? `a:${c.a.id}` : `g:${c.p.id}:${U.modal.gi}`;
 function medView(on) { const c = medCtx(), o = c.kind === 'area' ? c.a : c.g; o.view = on ? {...MV[medZk(c)]} : null; if (!on) delete MV[medZk(c)]; medRefresh(); toast(on ? '지도 장 범위 저장' : '범위 되돌림'); }
@@ -1603,7 +1722,8 @@ function summarySlides(p, gs) {
   const rows = [], fit = hasCrit(p.crit), cnt = gs.reduce((s, x) => s + x.its.length, 0);
   gs.forEach(x => { if (!x.its.length) return; rows.push({head: x.g}); x.its.forEach((it, ii) => rows.push({L: getL(it.listingId), n: ii + 1, g: x.g})); });
   const pages = [];
-  for (let i = 0; i < rows.length;) { let j = Math.min(i + 10, rows.length); if (j < rows.length && rows[j - 1].head) j--; pages.push(rows.slice(i, j)); i = j; }
+  // two-line rows: nine fit above the footer
+  for (let i = 0; i < rows.length;) { let j = Math.min(i + 9, rows.length); if (j < rows.length && rows[j - 1].head) j--; pages.push(rows.slice(i, j)); i = j; }
   const cols = fit ? 9 : 8;
   return pages.map((rs, pi) => `<div class="sl sl-std">${slHead(LG('매물 요약', 'Property Summary'), {tag: pages.length > 1 ? `${pi + 1} / ${pages.length}` : LG(`${cnt}곳`, `${cnt} sites`)})}
     <table class="sm-tbl"><thead><tr><th>No.</th><th>${LG('매물', 'Property')}</th><th>${LG('층', 'Floors')}</th><th class="num">${LG('면적', 'Area')}</th><th class="num">${LG('보증금', 'Deposit')}</th><th class="num">${LG('월 임대료', 'Monthly rent')}</th><th class="num">${LG('권리금', 'Key money')}</th><th>${LG('인도', 'Handover')}</th>${fit ? `<th>${LG('요청 조건', 'Requirements')}</th>` : ''}</tr></thead><tbody>
@@ -1655,14 +1775,14 @@ function modPanel(k, a) {
   return '';
 }
 function dataSlides(g, a, mods) {
-  const tag = `${esc(g.name)} · ${esc(a.name)}`, ins = areaInsight(a);
+  const tag = esc(g.name), ins = areaInsight(a);
   const tile = (l, v) => `<div class="tile"><span>${l}</span><b>${v}</b></div>`;
   const out = [{label: LG(`${g.name} · 상권 개요`, `${tv(g.name)} · Overview`), html: tr(`<div class="sl sl-std sl-dt">${slHead('상권 개요', {tag})}
     <div class="insight">${ins.html}</div>
     <div class="tiles">${tile('상권 유형', ins.type)}${tile('일평균 유동 인구', nf(a.pop[2][1]) + '명')}${tile('분기 추정 매출', nf(a.sales[a.sales.length - 1][1]) + '억원')}${tile('주말 매출 비중', a.week[1] + '%')}</div>
     <div class="charts c4"><div class="chart"><h5>인구 구성</h5>${hbars(a.pop, v => nf(v) + '명')}</div><div class="chart"><h5>분기 매출 추이 (억원)</h5>${lineChart(a.sales, '억')}</div>
       <div class="chart"><h5>시간대별 유동 인구 (%)</h5>${cols(a.hourly, '%')}</div><div class="chart"><h5>연령대별 유동 인구 (%)</h5>${cols(a.age, '%')}</div></div>
-    <div class="dt-src">서울시 상권분석서비스 · ${a.q} 기준 · 예시 데이터</div>${slFoot()}</div>`)}];
+    <div class="dt-src">출처: 서울시 상권분석서비스 ${a.q} · ${a.units.map(u => esc(u.name)).join(' · ')} 기준 추정 · 예시 데이터</div>${slFoot()}</div>`)}];
   const parts = MODULES.filter(([k]) => mods[k]).map(([k]) => modPanel(k, a)).filter(Boolean);
   for (let i = 0; i < parts.length; i += 2)
     out.push({label: LG(`${g.name} · 상권 데이터`, `${tv(g.name)} · Area data`), html: tr(`<div class="sl sl-std sl-dt">${slHead('상권 데이터', {tag})}<div class="dt-two">${parts.slice(i, i + 2).join('')}</div>${slFoot()}</div>`)});
@@ -2066,7 +2186,7 @@ function wizView() {
     return head + `<div class="row a" style="--i:0;margin-bottom:12px"><span class="sub">제안할 상권을 순서대로 고르세요. 고른 순서가 제안서의 상권 순서가 됩니다.</span><div class="sp"></div>${w.areas.map((id, i) => `<span class="chip dark">${i + 1} ${esc(getA(id).name)}</span>`).join('')}</div>
       <div class="grid">${S.areas.map((a, i) => { const inA = ls.filter(L => inMaster(L, a)), ok = inA.filter(L => fitsAll(L, a, {...crit, regions: [a.name]})).length, n = w.areas.indexOf(a.id) + 1;
         return `<button class="card wz-a a ${n ? 'on' : ''}" style="--i:${i}" onclick="wizArea('${a.id}')"><div class="ph map-th">${mapSvg(a, {view: slideView(null, a), cands: candDots(a, inA, [], {...crit, regions: [a.name]}, slideView(null, a) ? slideView(null, a).w / MAP_DATA[a.osm].w : 1)})}${n ? `<span class="wz-n">${n}</span>` : ''}</div>
-          <div class="bd"><div class="t">${esc(a.name)}</div><div class="kv"><span>진행 매물<b>${inA.length}건</b></span><span>조건 충족<b>${ok}건</b></span><span>상권 데이터<b>${AREAS[a.dataKey] ? '있음' : '없음'}</b></span></div></div></button>`; }).join('')}</div>
+          <div class="bd"><div class="t">${esc(a.name)}</div><div class="kv"><span>진행 매물<b>${inA.length}건</b></span><span>조건 충족<b>${ok}건</b></span><span>공식 상권<b>${areaLinks(a).length}곳</b></span></div></div></button>`; }).join('')}</div>
       ${out.length ? `<div class="sub" style="margin-top:12px">어느 상권에도 속하지 않는 매물 ${out.length}건(${out.map(L => esc(bInfo(L).name)).join(', ')})은 다음 단계의 "상권 밖"에서 고를 수 있습니다.</div>` : ''}
       <div class="sticky-foot"><button class="btn" onclick="wizGo(1)">← 이전</button><button class="btn pri" onclick="wizGo(3)">다음 · 매물 고르기 →</button></div>`;
   }
@@ -2149,7 +2269,7 @@ function propEditor(p) {
         <div class="ctl"><span>색</span><div class="sws">${GCOLOR.map(c => `<button class="${st.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="${gs('color', `'${c}'`)}"></button>`).join('')}<input type="color" value="${st.color}" title="직접 고르기" onchange="${gs('color', 'this.value')}"></div></div>
         <div class="ctl"><span>위치</span><div class="pos9">${GPOS.map(k => `<button class="${st.pos === k ? 'on' : ''}" onclick="${gs('pos', `'${k}'`)}"></button>`).join('')}</div></div>
         <div class="ctl"><span>상권</span><select class="in" onchange="setG('${p.id}',${gi},'areaId',this.value||null)"><option value="">자동 · ${am ? esc(am.name) : '없음'}</option>${S.areas.map(x => `<option value="${x.id}" ${g.areaId === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}<option value="none" ${g.areaId === 'none' ? 'selected' : ''}>넣지 않음</option></select></div>
-        <div class="ctl"><span>지도</span><button class="btn xs" ${groupMaster(g) ? '' : 'disabled'} onclick="MED={tool:'move',draft:[],sel:null,drag:null};openModal({type:'gmap',pid:'${p.id}',gi:${gi}})">지도 편집</button>${groupMaster(g) && g.items.length ? `<button class="btn xs ghost" onclick="goSlideBy('${p.id}',s=>s.map==='${g.id}')">지도 장 보기</button>` : ''}<span class="sub">${groupMaster(g) ? `표시 ${(groupMaster(g).marks || []).length - (g.mapHide || []).length + (g.marks || []).length}개` : '상권을 고르면 지도 장이 생깁니다'}</span></div>
+        <div class="ctl"><span>지도</span><button class="btn xs" ${groupMaster(g) ? '' : 'disabled'} onclick="freshMed(false);openModal({type:'gmap',pid:'${p.id}',gi:${gi}})">지도 편집</button>${groupMaster(g) && g.items.length ? `<button class="btn xs ghost" onclick="goSlideBy('${p.id}',s=>s.map==='${g.id}')">지도 장 보기</button>` : ''}<span class="sub">${groupMaster(g) ? `표시 ${(groupMaster(g).marks || []).length - (g.mapHide || []).length + (g.marks || []).length}개` : '상권을 고르면 지도 장이 생깁니다'}</span></div>
       </div><div class="gi-list">${g.items.map((it, ii) => item(it, gi, ii, g)).join('') || '<div class="sub" style="padding:10px 0">매물을 추가하세요</div>'}
         <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'pick',pid:'${p.id}',gi:${gi}})">+ 매물 추가${groupMaster(g) ? ' · 지도에서' : ''}</button></div></div></div>`;
   };
@@ -2280,7 +2400,7 @@ function adminBld() {
       ${open ? `<div style="border-top:1px solid var(--line2);padding:6px 20px 14px;animation:fadeUp .3s var(--ease)"><table class="tbl"><thead><tr><th>범위</th><th>담당</th><th>공개</th><th>상태</th><th class="num">임대료</th><th>임대인 (내부)</th><th>메모 (내부)</th><th></th></tr></thead><tbody>
         ${ls.map(L => `<tr><td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td><td><button class="btn xs" onclick="event.stopPropagation();openModal({type:'hist',lid:'${L.id}'})">이력</button></td></tr>`).join('')}</tbody></table></div>` : ''}</div>`; }).join('')}`;
 }
-const freshMed = () => { MED = {tool: 'move', draft: [], sel: null, drag: null}; };
+const freshMed = (off = true) => { MED = {tool: 'move', draft: [], sel: null, drag: null, off}; };
 /* ---------- new trade area: find a place, pull its OpenStreetMap roads and outlines, then draw the zone ---------- */
 const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
 const ROADCLS = {motorway: 3, trunk: 3, primary: 3, secondary: 2, tertiary: 2, unclassified: 1, residential: 1, living_street: 1, pedestrian: 1, service: 0};
@@ -2325,7 +2445,7 @@ async function naCreate() {
   try {
     const d = await fetchOsm(pick.lat, pick.lng), key = uid('osm');
     (S.osm = S.osm || {})[key] = d; window.MAP_DATA[key] = d;
-    const a = {id: uid('A'), name, osm: key, dataKey: null, hidden: [], zone: [], marks: [], photo: GROUP_PHOTOS[S.areas.length % GROUP_PHOTOS.length], style: {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}};
+    const a = {id: uid('A'), name, osm: key, hidden: [], zone: [], marks: [], photo: GROUP_PHOTOS[S.areas.length % GROUP_PHOTOS.length], style: {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}};
     S.areas.push(a); U.modal = null; renderModal(); U.amap = a.id; freshMed(); MED.tool = 'zone'; commit();
     toast(`${name} 지도 생성`, `도로 ${d.roads.length} · 건물 ${d.buildings.length} · 이제 상권 영역을 그리세요`);
   } catch (e) { m.busy = ''; renderModal(); toast('지도 데이터를 받지 못했습니다', String(e.message || e)); }
@@ -2340,9 +2460,10 @@ function rmArea(id) {
 function adminMaps() {
   const a = U.amap && getA(U.amap);
   if (a) return `<div class="head"><button class="btn ghost icon" onclick="U.amap=null;freshMed();render()">←</button><h1>${esc(a.name)} 지도</h1><span class="sub">회사 상권 지도 · 모든 제안서가 같이 씁니다</span></div><div class="panel">${mapEditor(medCtx())}</div>`;
-  return `<div class="head"><h1>상권 지도</h1><span class="sub">회사가 정한 상권 영역 · 제안서 지도 장의 바탕</span><div class="sp"></div><button class="btn pri" onclick="openModal({type:'newArea'})">+ 새 상권</button></div>
+  return `<div class="head"><h1>상권 지도</h1><span class="sub">회사가 정한 상권 영역 · 제안서 지도 장과 상권 데이터의 기준</span><div class="sp"></div><button class="btn pri" onclick="openModal({type:'newArea'})">+ 새 상권</button></div>
+  <div class="panel a sync-p" style="--i:0"><div><b>상권 데이터 전체 동기화</b><span class="sub">서울시 상권분석서비스 공식 상권 ${S.sync?.units || 0}곳(예시) · ${S.sync?.q || '–'} 데이터 · 마지막 ${fmtDate(S.sync?.at || '')} · 다음 예정 ${fmtDate(nextSync(S.sync?.at || S.today))} (분기 종료 2개월 뒤)</span></div><div class="sp"></div><button class="btn sm" onclick="syncNow()">지금 동기화</button></div>
   <div class="grid">${S.areas.map((x, i) => `<div class="card hov a" style="--i:${i}" onclick="U.amap='${x.id}';freshMed();render()"><div class="ph map-th">${mapSvg(x, {view: slideView(null, x)})}</div>
-    <div class="bd"><div class="t">${esc(x.name)}</div><div class="ad">${AREAS[x.dataKey] ? esc(AREAS[x.dataKey].name) : '상권 데이터 없음'}</div>
+    <div class="bd"><div class="t">${esc(x.name)}</div><div class="ad">${areaLinks(x).length ? esc(linkTxt(x)) : '연결된 공식 상권 없음'}</div>
     <div class="kv"><span>건물<b>${zoneBuildings(x).length - (x.hidden || []).length}</b></span><span>표시<b>${(x.marks || []).length}</b></span><span>쓰는 제안서<b>${visProps().filter(p => p.groups.some(g => groupMaster(g) === x)).length}</b></span></div></div></div>`).join('')}</div>`;
 }
 function adminHand() {
