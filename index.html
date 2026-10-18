@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LeaseDesk · Prototype</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=Noto+Serif+KR:wght@700&display=swap">
 <style>
 :root{
   --bg:#f5f5f2;--surface:#fff;--ink:#121212;--ink2:#4f4d48;--muted:#8b8881;--line:#e6e4de;--line2:#efeee9;
@@ -333,6 +333,39 @@ textarea.in{resize:vertical;min-height:64px}
 .ct-card{border-left:3px solid var(--accent);padding:4px 0 4px 28px;display:flex;flex-direction:column;gap:8px;font-size:19px;color:var(--ink2)}
 .ct-card b{font-size:30px;color:var(--ink);letter-spacing:-.03em}
 .ct-disc{position:absolute;left:84px;right:84px;bottom:56px;margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* ---------- deck style: gallery — black on white, light display weight, square edges, no pills ---------- */
+.sl :is(.tile,.chart,.insight,.ls-photo,.ph-grid div,.pl-fig,.xs .ico,.chip,.xb span,.xb i,.hb .tr,.hb .b,.stack,.cols .bar){border-radius:0}
+.sl .fit span{background:none;padding:0 8px 0 0;font-weight:700}
+.sl .chip{background:none;border:1px solid currentColor;padding:2px 7px}
+.sl .ph-grid{gap:6px}
+.sl .sl-brand i,.sl .sl-ft .brand i{color:inherit;font-weight:400}
+
+.sl{font-family:'IBM Plex Sans KR',system-ui,sans-serif;--ink:#141414;--ink2:#3d3d3d;--muted:#8a8a8a;--line:#d9d9d9;--line2:#ececec;--accent:#141414;--accent-2:#141414;--accent-soft:#f2f2f2;--series-2:#9a9a9a}
+.sl .sl-hd{border-bottom:1px solid #141414;padding-bottom:14px}
+.sl .sl-hd h2{font-weight:300;font-size:36px;letter-spacing:-.02em}
+.sl .sl-hd h2 em{font-size:13px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#8a8a8a;margin-left:10px;vertical-align:6px}
+.sl .sl-hd .no{font-weight:300;color:#8a8a8a}
+.sl .sl-hd .tag{font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+.sl.sl-cover::before{background:linear-gradient(90deg,rgba(0,0,0,.82),rgba(0,0,0,.15) 70%)}
+.sl .cv-t h1{font-weight:300;font-size:96px;letter-spacing:-.03em}
+.sl .cv-t .eyebrow{font-weight:500;letter-spacing:.45em;font-size:16px}
+.sl .cv-t p{font-size:22px}
+.sl .tile{background:none;border:0;border-top:1px solid #141414;padding:12px 0 0}
+.sl .tile b{font-weight:300;font-size:30px}
+.sl .chart,.sl .insight{background:none;border:0;border-top:1px solid #d9d9d9;padding:14px 0 0}
+.sl .cols .bar{background:#d4d4d4}.sl .cols .c.peak .bar{background:#141414}
+.sl .ls-tbl th{font-weight:500;color:#8a8a8a;font-size:12.5px;letter-spacing:.08em}
+.sl .ls-tbl td{border-color:#ececec}
+.sl .ls-tbl .tot{font-weight:600}
+.sl .sm-tbl th{border-bottom:1px solid #141414;letter-spacing:.06em}
+.sl .sm-tbl td.n{color:#141414;font-weight:300;font-size:18px}
+.sl .sm-tbl tr.gh td{background:none;border-bottom:1px solid #141414;font-size:12px;letter-spacing:.24em;text-transform:uppercase;padding-top:14px}
+.sl .g-name{text-shadow:none}
+.sl .ct-card{border-left:1px solid #141414}
+.sl.sl-ct h2{font-weight:300;font-size:88px}
+.sl .sl-ft{border-top:1px solid #ececec;padding-top:10px;bottom:20px}
+.slw{border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.08),0 8px 24px rgba(0,0,0,.05)}
 
 /* ---------- proposal editor ---------- */
 .ed-grid{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}
