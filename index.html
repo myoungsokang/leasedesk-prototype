@@ -388,6 +388,9 @@ textarea.in{resize:vertical;min-height:64px}
 .tmap .mk.off{opacity:.25}
 .map-th{position:relative;overflow:hidden}.map-th svg{position:absolute;inset:0;width:100%;height:100%}
 .med{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px}
+.med-top{display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid var(--line2)}
+.med-top>.f:first-child{width:220px}
+.mt-cover .row{align-items:flex-end;flex-wrap:nowrap}.mt-cover .slw{width:170px;flex:none}
 .med-main{display:flex;flex-direction:column;gap:8px;min-width:0}
 .med-map{position:relative;border:1px solid var(--line);background:#e7e7e4;touch-action:none;user-select:none;overflow:hidden}
 .zm-ctl{position:absolute;right:10px;top:10px;z-index:2;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.08)}
@@ -1601,19 +1604,20 @@ function mapEditor(c) {
     <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '자동으로'}</button>` : ''}</div>
     ${c.kind === 'group' ? `<label class="chk" style="margin-top:6px"><input type="checkbox" ${c.g.mapDim ? 'checked' : ''} onchange="medCtx().g.mapDim=this.checked;medRefresh()"> 상권 영역 밖 흐리게</label>` : ''}</div>`;
   const row = m => `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="이름" onkeydown="if(event.key==='Enter')this.blur()" onchange="medName('${m.id}',this.value)"><button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`;
-  return `<div class="med"><div class="med-main">
+  const top = c.kind === 'area' ? `<div class="med-top">
+      <div class="f"><label>상권 이름</label><input class="in" value="${esc(c.a.name)}" onchange="getA('${c.a.id}').name=this.value;commit()"></div>
+        <div class="f mt-cover"><label>상권 표지 기본값 <span class="sub">새 제안서의 상권 표지로 복사</span></label><div class="row">${thumb(groupCoverSlide({name: c.a.name, photo: c.a.photo, style: c.a.style || {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}}))}
+          <div class="row"><label class="btn xs">업로드<input type="file" accept="image/*" hidden onchange="(f=>f&&readImg(f,src=>{getA('${c.a.id}').photo=src;commit()}))(this.files[0])"></label><button class="btn xs ghost" onclick="(a=>{a.photo=GROUP_PHOTOS[(GROUP_PHOTOS.indexOf(a.photo)+1)%GROUP_PHOTOS.length];commit()})(getA('${c.a.id}'))">샘플 바꾸기</button></div></div></div>
+      <div class="sp"></div><button class="btn sm ghost danger" onclick="rmArea('${c.a.id}')">상권 지도 삭제</button></div>` : '';
+  return `${top}<div class="med"><div class="med-main">
       <div class="row">${seg(tools, t, '(v=>medTool(v))')}<label class="chk ofc-t"><input type="checkbox" ${MED.off ? 'checked' : ''} onchange="MED.off=this.checked;medRefresh()"> 공식 상권 경계</label>${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
       <div class="sub">${MHINT[t]}</div>
       <div class="med-map t-${t}">${zoomCtl(zk, c.a.osm)}<div onwheel="mWheel(event,'${zk}','${c.a.osm}')" onpointerdown="medDown(event)" onpointermove="medMove(event)" onpointerup="medUp(event)">${svg}</div></div></div>
     <div class="med-side">
-      ${c.kind === 'area' ? `<div class="f"><label>상권 이름</label><input class="in" value="${esc(c.a.name)}" onchange="getA('${c.a.id}').name=this.value;commit()"></div>
-        ${linkPanel(c.a)}
-        <div class="f"><label>상권 표지 기본값</label>${thumb(groupCoverSlide({name: c.a.name, photo: c.a.photo, style: c.a.style || {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}}))}
-          <div class="row"><label class="btn xs">업로드<input type="file" accept="image/*" hidden onchange="(f=>f&&readImg(f,src=>{getA('${c.a.id}').photo=src;commit()}))(this.files[0])"></label><button class="btn xs ghost" onclick="(a=>{a.photo=GROUP_PHOTOS[(GROUP_PHOTOS.indexOf(a.photo)+1)%GROUP_PHOTOS.length];commit()})(getA('${c.a.id}'))">샘플 바꾸기</button><span class="sub">새 제안서의 상권 표지로 복사</span></div></div>
+      ${c.kind === 'area' ? `${linkPanel(c.a)}
         <div class="sub">파란 점 = 진행 중 매물 위치 · 건물 ${zoneBuildings(c.a).length - (c.a.hidden || []).length}개 표시 · ${(c.a.hidden || []).length}개 숨김 ${(c.a.hidden || []).length ? `<button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div>`
         : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}${c.hide.length < (c.a.marks || []).length ? ` <button class="btn xs ghost" onclick="(c=>{c.g.mapHide=(c.a.marks||[]).map(m=>m.id)})(medCtx());medRefresh()">모두 숨기기</button>` : ''}</div>`}
       ${vwRow}
-      ${c.kind === 'area' ? `<button class="btn xs ghost danger" style="align-self:flex-start" onclick="rmArea('${c.a.id}')">상권 지도 삭제</button>` : ''}
       <b class="med-h">${c.kind === 'area' ? '회사 표시' : '이 제안서 표시'} <span class="sub">${c.list.length}</span></b>
       <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div>`;
 }
