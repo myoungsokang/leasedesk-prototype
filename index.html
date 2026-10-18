@@ -295,12 +295,16 @@ textarea.in{resize:vertical;min-height:64px}
 .sl-ft .pg{margin-left:auto;font-weight:700;color:var(--ink2);font-variant-numeric:tabular-nums}
 .sl-lead{margin:0 0 16px;font-size:17px;line-height:1.55;color:var(--ink2)}.sl-lead b{color:var(--ink)}
 .ls-body{display:grid;grid-template-columns:560px 1fr;gap:34px;flex:1;min-height:0;padding-bottom:64px}
-.ls-media{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 168px;gap:8px;min-height:0}
-.ls-media .m{background:#e9e8e3 center/cover;border-radius:6px;position:relative;overflow:hidden}
-.ls-media .m.big{grid-column:1/-1}
-.ls-media .m.plan{background:#fff;border:1px solid var(--line)}
-.ls-media .m.plan svg{position:absolute;inset:0;width:100%;height:100%}
-.ls-media .m span{position:absolute;left:8px;bottom:6px;font-size:12px;background:rgba(255,255,255,.92);padding:1px 7px;border-radius:5px;font-weight:600}
+.ls-photo{background:#e9e8e3 center/cover;border-radius:6px}
+.ph-grid{flex:1;min-height:0;display:grid;gap:10px;margin-bottom:64px}
+.ph-grid.n2{grid-template-columns:1fr 1fr}.ph-grid.n4{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+.ph-grid div{background:#e9e8e3 center/cover;border-radius:6px}
+.pl-body{flex:1;min-height:0;display:grid;grid-template-columns:1fr 250px;gap:28px;margin-bottom:64px}
+.pl-fig{position:relative;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+.pl-fig svg{position:absolute;inset:0;width:100%;height:100%}
+.pl-cap{display:flex;flex-direction:column;justify-content:flex-end;gap:10px;font-size:15px;color:var(--ink2);line-height:1.5}
+.pl-cap b{font-size:26px;color:var(--ink);letter-spacing:-.03em}
+.pl-key{display:flex;align-items:center;gap:8px;font-size:13.5px}.pl-key i{width:16px;height:12px;border-radius:3px;background:rgba(42,120,214,.24);border:2px solid var(--accent)}
 .ls-tbl{width:100%;border-collapse:collapse;font-size:15px;align-self:start}
 .ls-tbl th{width:150px;text-align:left;vertical-align:top;font-weight:700;color:var(--ink2);padding:8px 12px 8px 0;border-bottom:1px solid var(--line);font-size:14px}
 .ls-tbl th small{display:block;font-weight:500;color:var(--muted);font-size:11.5px}
@@ -360,9 +364,13 @@ textarea.in{resize:vertical;min-height:64px}
 .gitem{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line2)}
 .gitem:first-child{padding-top:0}
 .gitem.off{opacity:.55}
-.gitem .ph{width:88px;aspect-ratio:4/3;border-radius:8px;background:#eee center/cover;flex:none}
+.gitem .ph{width:88px;aspect-ratio:4/3;border-radius:8px;background:#eee center/cover;flex:none;align-self:flex-start}
 .gi-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .gi-b textarea.in{min-height:58px;font-size:13px}
+.ph-ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.ph-ctl>span:first-child{font-size:12px;color:var(--muted);font-weight:600;width:62px;flex:none}
+.ph-pick{display:flex;gap:5px;flex-wrap:wrap}
+.ph-pick button{width:46px;height:34px;border-radius:6px;border:2px solid transparent;background:#eee center/cover;padding:0;opacity:.7}
+.ph-pick button.on{border-color:var(--accent);opacity:1}
 .in.mini{width:auto;padding:3px 6px;font-size:12px;border-radius:7px}
 .fxbox{display:flex;flex-direction:column;align-items:flex-start;gap:4px;margin-top:12px;padding:10px 12px;border-radius:10px;background:#f7f7f4;font-size:12.5px}.fxbox span{color:var(--muted)}
 .pv-wrap{display:grid;grid-template-columns:190px 1fr;gap:22px;align-items:start}
@@ -916,7 +924,7 @@ function seed() {
   ];
   L.forEach(l => l.leaseArea = sumArea(l.floors));
   const st = (font, size, color, pos) => ({font, size, color, pos});
-  const G = (id, name, photo, style, items) => ({id, name, photo, style, areaKey: null, items: items.map(([listingId, comment]) => ({listingId, comment}))});
+  const G = (id, name, photo, style, items) => ({id, name, photo, style, areaKey: null, items: items.map(([listingId, comment, layout = 2]) => ({listingId, comment, photo: null, layout}))});
   const props = [{id: 'P1', ownerId: 'brokerA', clientName: '모먼트커피', createdAt: '2026-09-18T17:00:00',
     lang: 'ko', cur: 'USD', fx: {month: '2026-09', rates: fxFor('2026-09')},
     cover: {title: '', region: 'SEOUL', date: '2026-10', photo: PH.cheonggye},
@@ -924,14 +932,14 @@ function seed() {
     slides: {summary: true, compare: true}, modules: {...DEFAULT_MODS},
     groups: [
       G('G1', '성수', PH.brick, st('wide', 'L', '#ffffff', 'bl'), [
-        ['L2', '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 구성 가능\n즉시 입주 가능'],
-        ['L9', '평일 직장인 수요 중심의 오피스 1층 리테일\n관리비는 실비정산']]),
+        ['L2', '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 구성 가능\n즉시 입주 가능', 4],
+        ['L9', '평일 직장인 수요 중심의 오피스 1층 리테일\n관리비는 실비정산', 1]]),
       G('G2', '가로수길', PH.seoulStreet, st('serif', 'M', '#ffffff', 'mc'), [
-        ['L1', '2층은 로스터리 쇼룸으로 활용 가능\n권리금은 현 임차인과 협의 필요']]),
+        ['L1', '2층은 로스터리 쇼룸으로 활용 가능\n권리금은 현 임차인과 협의 필요', 2]]),
       G('G3', '한남', PH.garden, st('sans', 'L', '#f2d16b', 'tl'), [
-        ['L3', '주말 매출 비중이 높아 브랜드 체험형 매장에 적합\n1층은 테라스 쪽 일부만 임대']]),
+        ['L3', '주말 매출 비중이 높아 브랜드 체험형 매장에 적합\n1층은 테라스 쪽 일부만 임대', 1]]),
       G('G4', '명동', PH.seoulNeon, st('wide', 'M', '#ffffff', 'br'), [
-        ['L5', '관광객 유동이 가장 많은 대안\n해외 고객 대상 플래그십으로 검토 권장']]),
+        ['L5', '관광객 유동이 가장 많은 대안\n해외 고객 대상 플래그십으로 검토 권장', 4]]),
     ]}];
   props.push({id: 'P2', hidden: true, ownerId: 'brokerB', clientName: '어반스레드', createdAt: '2026-09-25T10:30:00',
     lang: 'en', cur: 'CNY', fx: {month: '2026-09', rates: fxFor('2026-09')},
@@ -1179,9 +1187,19 @@ function fxNote() {
 function planSvg(m) {
   return `<svg class="plansvg" viewBox="0 0 1000 640" preserveAspectRatio="xMidYMid meet"><image href="${m.src}" width="1000" height="640"/>${m.poly ? `<polygon class="poly" vector-effect="non-scaling-stroke" points="${m.poly.map(([x, y]) => `${(x * 1000).toFixed(1)},${(y * 640).toFixed(1)}`).join(' ')}"/>` : ''}</svg>`;
 }
-function firstPlan(L) {
-  const f = [...L.floors].sort((a, b) => Math.abs(a.floor - 1) - Math.abs(b.floor - 1)).find(x => x.planId), pl = f && L.plans.find(p => p.id === f.planId);
-  return pl ? {src: pl.src, poly: f.scope === '일부' ? f.poly : null, floor: f.floor} : null;
+/* the overview shows one photo (the item's pick, else the first); every other photo goes to photo slides */
+const ovPhoto = (L, it) => it?.photo && L.photos.includes(it.photo) ? it.photo : L.photos[0];
+const PHOTO_LAYOUTS = [1, 2, 4];
+const restPhotos = (L, it) => { const ov = ovPhoto(L, it); return L.photos.filter(src => src !== ov); };
+/* one slide per drawing: whole floors sharing a drawing share the slide; a part-floor area gets its own */
+function planSets(L) {
+  const out = [];
+  [...L.floors].sort((a, b) => a.floor - b.floor).forEach(f => {
+    const pl = f.planId && L.plans.find(x => x.id === f.planId); if (!pl) return;
+    const part = f.scope === '일부' && f.poly, hit = !part && out.find(o => o.src === pl.src && !o.poly);
+    if (hit) hit.floors.push(f); else out.push({src: pl.src, poly: part ? f.poly : null, floors: [f]});
+  });
+  return out;
 }
 
 /* requested-terms check: rent ceiling, total area range, target regions */
@@ -1225,17 +1243,14 @@ function groupCoverSlide(g) {
   return `<div class="sl sl-g" style="background-image:url('${g.photo || ''}')"><h2 class="g-name f-${st.font} s-${st.size} v-${st.pos[0]} h-${st.pos[1]}" style="color:${st.color}">${esc(tv(g.name))}</h2></div>`;
 }
 function listingSlide(L, it, n, g) {
-  const I = bInfo(L), fs = [...L.floors].sort((a, b) => b.floor - a.floor), pl = firstPlan(L);
+  const I = bInfo(L), fs = [...L.floors].sort((a, b) => b.floor - a.floor);
   const lines = fs.map(f => `<span class="ln">${fmtF(f.floor)}${f.scope === '일부' ? LG(' 일부', ' (part)') : ''}: ${areaTxt(+f.area)}</span>`).join('')
     + (fs.length > 1 ? `<span class="ln tot">TOTAL: ${areaTxt(L.leaseArea)}</span>` : '');
   const cm = [...new Set([L.note, ...(it?.comment || '').split('\n')].map(s => (s || '').trim()).filter(Boolean))];
   const row = (th, v) => `<tr><th>${th}</th><td>${v}</td></tr>`;
   const vat = `<small>${LG('VAT 별도', 'VAT Excluded')}</small>`;
   return `<div class="sl sl-std sl-ls ${fs.length > 4 ? 'dense' : ''}">${slHead(esc(tv(I.name)), {no: n, em: LG('개요', 'Overview'), tag: g ? esc(tv(g.name)) : ''})}
-    <div class="ls-body"><div class="ls-media">
-      <div class="m big" style="background-image:url('${L.photos[0] || ''}')"></div>
-      <div class="m" style="background-image:url('${L.photos[1] || L.photos[0] || ''}')"></div>
-      ${pl ? `<div class="m plan">${planSvg(pl)}<span>${fmtF(pl.floor)} ${LG('평면도', 'Floor plan')}</span></div>` : `<div class="m" style="background-image:url('${L.photos[2] || L.photos[0] || ''}')"></div>`}</div>
+    <div class="ls-body"><div class="ls-photo" style="background-image:url('${ovPhoto(L, it) || ''}')"></div>
       <table class="ls-tbl"><tbody>
         ${row(LG('주소', 'Address'), esc(tv(I.address)))}
         ${row(LG('층', 'Floors'), esc(floorsTxt(L)))}
@@ -1247,6 +1262,20 @@ function listingSlide(L, it, n, g) {
         ${row(LG('인도 시기', 'Handover'), handoverTxt(L.handover))}
         ${cm.length ? row(LG('코멘트', 'Comments'), `<ul>${cm.map(s => `<li>${esc(tv(s))}</li>`).join('')}</ul>`) : ''}
       </tbody></table></div>${slFoot()}</div>`;
+}
+function photoSlides(L, it, n, g) {
+  const ph = restPhotos(L, it), k = PHOTO_LAYOUTS.includes(it?.layout) ? it.layout : 2, out = [];
+  for (let i = 0; i < ph.length; i += k) out.push(ph.slice(i, i + k));
+  return out.map((set, i) => `<div class="sl sl-std">${slHead(esc(tv(bInfo(L).name)), {no: n, em: LG('사진', 'Photos') + (out.length > 1 ? ` ${i + 1}/${out.length}` : ''), tag: g ? esc(tv(g.name)) : ''})}
+    <div class="ph-grid n${k}">${set.map(src => `<div style="background-image:url('${src}')"></div>`).join('')}</div>${slFoot()}</div>`);
+}
+function planSlides(L, n, g) {
+  return planSets(L).map(o => {
+    const fl = floorLabel(o.floors, 'partial'), area = sumArea(o.floors);
+    return `<div class="sl sl-std">${slHead(esc(tv(bInfo(L).name)), {no: n, em: LG('평면도', 'Floor Plan'), tag: esc(LG(fl, fl.replace(/ 일부/g, ' (part)')))})}
+    <div class="pl-body"><div class="pl-fig">${planSvg(o)}</div>
+      <div class="pl-cap"><b>${esc(LG(fl, fl.replace(/ 일부/g, ' (part)')))}</b><span>${o.floors.length > 1 ? LG(`${o.floors.length}개 층 · 층당 `, `${o.floors.length} floors · each `) + o.floors.map(f => `${nf(f.area)}${LG('㎡', 'm²')}`).join(' / ') + ' · ' : ''}${LG('합계', 'Total')} ${areaTxt(area)}</span>${o.poly ? `<span class="pl-key"><i></i>${LG('파란 영역 = 임대 범위', 'Blue = leased area')}</span>` : ''}</div></div>${slFoot()}</div>`;
+  });
 }
 function summarySlides(p, gs) {
   const rows = [], fit = hasCrit(p.crit), cnt = gs.reduce((s, x) => s + x.its.length, 0);
@@ -1334,7 +1363,12 @@ function deckSlides(p) {
   gs.forEach((x, gi) => {
     out.push({label: tv(x.g.name), group: gi, head: true, html: groupCoverSlide(x.g)});
     if (x.a) dataSlides(x.g, x.a, mods).forEach(d => out.push({...d, group: gi}));
-    x.its.forEach((it, ii) => { const L = getL(it.listingId); out.push({label: `${ii + 1}. ${tv(bInfo(L).name)}`, group: gi, html: listingSlide(L, it, ii + 1, x.g)}); });
+    x.its.forEach((it, ii) => {
+      const L = getL(it.listingId), nm = `${ii + 1}. ${tv(bInfo(L).name)}`;
+      out.push({label: nm, group: gi, html: listingSlide(L, it, ii + 1, x.g)});
+      photoSlides(L, it, ii + 1, x.g).forEach((h, j, a) => out.push({label: `${nm} · ${LG('사진', 'Photos')}${a.length > 1 ? ` ${j + 1}` : ''}`, group: gi, html: h}));
+      planSlides(L, ii + 1, x.g).forEach((h, j, a) => out.push({label: `${nm} · ${LG('평면도', 'Plan')}${a.length > 1 ? ` ${j + 1}` : ''}`, group: gi, html: h}));
+    });
   });
   out.push({label: LG('연락처', 'Contact'), html: contactSlide(p)});
   return out;
@@ -1652,13 +1686,16 @@ function propEditor(p) {
   const cover = withDeck(p, () => coverSlide(p));
   const item = (it, gi, ii, g) => {
     const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId), n = g.items.length;
-    return `<div class="gitem ${ok ? '' : 'off'}"><div class="ph" style="background-image:url('${L.photos[0] || ''}')"></div><div class="gi-b">
+    const ov = ovPhoto(L, it), lay = PHOTO_LAYOUTS.includes(it.layout) ? it.layout : 2, rest = restPhotos(L, it).length, plans = planSets(L).length;
+    return `<div class="gitem ${ok ? '' : 'off'}"><div class="ph" style="background-image:url('${ov || ''}')"></div><div class="gi-b">
       <div class="row"><b>${ii + 1}. ${esc(I.name)}</b><span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span>${L.ownerId !== me() ? `<span class="chip blue">${USERS[L.ownerId].name}</span>` : ''}<div class="sp"></div>
         <button class="btn xs ghost" ${ii ? '' : 'disabled'} onclick="moveItem('${p.id}',${gi},${ii},-1)">↑</button><button class="btn xs ghost" ${ii < n - 1 ? '' : 'disabled'} onclick="moveItem('${p.id}',${gi},${ii},1)">↓</button>
         ${p.groups.length > 1 ? `<select class="in mini" onchange="moveTo('${p.id}',${gi},${ii},this.value)"><option value="">상권 이동</option>${p.groups.map((x, j) => j === gi ? '' : `<option value="${j}">${esc(x.name)}</option>`).join('')}</select>` : ''}
         <button class="btn xs ghost danger" onclick="rmItem('${p.id}',${gi},${ii})">✕</button></div>
       ${ok ? fitChips(fitOf(L, g, p.crit)) : '<span><span class="chip dark">제안 종료 · 장표 제외</span></span>'}
-      <textarea class="in" placeholder="COMMENTS · 한 줄에 한 항목 (매물 비고는 첫 줄에 자동으로 들어갑니다)" onchange="setComment('${p.id}',${gi},${ii},this.value)">${esc(it.comment)}</textarea></div></div>`;
+      <textarea class="in" placeholder="COMMENTS · 한 줄에 한 항목 (매물 비고는 첫 줄에 자동으로 들어갑니다)" onchange="setComment('${p.id}',${gi},${ii},this.value)">${esc(it.comment)}</textarea>
+      <div class="ph-ctl"><span>오버뷰 사진</span><div class="ph-pick">${L.photos.map(src => `<button class="${src === ov ? 'on' : ''}" style="background-image:url('${src}')" title="오버뷰 사진으로" onclick="setItem('${p.id}',${gi},${ii},'photo','${src}')"></button>`).join('')}</div></div>
+      <div class="ph-ctl"><span>사진 장</span>${seg(PHOTO_LAYOUTS.map(k => [k, `${k}장씩`]), lay, `(v=>setItem('${p.id}',${gi},${ii},'layout',+v))`)}<span class="sub">사진 ${rest}장 → ${Math.ceil(rest / lay)}장 · 평면도 ${plans}장</span></div></div></div>`;
   };
   const group = (g, gi) => {
     const ak = autoAreaKey(g), st = g.style, gs = (k, v) => `setGS('${p.id}',${gi},'${k}',${v})`;
@@ -1728,12 +1765,13 @@ function rmGroup(pid, gi) {
 function moveItem(pid, gi, ii, d) { const it = getP(pid).groups[gi].items; [it[ii], it[ii + d]] = [it[ii + d], it[ii]]; commit(); }
 function moveTo(pid, gi, ii, to) { if (to === '') return; const gs = getP(pid).groups, [it] = gs[gi].items.splice(ii, 1); gs[+to].items.push(it); commit(); toast('상권 이동', gs[+to].name); }
 function rmItem(pid, gi, ii) { getP(pid).groups[gi].items.splice(ii, 1); commit(); toast('제외됨'); }
+function setItem(pid, gi, ii, k, v) { getP(pid).groups[gi].items[ii][k] = v; commit(); }
 function setComment(pid, gi, ii, v) { getP(pid).groups[gi].items[ii].comment = v; commit(); }
 function addItem(pid, gi, lid) {
   const p = getP(pid), L = getL(lid);
   if (p.groups.some(g => g.items.some(x => x.listingId === lid))) return toast('이미 포함된 물건');
   if (gi === 'new' || !p.groups[gi]) { p.groups.push(newGroup('새 상권', p.groups.length)); gi = p.groups.length - 1; }
-  p.groups[gi].items.push({listingId: lid, comment: ''});
+  p.groups[gi].items.push({listingId: lid, comment: '', photo: null, layout: 2});
   if (L.ownerId !== me()) note(L.ownerId, `${USERS[me()].name}님이 <b>${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</b>를 ${esc(p.clientName)} 제안서에 추가했습니다`);
   commit(); toast('추가됨', `${p.clientName} · ${p.groups[gi].name}`);
 }
