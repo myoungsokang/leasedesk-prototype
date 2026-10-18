@@ -478,7 +478,7 @@ textarea.in{resize:vertical;min-height:64px}
 .lk{display:flex;flex-direction:column;margin:2px 0}
 .lk-i{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;cursor:pointer;border-bottom:1px solid var(--line2)}.lk-i:last-child{border-bottom:0}
 .lk-i input{accent-color:var(--ink);margin:0}.lk-i b{font-weight:600}.lk-i small{margin-left:auto;color:var(--muted);font-size:11.5px}
-.lk-add{align-self:flex-start}
+.lk-add{align-self:flex-start}.zown{padding:10px 12px;background:#fff8f0;border:1px solid #f1d9bd;border-radius:10px}.zown .btn{align-self:flex-start;width:auto}.map-modal .bld-p{margin:14px 0 0}
 .sync-p{display:flex;align-items:center;gap:12px;padding:14px 18px}.sync-p b{display:block;font-size:14px}
 .na-res{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:260px;overflow:auto}
 .na-i{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px}
@@ -912,8 +912,8 @@ function areaLinks(a) {
 /* With a.wauto on, a share typed for one area moves the others the opposite way, all by the same factor,
    so the zone's total visitors stay where they were; each share stays within 0..100%. */
 function setShare(id, code, v) {
-  const a = getA(id); a.wset = a.wset || {};
-  const before = a.wauto && v != null && v !== '' ? areaLinks(a) : null;
+  const a = zoneHost(id); a.wset = a.wset || {};
+  const before = a.wauto && v != null && v !== '' ? areaLinks(zoneView(id)) : null;
   if (v == null || v === '') delete a.wset[code]; else a.wset[code] = Math.min(100, Math.max(0, +v)) / 100;
   if (before) {
     const me = before.find(u => u.o.code === code), rest = before.filter(u => u !== me && u.w > 0), vis = u => u.o.data.pop[2][1];
@@ -922,7 +922,7 @@ function setShare(id, code, v) {
       const kept = rest.reduce((t, u) => t + a.wset[u.o.code] * vis(u), 0), miss = Math.round(pool - gone - kept);
       if (Math.abs(miss) >= 1) toast('합계를 다 맞추지 못했습니다', `나머지 상권이 ${miss > 0 ? '0%' : '100%'}까지 가서 유동인구 합계가 ${nf(Math.abs(miss))}명 ${miss > 0 ? '늘었' : '줄었'}습니다`); }
   }
-  commit();
+  zoneSaved();
 }
 const stepShare = (id, code, cur, d) => setShare(id, code, Math.min(100, Math.max(0, Math.round((cur + d) / 5) * 5)));
 const DCACHE = {};
@@ -1521,7 +1521,23 @@ const getA = id => S.areas.find(a => a.id === id);
 function autoMaster(g) { for (const it of g.items) { const L = getL(it.listingId), a = L && S.areas.find(x => inMaster(L, x)); if (a) return a; } return null; }
 function pinMaster(g) { if (!g.areaId) g.areaId = autoMaster(g)?.id || null; }
 const groupMaster = g => g.areaId === 'none' ? null : g.areaId ? getA(g.areaId) : autoMaster(g);
-const groupArea = g => { const a = groupMaster(g); return a ? areaData(a) : null; };
+/* A proposal's trade area starts as the company map. The broker's first change to its zone, official areas or
+   shares copies those into g.own, and from then on the proposal uses its copy; the company map never changes.
+   Callers read through groupZone and write through zoneHost, keyed "A1" for a company map or "g:P1:G1" for a group. */
+const ZFIELDS = ['zone', 'incl', 'excl', 'wset', 'wauto'];
+const propOf = g => S.proposals.find(p => p.groups.includes(g));
+function groupZone(g, p) { const a = groupMaster(g); if (!a) return null; return {...a, ...(g.own || {}), key: `g:${(p || propOf(g))?.id}:${g.id}`, base: a, own: !!g.own}; }
+function zoneGroup(key) { const [, pid, gid] = key.split(':'), p = getP(pid); return {p, g: p?.groups.find(x => x.id === gid)}; }
+function zoneHost(key) {
+  if (!key.startsWith('g:')) return getA(key);
+  const {g} = zoneGroup(key), a = groupMaster(g);
+  if (!g.own) g.own = {zone: clone(a.zone), incl: [...(a.incl || [])], excl: [...(a.excl || [])], wset: {...(a.wset || {})}, wauto: !!a.wauto};
+  return g.own;
+}
+const zoneView = key => key.startsWith('g:') ? (({p, g}) => groupZone(g, p))(zoneGroup(key)) : getA(key);
+const zoneSaved = () => U.modal?.type === 'gmap' ? medRefresh() : commit();
+function zoneReset(key) { const {g} = zoneGroup(key); delete g.own; zoneSaved(); toast('회사 기본값으로', '이 제안서의 상권 영역 · 데이터 설정을 지웠습니다'); }
+const groupArea = g => { const a = groupZone(g); return a ? areaData(a) : null; };
 
 /* ---------- trade-area maps: OSM roads and outlines drawn as SVG, no map tiles ---------- */
 const MRW = [5, 9, 14, 22]; // road width in metres: service, local, collector, arterial
@@ -1659,13 +1675,13 @@ function mapSlide(g, a, its) {
 
 /* ---------- map editor: one component for the company master and for a proposal's own layer ---------- */
 const MTOOLS_AREA = [['move', '선택 · 이동'], ['zone', '상권 영역'], ['bld', '건물 숨기기'], ['brand', '브랜드'], ['ours', '자사 중개'], ['text', '글자'], ['hl', '강조 영역']];
-const MTOOLS_GROUP = [['move', '선택 · 이동'], ['hide', '회사 표시 숨기기'], ['brand', '브랜드'], ['text', '글자'], ['hl', '강조 영역']];
+const MTOOLS_GROUP = [['move', '선택 · 이동'], ['zone', '상권 영역'], ['hide', '회사 표시 숨기기'], ['brand', '브랜드'], ['text', '글자'], ['hl', '강조 영역']];
 const MKIND = {brand: '브랜드', ours: '자사 중개', text: '글자', hl: '강조 영역'};
 const MHINT = {move: '지도를 누르면 그 자리의 공식 상권 · 끌면 이동 · 휠이나 + − 로 확대 · 축소 · 표시는 끌어서 옮기기', zone: '지도를 눌러 꼭짓점을 찍고 완료를 누르세요. 영역 안의 건물만 지도에 그려집니다', bld: '건물을 누르면 숨기고, 다시 누르면 살립니다 (빨간 점선 = 숨김)',
   brand: '지도를 누른 곳에 브랜드 표시를 놓습니다', ours: '지도를 누른 곳에 자사 중개 표시(로고)를 놓습니다', text: '지도를 누른 곳에 글자를 놓습니다', hl: '꼭짓점을 찍고 완료를 누르세요', hide: '회사 표시를 누르면 이 제안서에서만 숨깁니다 (흐린 표시 = 숨김)'};
 let MED = {tool: 'move', draft: [], sel: null, drag: null, off: true, refs: true};
 function medCtx() {
-  if (U.modal?.type === 'gmap') { const p = getP(U.modal.pid), g = p.groups[U.modal.gi]; return {kind: 'group', p, g, a: groupMaster(g), list: g.marks = g.marks || [], hide: g.mapHide = g.mapHide || []}; }
+  if (U.modal?.type === 'gmap') { const p = getP(U.modal.pid), g = p.groups[U.modal.gi]; return {kind: 'group', p, g, a: groupZone(g, p), list: g.marks = g.marks || [], hide: g.mapHide = g.mapHide || []}; }
   const a = getA(U.amap); return a && {kind: 'area', a, list: a.marks = a.marks || []};
 }
 function medRefresh() { // swap only the editor body, so the modal does not replay its opening animation on every click
@@ -1691,23 +1707,24 @@ function mapEditor(c) {
     <div class="med-side">
       ${c.kind === 'area' ? `${linkPanel(c.a)}
         <div class="med-sec"><h4>건물</h4><div class="sub">영역 안 ${zoneBuildings(c.a).length - hiddenIn(c.a)}동 표시 · ${hiddenIn(c.a)}동 숨김${(c.a.hidden || []).length ? ` <button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div></div>`
-        : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.filter(id => (c.a.marks || []).some(m => m.id === id)).length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}${c.hide.length < (c.a.marks || []).length ? ` <button class="btn xs ghost" onclick="(c=>{c.g.mapHide=(c.a.marks||[]).map(m=>m.id)})(medCtx());medRefresh()">모두 숨기기</button>` : ''}</div>`}
+        : `<div class="med-sec zown"><h4>이 제안서의 상권</h4><div class="sub">${c.a.own ? '이 제안서용으로 고친 영역 · 데이터 설정을 씁니다. 회사 상권 지도는 그대로입니다.' : `회사 상권 지도 <b>${esc(c.a.name)}</b> 그대로입니다. 영역이나 데이터를 고치면 이 제안서에만 복사돼 적용됩니다.`}</div>${c.a.own ? `<button class="btn xs" onclick="zoneReset('${c.a.key}')">회사 기본값으로</button>` : ''}</div>
+        ${linkPanel(c.a)}<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.filter(id => (c.a.marks || []).some(m => m.id === id)).length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}${c.hide.length < (c.a.marks || []).length ? ` <button class="btn xs ghost" onclick="(c=>{c.g.mapHide=(c.a.marks||[]).map(m=>m.id)})(medCtx());medRefresh()">모두 숨기기</button>` : ''}</div>`}
       ${vwRow}
       <div class="med-sec"><h4>${c.kind === 'area' ? '회사 표시' : '이 제안서 표시'} <span class="sub">${c.list.length}</span></h4>
-      <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div></div>`;
+      <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div></div>${c.kind === 'group' ? areaBuild(c.a) : ''}`;
 }
 function linkPanel(a) {
   const on = new Set(areaLinks(a).map(u => u.o.code)), all = OFFICIAL.filter(o => o.osm === a.osm).map(o => ({o, ov: overlap(a.zone, o.poly)}));
   const near = all.filter(x => x.ov >= .01 || on.has(x.o.code)).sort((x, y) => y.ov - x.ov), rest = all.filter(x => !near.includes(x)).sort((x, y) => x.o.name.localeCompare(y.o.name));
   return `<div class="med-sec"><h4>상권 데이터</h4><div class="sub">겹치는 서울시 공식 상권을 합쳐 씁니다</div>
-    <div class="lk">${near.map(({o}) => `<label class="lk-i"><input type="checkbox" ${on.has(o.code) ? 'checked' : ''} onchange="toggleArea('${a.id}','${o.code}',this.checked)"><b>${esc(o.name)}</b><small>${OTYPE[o.type]}</small></label>`).join('') || '<div class="sub">겹치는 공식 상권이 없습니다</div>'}</div>
-    ${rest.length ? `<select class="in mini lk-add" onchange="this.value&&toggleArea('${a.id}',this.value,true)"><option value="">+ 다른 공식 상권</option>${rest.map(({o}) => `<option value="${o.code}">${esc(o.name)} · ${OTYPE[o.type]}</option>`).join('')}</select>` : ''}
+    <div class="lk">${near.map(({o}) => `<label class="lk-i"><input type="checkbox" ${on.has(o.code) ? 'checked' : ''} onchange="toggleArea('${a.key || a.id}','${o.code}',this.checked)"><b>${esc(o.name)}</b><small>${OTYPE[o.type]}</small></label>`).join('') || '<div class="sub">겹치는 공식 상권이 없습니다</div>'}</div>
+    ${rest.length ? `<select class="in mini lk-add" onchange="this.value&&toggleArea('${a.key || a.id}',this.value,true)"><option value="">+ 다른 공식 상권</option>${rest.map(({o}) => `<option value="${o.code}">${esc(o.name)} · ${OTYPE[o.type]}</option>`).join('')}</select>` : ''}
     <div class="sub">${fmtDate(S.sync?.at || '')} 동기화 · ${S.sync?.q || '–'}</div></div>`;
 }
 function toggleArea(id, code, on) {
-  const a = getA(id); a.incl = (a.incl || []).filter(c => c !== code); a.excl = (a.excl || []).filter(c => c !== code);
+  const a = zoneHost(id); a.incl = (a.incl || []).filter(c => c !== code); a.excl = (a.excl || []).filter(c => c !== code);
   const ov = overlap(a.zone, getO(code).poly) >= .05;
-  if (on && !ov) a.incl.push(code); if (!on && ov) a.excl.push(code); commit();
+  if (on && !ov) a.incl.push(code); if (!on && ov) a.excl.push(code); zoneSaved();
 }
 const medZk = c => c.kind === 'area' ? `a:${c.a.id}` : `g:${c.p.id}:${c.g.id}`;
 function medView(on) { const c = medCtx(), o = c.kind === 'area' ? c.a : c.g; o.view = on ? {...MV[medZk(c)]} : null; if (!on) delete MV[medZk(c)]; medRefresh(); toast(on ? '지도 장 범위 저장' : '범위 되돌림'); }
@@ -1728,7 +1745,7 @@ function popCard(c) {
     return `<div class="pc-o"><div class="pc-h"><b>${esc(o.name)}</b><span class="chip">${OTYPE[o.type]}</span></div>
       <div class="sub">${esc(o.gu)} ${esc(o.dong)} · 면적 ${nf(o.area / 10000, 1)}ha · 코드 ${o.code}${extra}</div>
       <div class="sub">${sc.inz ? `회사 영역 안 점포 ${sc.inz} / ${sc.all}곳` : '회사 영역과 겹치지 않음'} · ${on ? '<b class="pc-on">상권 데이터에 포함</b>' : '포함 안 됨'}</div>
-      ${area ? `<button class="btn xs ${on ? 'ghost danger' : 'pri'}" onclick="toggleArea('${c.a.id}','${o.code}',${!on})">${on ? '상권 데이터에서 빼기' : '상권 데이터에 추가'}</button>` : ''}</div>`; };
+      ${`<button class="btn xs ${on ? 'ghost danger' : 'pri'}" onclick="toggleArea('${c.a.key || c.a.id}','${o.code}',${!on})">${on ? '상권 데이터에서 빼기' : '상권 데이터에 추가'}</button>`}</div>`; };
   return `<div class="mpop" style="left:${P.px}px;top:${P.py}px"><button class="pc-x" onclick="MED.pop=null;medRefresh()">✕</button>
     <div class="sub pc-where">${P.inZone ? `회사 영역 ${esc(c.a.name)} 안` : `회사 영역 ${esc(c.a.name)} 밖`}</div>
     ${P.here.length ? P.here.map(code => card(getO(code))).join('') : `<div class="pc-o"><b>공식 상권이 아닌 곳</b><div class="sub">서울시 공식 상권 경계에 들지 않는 지점입니다.${P.near ? ' 가장 가까운 공식 상권:' : ''}</div></div>${P.near ? card(getO(P.near.code), ` · 약 ${Math.round(P.near.d / 10) * 10}m`) : ''}`}</div>`;
@@ -1756,7 +1773,7 @@ function medMove(e) { if (panMove(e)) return; if (!MED.drag) return; const [x, y
 function medUp(e) { if (MPAN) { if (!panEnd() && e) medPop(e); return; } const d = MED.drag; MED.drag = null; if (d?.at) { [d.m.x, d.m.y] = d.at; medRefresh(); } }
 function medDone() {
   const c = medCtx();
-  if (MED.tool === 'zone') { c.a.zone = MED.draft; toast('상권 영역 저장', `건물 ${zoneBuildings(c.a).length}개가 영역 안에 있습니다`); }
+  if (MED.tool === 'zone') { zoneHost(c.a.key || c.a.id).zone = MED.draft; c.a.zone = MED.draft; toast('상권 영역 저장', `건물 ${zoneBuildings(c.a).length}개가 영역 안에 있습니다`); }
   else { const m = {id: uid('M'), kind: 'hl', pts: MED.draft, name: ''}; c.list.push(m); MED.sel = m.id; }
   MED.draft = []; MED.tool = 'move'; medRefresh();
 }
@@ -1934,7 +1951,7 @@ function deckSlides(p) {
   if (p.slides.compare && gs.some(x => x.a && x.its.length)) out.push({label: LG('상권 비교', 'Area comparison'), html: compareSlide(gs)});
   gs.forEach((x, gi) => {
     out.push({label: tv(x.g.name), group: gi, head: true, html: groupCoverSlide(x.g)});
-    const ma = groupMaster(x.g);
+    const ma = groupZone(x.g, p);
     if (ma && window.MAP_DATA?.[ma.osm] && x.its.length) out.push({label: LG(`${x.g.name} · 지도`, `${tv(x.g.name)} · Map`), group: gi, map: x.g.id, html: mapSlide(x.g, ma, x.its)});
     if (x.a) dataSlides(x.g, x.a, mods).forEach(d => out.push({...d, group: gi}));
     x.its.forEach((it, ii) => {
@@ -2633,7 +2650,7 @@ function wizFinish() {
 }
 /* "+ 매물 추가" in the editor: the group's own map when it has a trade area */
 function pickBody(m) {
-  const p = getP(m.pid), g = p.groups[m.gi], a = groupMaster(g), mine = g.items.map(it => it.listingId);
+  const p = getP(m.pid), g = p.groups[m.gi], a = groupZone(g, p), mine = g.items.map(it => it.listingId);
   const ls = openListings().filter(L => inMaster(L, a) && (mine.includes(L.id) || !p.groups.some(x => x.items.some(it => it.listingId === L.id))));
   return picker(a, ls, mine, p.crit, 'groupPick', `newListing({kind:'prop',pid:'${p.id}',gi:${m.gi},add:true})`);
 }
@@ -2694,7 +2711,7 @@ function propEditor(p) {
         <div class="ctl"><span>색</span><div class="sws">${GCOLOR.map(c => `<button class="${st.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="${gs('color', `'${c}'`)}"></button>`).join('')}<input type="color" value="${st.color}" title="직접 고르기" onchange="${gs('color', 'this.value')}"></div></div>
         <div class="ctl"><span>위치</span><div class="pos9">${GPOS.map(k => `<button class="${st.pos === k ? 'on' : ''}" onclick="${gs('pos', `'${k}'`)}"></button>`).join('')}</div></div>
         <div class="ctl"><span>상권</span><select class="in" onchange="setG('${p.id}',${gi},'areaId',this.value||null)"><option value="">자동 · ${am ? esc(am.name) : '없음'}</option>${S.areas.map(x => `<option value="${x.id}" ${g.areaId === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}<option value="none" ${g.areaId === 'none' ? 'selected' : ''}>넣지 않음</option></select></div>
-        <div class="ctl"><span>지도</span><button class="btn xs" ${groupMaster(g) ? '' : 'disabled'} onclick="freshMed(false);openModal({type:'gmap',pid:'${p.id}',gi:${gi}})">지도 편집</button>${groupMaster(g) && g.items.length ? `<button class="btn xs ghost" onclick="goSlideBy('${p.id}',s=>s.map==='${g.id}')">지도 장 보기</button>` : ''}<span class="sub">${groupMaster(g) ? `표시 ${(groupMaster(g).marks || []).length - (g.mapHide || []).length + (g.marks || []).length}개` : '상권을 고르면 지도 장이 생깁니다'}</span></div>
+        <div class="ctl"><span>지도</span><button class="btn xs" ${groupMaster(g) ? '' : 'disabled'} onclick="freshMed(false);openModal({type:'gmap',pid:'${p.id}',gi:${gi}})">지도 · 상권 데이터 편집</button>${g.own ? '<span class="chip warn" title="이 제안서용 영역 · 데이터 설정">이 제안서용</span>' : ''}${groupMaster(g) && g.items.length ? `<button class="btn xs ghost" onclick="goSlideBy('${p.id}',s=>s.map==='${g.id}')">지도 장 보기</button>` : ''}<span class="sub">${groupMaster(g) ? `표시 ${(groupMaster(g).marks || []).length - (g.mapHide || []).length + (g.marks || []).length}개` : '상권을 고르면 지도 장이 생깁니다'}</span></div>
       </div><div class="gi-list">${g.items.map((it, ii) => item(it, gi, ii, g)).join('') || '<div class="sub" style="padding:10px 0">매물을 추가하세요</div>'}
         <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'pick',pid:'${p.id}',gi:${gi}})">+ 매물 추가${groupMaster(g) ? ' · 지도에서' : ''}</button></div></div></div>`;
   };
@@ -2885,6 +2902,7 @@ async function naCreate() {
   } catch (e) { m.busy = ''; renderModal(); toast('지도 데이터를 받지 못했습니다', String(e.message || e)); }
 }
 function areaBuild(a) {
+  const k = a.key || a.id;
   const us = areaLinks(a), D = areaData(a);
   if (!us.length || !D) return `<div class="panel"><h3>상권 데이터 구성</h3><div class="sub">상권 데이터에 쓰는 공식 상권이 없습니다. 지도에서 공식 상권을 눌러 추가하세요.</div></div>`;
   const rows = us.map(u => { const sc = storeCount(a, u.o), vis = u.o.data.pop[2][1], sal = u.o.data.sales[u.o.data.sales.length - 1][1];
@@ -2893,11 +2911,11 @@ function areaBuild(a) {
   const own = rows.filter(r => r.u.own).length, tot = rows.reduce((t, r) => t + r.cv, 0);
   return `<div class="panel bld-p"><div class="row"><h3 style="margin:0">상권 데이터 구성</h3><span class="sub">${esc(S.sync?.q || '')} · 예시 수치</span></div>
     <p class="bp-lead"><b>${esc(a.name)}</b>의 상권 데이터는 겹치는 서울시 공식 상권 ${us.length}곳의 수치를 <b>각 공식 상권 점포 중 회사 영역 안에 있는 비율</b>만큼 가져와 합친 값입니다.</p>
-    <div class="bp-tools"><label class="bp-auto ${a.wauto ? 'on' : ''}"><input type="checkbox" ${a.wauto ? 'checked' : ''} onchange="getA('${a.id}').wauto=this.checked;commit()"><i class="sw"></i>다른 상권 자동 조정<small>${a.wauto ? '켜짐 · 한 곳을 바꾸면 나머지가 반대로 움직여 유동인구 합계 유지' : '꺼짐 · 바꾼 상권만 바뀌고 합계가 따라 변함'}</small></label><div class="sp"></div>${own ? `<span class="sub">${own}곳 직접 조정</span><button class="btn sm" onclick="getA('${a.id}').wset={};commit()">모두 기본값으로</button>` : ''}</div>
+    <div class="bp-tools"><label class="bp-auto ${a.wauto ? 'on' : ''}"><input type="checkbox" ${a.wauto ? 'checked' : ''} onchange="zoneHost('${k}').wauto=this.checked;zoneSaved()"><i class="sw"></i>다른 상권 자동 조정<small>${a.wauto ? '켜짐 · 한 곳을 바꾸면 나머지가 반대로 움직여 유동인구 합계 유지' : '꺼짐 · 바꾼 상권만 바뀌고 합계가 따라 변함'}</small></label><div class="sp"></div>${own ? `<span class="sub">${own}곳 직접 조정</span><button class="btn sm" onclick="zoneHost('${k}').wset={};zoneSaved()">모두 기본값으로</button>` : ''}</div>
     <div class="bp-scroll"><table class="tbl bp-t"><thead><tr><th>공식 상권</th><th>유형</th><th class="num">영역 안 점포</th><th class="num">반영 비율</th><th class="num">일평균 유동인구</th><th class="num">→ 반영</th><th class="num">구성비</th><th class="num">분기 매출</th><th class="num">→ 반영</th></tr></thead><tbody>
       ${rows.map(r => `<tr class="${r.u.own ? 'bp-own' : ''}"><td><b>${esc(r.u.o.name)}</b></td><td>${OTYPE[r.u.o.type]}</td><td class="num">${how(r.u)}</td>
-        <td class="num bp-wc"><div class="bp-st"><button title="5%p 내리기" onclick="stepShare('${a.id}','${r.u.o.code}',${r.u.w * 100},-5)">−</button><div class="ui"><input class="in" type="number" min="0" max="100" value="${+(r.u.w * 100).toFixed(1)}" step="0.1" onchange="setShare('${a.id}','${r.u.o.code}',this.value)"><span>%</span></div><button title="5%p 올리기" onclick="stepShare('${a.id}','${r.u.o.code}',${r.u.w * 100},5)">+</button></div>
-          ${r.u.own ? `<button class="bp-def" onclick="setShare('${a.id}','${r.u.o.code}',null)" title="점포 비율로 계산한 기본값">↺ 기본값 ${Math.round(r.u.def * 100)}%로</button>` : '<small>기본값</small>'}</td><td class="num">${nf(r.vis)}명</td><td class="num">${nf(r.cv)}명</td><td class="num">${tot ? Math.round(r.cv / tot * 100) : 0}%</td><td class="num">${nf(r.sal)}억</td><td class="num">${nf(r.cs)}억</td></tr>`).join('')}
+        <td class="num bp-wc"><div class="bp-st"><button title="5%p 내리기" onclick="stepShare('${k}','${r.u.o.code}',${r.u.w * 100},-5)">−</button><div class="ui"><input class="in" type="number" min="0" max="100" value="${+(r.u.w * 100).toFixed(1)}" step="0.1" onchange="setShare('${k}','${r.u.o.code}',this.value)"><span>%</span></div><button title="5%p 올리기" onclick="stepShare('${k}','${r.u.o.code}',${r.u.w * 100},5)">+</button></div>
+          ${r.u.own ? `<button class="bp-def" onclick="setShare('${k}','${r.u.o.code}',null)" title="점포 비율로 계산한 기본값">↺ 기본값 ${Math.round(r.u.def * 100)}%로</button>` : '<small>기본값</small>'}</td><td class="num">${nf(r.vis)}명</td><td class="num">${nf(r.cv)}명</td><td class="num">${tot ? Math.round(r.cv / tot * 100) : 0}%</td><td class="num">${nf(r.sal)}억</td><td class="num">${nf(r.cs)}억</td></tr>`).join('')}
       <tr class="bp-sum"><td colspan="5">${esc(a.name)} 상권 데이터</td><td class="num">${nf(D.pop[2][1])}명</td><td class="num">100%</td><td></td><td class="num">${nf(D.sales[D.sales.length - 1][1])}억</td></tr></tbody></table></div>
     <ul class="bp-rules"><li><b>반영 비율</b>: 기본값은 그 공식 상권 점포 중 회사 영역 안에 있는 비율입니다. 숫자나 −/+(5%p)로 바꾸면 그 값을 쓰고, "기본값으로"를 누르면 돌아갑니다. "다른 상권 자동 조정"을 켜면 나머지 상권이 같은 배율로 반대로 움직여 유동인구 합계가 그대로입니다.</li>
       <li><b>구성비</b>: 회사 상권 유동인구 합계 중 그 공식 상권에서 온 몫입니다.</li>
@@ -2914,7 +2932,7 @@ function rmArea(id) {
 }
 function adminMaps() {
   const a = U.amap && getA(U.amap);
-  if (a) return `<div class="head"><button class="btn ghost icon" onclick="U.amap=null;freshMed();render()">←</button><input class="h1-in" value="${esc(a.name)}" size="${Math.max(4, a.name.length + 1)}" title="상권 이름" onchange="getA('${a.id}').name=this.value.trim()||getA('${a.id}').name;commit()"><span class="sub">회사 상권 지도 · 모든 제안서가 같이 씁니다</span><div class="sp"></div><button class="btn sm ghost danger" onclick="rmArea('${a.id}')">상권 지도 삭제</button></div>
+  if (a) return `<div class="head"><button class="btn ghost icon" onclick="U.amap=null;freshMed();render()">←</button><input class="h1-in" value="${esc(a.name)}" size="${Math.max(4, a.name.length + 1)}" title="상권 이름" onchange="getA('${a.id}').name=this.value.trim()||getA('${a.id}').name;commit()"><span class="sub">회사 기본값 · 새 제안서가 이 값으로 시작하고, 브로커가 제안서마다 영역 · 데이터를 바꿉니다</span><div class="sp"></div><button class="btn sm ghost danger" onclick="rmArea('${a.id}')">상권 지도 삭제</button></div>
     <div class="panel">${mapEditor(medCtx())}</div>
     ${areaBuild(a)}
     <div class="panel cover-p"><div class="cp-th">${thumb(groupCoverSlide({name: a.name, photo: a.photo, style: a.style || {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}}))}</div>
