@@ -93,7 +93,10 @@ h1{font-size:23px;margin:0;letter-spacing:-.035em}
 .card.hov:hover,.card.lift:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(0,0,0,.08)}
 .card .ph{aspect-ratio:16/9;background:#e9e8e3 center/cover;position:relative}
 .card .ph .ph-area{position:absolute;left:10px;bottom:10px;background:rgba(18,18,18,.78);color:#fff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
-.lf-bar{display:flex;gap:8px;align-items:center;margin:-8px 0 16px;flex-wrap:wrap}.lf-bar #lf-q{max-width:260px}.lf-bar select.in{width:auto}
+.lf-bar{display:flex;gap:8px;align-items:center;margin:-8px 0 16px;flex-wrap:wrap}.lf-bar #lf-q{max-width:220px}.lf-bar select.in{width:auto}.lf-num{width:136px}.lf-num .in{padding-right:40px}
+.lsec{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}.lsec h2{font-size:17px;margin:0;letter-spacing:-.01em}
+.lm-i{align-items:flex-start}.lm-i .pk-n{margin-top:12px}.lm-act{display:flex;gap:6px;margin-top:4px}.lm .pk-map .cd{cursor:pointer}.bscroll{overflow-x:auto}.bt-p{padding:4px 18px 8px}.bt{min-width:980px}.bt td{vertical-align:top}.bt tr.bt-first td{border-top:1px solid var(--line)}.bt tbody tr:first-child td{border-top:0}.bt-b small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}.bt-b{max-width:260px}
+.lm .pk-map{position:sticky;top:16px}.lm .pk-list{max-height:calc(100vh - 120px)}
 .card .ph .tags{position:absolute;left:10px;top:10px;display:flex;gap:5px}
 .card .ph .tags .chip{backdrop-filter:blur(8px);background:rgba(255,255,255,.88)}
 .card .ph .tags .chip.red{background:rgba(251,233,232,.95)}
@@ -529,6 +532,7 @@ button.chip{border:0;cursor:pointer}
   .nav button{white-space:nowrap;padding:8px 12px}
   .main{padding:20px 16px 80px}
   .ed-grid,.grp-b,.pcv,.pv-wrap,.med,.pk{grid-template-columns:1fr}
+  .lm .pk-map{position:relative;top:auto}.lm .pk-list{max-height:none}
   .cover-p{flex-direction:column;align-items:stretch}.cp-th{width:100%}
   .wz-steps{margin-left:0;flex-basis:100%}
   .outl:not(.in-panel){display:none}
@@ -1229,7 +1233,7 @@ const SS30 = [["연무장길","28-12",37.543023,127.052313],["연무장5길","9-
 /* ---------- state ---------- */
 let S;
 try { S = JSON.parse(store.getItem(KEY)); } catch (e) { S = null; }
-const U = {role: ROLES.some(r => r[0] === store.getItem(KEY + '-role')) ? store.getItem(KEY + '-role') : 'brokerA', tab: {brokerA: 'mine', brokerB: 'mine', admin: 'over'},
+const U = {role: ROLES.some(r => r[0] === store.getItem(KEY + '-role')) ? store.getItem(KEY + '-role') : 'brokerA', tab: {brokerA: 'list', brokerB: 'list', admin: 'over'},
   prop: null, pmode: 'edit', modal: null, unit: 'sqm', lang: 'ko', guide: false, open: {}};
 let D = null; // listing draft
 let lastView = '';
@@ -1581,7 +1585,7 @@ function mapSvg(a, o = {}) {
     ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '', k)).join('')}${(o.marks || []).map(m => markSvg(m, 'pr', '', k)).join('')}
     ${(o.refs || []).map(q => `<g data-ref="${q.id}" class="rf" transform="${sc(q.x, q.y)}"><title>${esc(q.label)}</title><circle r="5.5" fill="#2a78d6" stroke="#fff" stroke-width="1.8"/>${o.refs.length <= 10 ? `<text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text>` : ''}</g>`).join('')}
     ${(() => { const cs = o.cands || [], R = pinR(cs.length), lab = cs.length <= 10, q = declutter(cs, R * k);
-      return q.map(c => `${leader(c, k)}<g data-lid="${c.id}" class="cd" transform="${sc(c.x, c.y)}"><title>${esc(c.label)}</title>${c.st === 'in' ? `<circle r="${R}" fill="#141414" stroke="#fff" stroke-width="3"/><text y="${R * .37}" font-size="${R * 1.05}" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
+      return q.map(c => `${leader(c, k)}<g data-lid="${c.id}" class="cd" transform="${sc(c.x, c.y)}"><title>${esc(c.label)}</title>${c.st === 'in' ? `${c.ring ? `<circle r="${R + 6}" fill="none" stroke="#d9822b" stroke-width="4"/>` : ''}<circle r="${R}" fill="${c.fill || '#141414'}" stroke="#fff" stroke-width="3"/><text y="${R * .37}" font-size="${R * 1.05}" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
         : `<circle r="${R * .7}" fill="${c.st === 'fit' ? '#fff' : '#ecece9'}" stroke="${c.st === 'fit' ? '#141414' : '#a3a39e'}" stroke-width="3.5"/>`}${lab ? `<text x="${R + 6}" y="7" font-size="18" font-weight="600" fill="${c.st === 'nofit' ? '#8a8a85' : '#141414'}" ${halo}>${esc(c.label)}</text>` : ''}</g>`).join(''); })()}
     ${(() => { const ps = o.pins || [], R = pinR(ps.length), q = declutter(ps, R * k);
       return q.map(p => `${leader(p, k)}<g transform="${sc(p.x, p.y)}"><circle r="${R}" fill="#141414" stroke="#fff" stroke-width="3"/><text y="${R * .37}" font-size="${R * 1.05}" font-weight="700" fill="#fff" text-anchor="middle">${p.n}</text></g>`).join(''); })()}
@@ -1917,9 +1921,9 @@ function guide() {
   <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>상권 지도 → 성수 · 영역 · 건물 숨기기 · 브랜드 · 자사 중개</li><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol></div>`;
 }
-function setRole(r) { U.role = r; U.prop = null; U.wiz = null; D = null; Object.assign(LF, {q: '', area: '', all: false}); U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
-function setTab(t) { U.tab[U.role] = t; U.prop = null; U.amap = null; U.wiz = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
-function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); D = null; U.prop = null; U.wiz = null; U.amap = null; U.modal = null; renderModal(); RET = null; Object.assign(LF, {q: '', area: '', all: false}); freshMed(); save(); render(); toast('초기화 완료'); }
+function setRole(r) { U.role = r; U.prop = null; U.wiz = null; D = null; U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
+function setTab(t) { if (t === 'mine' || t === 'shared') { lf().scope = t; t = 'list'; } U.tab[U.role] = t; U.prop = null; U.amap = null; U.wiz = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
+function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); D = null; U.prop = null; U.wiz = null; U.amap = null; U.modal = null; renderModal(); RET = null; Object.keys(LFS).forEach(k => delete LFS[k]); freshMed(); save(); render(); toast('초기화 완료'); }
 
 function render() {
   const role = U.role, tab = U.tab[role];
@@ -1934,7 +1938,7 @@ function sideNav() {
   const u = USERS[me()], unread = S.notes.filter(n => n.to === me() && !n.read).length;
   const items = me() === 'admin'
     ? [['over', '개요'], ['maps', '상권 지도'], ['bld', '건물 · 매물'], ['hist', '변경 이력'], ['handover', '이관'], ['notes', '알림']]
-    : [['mine', '내 매물'], ['shared', '공유 매물'], ['props', '제안서'], ['notes', '알림']];
+    : [['list', '매물'], ['props', '제안서'], ['notes', '알림']];
   return `<div class="me"><b>${u.name}</b><span>${u.title}</span></div><nav class="nav">${items.map(([k, l]) => `<button class="${U.tab[me()] === k && !D && !U.prop ? 'on' : ''}" onclick="setTab('${k}')">${l}${k === 'notes' && unread ? `<span class="ndot">${unread}</span>` : ''}</button>`).join('')}</nav>`;
 }
 
@@ -1944,8 +1948,7 @@ function brokerView() {
   if (U.wiz) return wizView();
   if (U.prop) return propEditor(getP(U.prop));
   const t = U.tab[me()];
-  if (t === 'mine') return mineView();
-  if (t === 'shared') return sharedView();
+  if (t === 'list') return listView();
   if (t === 'props') return propsView();
   if (t === 'notes') return notesView();
 }
@@ -1972,30 +1975,71 @@ function listingCard(L, i, own) {
       </div></div>
     <div class="ft" onclick="event.stopPropagation()">${actions}${toProp}</div></div>`;
 }
-const LF = {q: '', area: '', all: false}; // listing list filters, shared by 내 매물 and 공유 매물
-function lfPass(L) {
-  if (LF.area && LF.area !== 'none' && !getA(LF.area)) LF.area = '';
-  const I = bInfo(L), a = masterOf(L);
-  return (!LF.q || `${I.name} ${I.address}`.replace(/\s/g, '').includes(LF.q.replace(/\s/g, ''))) && (!LF.area || (LF.area === 'none' ? !a : a?.id === LF.area));
+/* listing filters and view, one set per person: the broker's 매물 page and the admin's 건물 · 매물 page */
+const LFS = {};
+const lf = () => LFS[me()] = LFS[me()] || {q: '', area: '', status: me() === 'admin' ? 'all' : 'active', scope: 'all', owner: '', vis: '', rentMax: '', pyMin: '', view: 'list', mapArea: '', sel: null};
+const lfBusy = F => !!(F.bld || F.q || F.area || F.owner || F.vis || F.rentMax || F.pyMin || F.scope !== 'all' || F.status !== (me() === 'admin' ? 'all' : 'active'));
+function lfClear() { const F = lf(); delete LFS[me()]; Object.assign(lf(), {view: F.view, mapArea: F.mapArea}); render(); }
+function lfPass(L, F = lf()) {
+  if (F.area && F.area !== 'none' && !getA(F.area)) F.area = '';
+  const I = bInfo(L), a = masterOf(L), q = F.q.replace(/\s/g, '');
+  return (!q || `${I.name}${I.address}${USERS[L.ownerId].name}`.replace(/\s/g, '').includes(q))
+    && (!F.area || (F.area === 'none' ? !a : a?.id === F.area))
+    && (F.status === 'all' || L.status === 'active')
+    && (F.scope === 'all' || (F.scope === 'mine') === (L.ownerId === me()))
+    && (!F.bld || L.buildingId === F.bld) && (!F.owner || L.ownerId === F.owner) && (!F.vis || L.visibility === F.vis)
+    && (!F.rentMax || (L.rent.s === 'v' && L.rent.v <= F.rentMax * 10000))
+    && (!F.pyMin || L.leaseArea * PYR >= +F.pyMin);
 }
-function lfBar(n, total, withStatus) {
-  return `<div class="lf-bar"><input class="in" id="lf-q" placeholder="이름 · 주소 검색" value="${esc(LF.q)}" oninput="LF.q=this.value;lfRender()">
-    <select class="in" onchange="LF.area=this.value;render()"><option value="">모든 상권</option>${S.areas.map(a => `<option value="${a.id}" ${LF.area === a.id ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}<option value="none" ${LF.area === 'none' ? 'selected' : ''}>상권 밖</option></select>
-    ${withStatus ? seg([['active', '진행 중'], ['all', '전체']], LF.all ? 'all' : 'active', "(v=>{LF.all=v==='all';render()})") : ''}<span class="sub">${n === total ? `${total}건` : `${n} / ${total}건`}</span></div>`;
+function lfBar(n, total) {
+  const F = lf(), adm = me() === 'admin', num = (k, unit, ph) => `<div class="ui lf-num"><input class="in" type="number" min="0" placeholder="${ph}" value="${F[k]}" onchange="lf().${k}=this.value;render()"><span>${unit}</span></div>`;
+  return `<div class="lf-bar">${adm ? '' : seg([['all', '전체'], ['mine', '내 매물'], ['shared', '공유 매물']], F.scope, "(v=>{lf().scope=v;render()})")}
+    <input class="in" id="lf-q" placeholder="이름 · 주소 · 담당 검색" value="${esc(F.q)}" oninput="lf().q=this.value;lfRender()">
+    <select class="in" onchange="lf().area=this.value;render()"><option value="">모든 상권</option>${S.areas.map(a => `<option value="${a.id}" ${F.area === a.id ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}<option value="none" ${F.area === 'none' ? 'selected' : ''}>상권 밖</option></select>
+    ${seg([['active', '진행 중'], ['all', '전체 상태']], F.status, "(v=>{lf().status=v;render()})")}
+    ${adm ? `<select class="in" onchange="lf().owner=this.value;render()"><option value="">모든 브로커</option>${Object.keys(USERS).filter(k => k !== 'admin').map(k => `<option value="${k}" ${F.owner === k ? 'selected' : ''}>${USERS[k].name}</option>`).join('')}</select>
+      <select class="in" onchange="lf().vis=this.value;render()"><option value="">모든 공개 범위</option><option value="shared" ${F.vis === 'shared' ? 'selected' : ''}>공유</option><option value="private" ${F.vis === 'private' ? 'selected' : ''}>나만</option></select>` : ''}
+    ${num('rentMax', '만원', '임대료 상한')}${num('pyMin', '평', '면적 하한')}
+    ${F.bld && getB(F.bld) ? `<button class="chip dark" onclick="lf().bld='';render()">건물 · ${esc(getB(F.bld).name || getB(F.bld).address)} ✕</button>` : ''}<span class="sub">${n === total ? `${total}건` : `${n} / ${total}건`}</span>${lfBusy(F) ? '<button class="btn xs ghost" onclick="lfClear()">필터 지우기</button>' : ''}</div>`;
 }
 function lfRender() { const at = $('#lf-q')?.selectionStart; render(); const i = $('#lf-q'); if (i) { i.focus(); i.setSelectionRange(at, at); } }
-function mineView() {
-  const order = {active: 0, expired: 1, done: 2, withdrawn: 3};
-  const own = S.listings.filter(L => L.ownerId === me()), ls = own.filter(L => (LF.all || L.status === 'active') && lfPass(L)).sort((a, b) => order[a.status] - order[b.status]);
-  return `<div class="head"><h1>내 매물</h1><span class="sub">${own.filter(l => l.status === 'active').length}건 진행</span><div class="sp"></div><button class="btn pri" onclick="newListing()">+ 등록</button></div>
-    ${lfBar(ls.length, LF.all ? own.length : own.filter(l => l.status === 'active').length, true)}
-    <div class="grid">${ls.map((L, i) => listingCard(L, i, true)).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>'}</div>`;
+const lfView = () => seg([['list', me() === 'admin' ? '목록' : '카드'], ['map', '지도']], lf().view, "(v=>{lf().view=v;render()})");
+/* listings grouped by the company trade area they sit in, in the areas' order, with 상권 밖 last */
+function byArea(ls) {
+  const m = new Map(S.areas.map(a => [a.id, []])), out = [];
+  ls.forEach(L => { const a = masterOf(L); if (a) m.get(a.id).push(L); else out.push(L); });
+  return [...S.areas.map(a => [a, m.get(a.id)]), [null, out]].filter(([, xs]) => xs.length);
 }
-function sharedView() {
-  const all = S.listings.filter(L => L.ownerId !== me() && L.visibility === 'shared' && L.status === 'active'), ls = all.filter(lfPass);
-  return `<div class="head"><h1>공유 매물</h1><span class="sub">다른 브로커가 공유한 진행 중 매물</span></div>
-    ${lfBar(ls.length, all.length, false)}
-    <div class="grid">${ls.map((L, i) => listingCard(L, i, false)).join('') || '<div class="empty">조건에 맞는 공유 매물이 없습니다</div>'}</div>`;
+const lsecHead = (a, n, extra = '') => `<div class="lsec"><h2>${a ? esc(a.name) : '상권 밖'}</h2><span class="sub">${n}건${extra}</span>${a ? `<button class="btn xs ghost" onclick="lf().view='map';lf().mapArea='${a.id}';lf().sel=null;render();window.scrollTo({top:0})">지도로 보기</button>` : ''}</div>`;
+const LST_ORDER = {active: 0, expired: 1, done: 2, withdrawn: 3};
+/* pin colour: the broker tells own from shared, the admin tells live from closed */
+const lfPinFill = L => L.status !== 'active' ? '#a3a39e' : me() !== 'admin' && L.ownerId !== me() ? '#2a78d6' : '#141414';
+function lfMap(ls) {
+  const F = lf(), groups = byArea(ls), areas = groups.filter(([a]) => a), out = groups.find(([a]) => !a)?.[1] || [];
+  if (!areas.length) return `<div class="empty">상권 지도에 올릴 매물이 없습니다${out.length ? ` · 상권 밖 ${out.length}건은 ${me() === 'admin' ? '목록' : '카드'} 보기에서 보세요` : ''}</div>`;
+  let a = getA(F.mapArea);
+  if (!a || !areas.some(([x]) => x === a)) { a = areas[0][0]; F.mapArea = a.id; }
+  const its = areas.find(([x]) => x === a)[1].sort((x, y) => LST_ORDER[x.status] - LST_ORDER[y.status]), d = MAP_DATA[a.osm], seen = {};
+  const at = its.map(L => listingXY(L, a)), zk = `l:${a.id}`, view = zkView(zk, d, slideView(null, a, at.filter(Boolean).map(([x, y]) => ({x, y})))), k = view.w / d.w;
+  const dots = its.map((L, i) => { const xy = at[i]; if (!xy) return null; const off = seen[L.buildingId] = (seen[L.buildingId] ?? -1) + 1;
+    return {id: L.id, x: xy[0] + off * 40 * k, y: xy[1], n: i + 1, st: 'in', fill: lfPinFill(L), ring: F.sel === L.id, label: `${bInfo(L).name} ${floorLabel(L.floors, L.leaseType)}`}; }).filter(Boolean);
+  const adm = me() === 'admin', leg = adm ? '<span><i class="d-in">1</i>진행</span><span><i class="d-in" style="background:#a3a39e">1</i>완료 · 철회 · 만료</span>' : '<span><i class="d-in">1</i>내 매물</span><span><i class="d-in" style="background:#2a78d6">1</i>공유 매물</span>';
+  const row = (L, i) => { const on = F.sel === L.id, mine = L.ownerId === me();
+    return `<div class="pk-i lm-i ${on ? 'on' : ''}" id="lm-${L.id}" onclick="lfSel('${L.id}')"><span class="pk-n" style="background:${lfPinFill(L)};border-color:${lfPinFill(L)};color:#fff">${i + 1}</span><span class="pk-ph" style="background-image:url('${L.photos[0] || ''}')"></span>
+      <span class="pk-b"><b>${esc(bInfo(L).name)}</b><small>${esc(floorLabel(L.floors, L.leaseType))} · ${nf(L.leaseArea * PYR, 1)}평 · ${priceShort(L.rent)}${mine ? '' : ` · ${USERS[L.ownerId].name}`}</small>${L.status !== 'active' ? `<span><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></span>` : ''}
+      ${on ? `<span class="lm-act" onclick="event.stopPropagation()"><button class="btn xs" onclick="openModal({type:'detail',lid:'${L.id}'})">자세히</button>${adm ? `<button class="btn xs ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button>` : `${mine ? `<button class="btn xs ghost" onclick="editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn xs ghost" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}`}</span>` : ''}</span></div>`; };
+  return `<div class="row" style="margin-bottom:10px">${seg(areas.map(([x, xs]) => [x.id, `${x.name} ${xs.length}`]), a.id, "(v=>{lf().mapArea=v;lf().sel=null;render()})")}<div class="sp"></div>${out.length ? `<span class="sub">상권 밖 ${out.length}건은 ${adm ? '목록' : '카드'} 보기에서</span>` : ''}</div>
+    <div class="pk lm"><div class="pk-map">${zoomCtl(zk, a.osm)}<div onwheel="mWheel(event,'${zk}','${a.osm}')" onpointerdown="panStart(event,'${zk}','${a.osm}')" onpointermove="panMove(event)" onpointerup="if(!panEnd())(t=>t&&lfSel(t.dataset.lid))(event.target.closest('[data-lid]'))">${mapSvg(a, {meet: true, view, zk, cands: dots})}</div>
+      <div class="pk-leg">${leg}</div></div><div class="pk-list">${its.map(row).join('')}</div></div>`;
+}
+function lfSel(id) { const F = lf(); F.sel = F.sel === id ? null : id; render(); if (F.sel) $('#lm-' + id)?.scrollIntoView({block: 'nearest'}); }
+function listView() {
+  const F = lf(), pool = S.listings.filter(L => L.ownerId === me() || (L.visibility === 'shared' && L.status === 'active'));
+  const ls = pool.filter(L => lfPass(L)).sort((x, y) => LST_ORDER[x.status] - LST_ORDER[y.status] || (y.ownerId === me()) - (x.ownerId === me()));
+  const mineN = pool.filter(L => L.ownerId === me() && L.status === 'active').length;
+  return `<div class="head"><h1>매물</h1><span class="sub">내 매물 ${mineN}건 진행 · 공유 매물 ${pool.filter(L => L.ownerId !== me()).length}건</span><div class="sp"></div>${lfView()}<button class="btn pri" onclick="newListing()">+ 등록</button></div>
+    ${lfBar(ls.length, pool.length)}
+    ${F.view === 'map' ? lfMap(ls) : byArea(ls).map(([a, xs]) => lsecHead(a, xs.length) + `<div class="grid">${xs.map((L, i) => listingCard(L, i, L.ownerId === me())).join('')}</div>`).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>'}`;
 }
 function toggleVis(id) {
   const L = getL(id); L.visibility = L.visibility === 'shared' ? 'private' : 'shared';
@@ -2015,7 +2059,7 @@ function blankDraft() {
     deposit: P('v', ''), rent: P('v', ''), mgmt: P('v', ''), keyMoney: P('none'), handover: P('tbd'), note: '',
     visibility: 'private', mStart: S.today, mEnd: addDays(S.today, 182), internal: {landlord: '', phone: '', fee: '', floor: '', memo: ''}, q: '', range: {from: '', to: ''}};
 }
-/* where the listing form returns to: {kind: 'prop', pid, gi, add} | {kind: 'wiz', add} | null (내 매물) */
+/* where the listing form returns to: {kind: 'prop', pid, gi, add} | {kind: 'wiz', add} | null (매물) */
 let RET = null;
 function newListing(ret) { RET = ret || null; U.modal = null; renderModal(); D = blankDraft(); render(); window.scrollTo({top: 0}); }
 function editListing(id, ret) {
@@ -2469,21 +2513,25 @@ function adminOver() {
   return `<div class="head"><h1>개요</h1></div>
   <div class="stats">${[['진행 매물', act.length], ['공유 비율', Math.round(act.filter(l => l.visibility === 'shared').length / Math.max(act.length, 1) * 100) + '%'], ['제안서', visProps().length], ['제안 매물', visProps().reduce((n, p) => n + p.groups.reduce((m, g) => m + g.items.length, 0), 0)]].map(([l, v], i) => `<div class="stat a" style="--i:${i}"><span>${l}</span><b>${v}</b></div>`).join('')}</div>
   <div class="panel a" style="--i:4"><h3>층 중복 <span class="chip ${cf.length ? 'warn' : 'ok'}">${cf.length}</span></h3>
-    ${cf.map(c => `<div class="conf"><span style="font-size:20px">⚠︎</span><div style="flex:1"><b>${esc(bInfo(c.a).name)}</b> · ${c.ov.map(fmtF).join(', ')}<div class="sub">${USERS[c.a.ownerId].name} (${esc(floorLabel(c.a.floors, c.a.leaseType))}, ${c.a.visibility === 'shared' ? '공유' : '나만'}) ↔ ${USERS[c.b.ownerId].name} (${esc(floorLabel(c.b.floors, c.b.leaseType))}, ${c.b.visibility === 'shared' ? '공유' : '나만'})</div></div><button class="btn sm" onclick="U.tab.admin='bld';U.open['${c.a.buildingId}']=true;render()">보기</button></div>`).join('') || '<div class="sub">중복 없음</div>'}</div>
+    ${cf.map(c => `<div class="conf"><span style="font-size:20px">⚠︎</span><div style="flex:1"><b>${esc(bInfo(c.a).name)}</b> · ${c.ov.map(fmtF).join(', ')}<div class="sub">${USERS[c.a.ownerId].name} (${esc(floorLabel(c.a.floors, c.a.leaseType))}, ${c.a.visibility === 'shared' ? '공유' : '나만'}) ↔ ${USERS[c.b.ownerId].name} (${esc(floorLabel(c.b.floors, c.b.leaseType))}, ${c.b.visibility === 'shared' ? '공유' : '나만'})</div></div><button class="btn sm" onclick="U.tab.admin='bld';Object.assign(lf(),{bld:'${c.a.buildingId}',view:'list'});render()">보기</button></div>`).join('') || '<div class="sub">중복 없음</div>'}</div>
   <div class="panel a" style="--i:5"><h3>용역 만료 30일 이내 <span class="chip">${soon.length}</span></h3>
     <table class="tbl"><tbody>${soon.map(L => `<tr><td><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span></td><td>${USERS[L.ownerId].name}</td><td class="num">${fmtDate(L.mEnd)}</td><td class="num">${(d => `<span class="chip ${d < 0 ? 'red' : d <= 14 ? 'warn' : ''}">${d < 0 ? `${-d}일 지남` : `D-${d}`}</span>`)(diffDays(L.mEnd, S.today))}</td></tr>`).join('') || '<tr><td class="sub">없음</td></tr>'}</tbody></table></div>`;
 }
+/* one table per trade area, a row per listing, rows of one building kept together under its name */
+function bldTable(xs) {
+  const bs = S.buildings.filter(B => xs.some(L => L.buildingId === B.id));
+  return `<div class="panel bt-p"><div class="bscroll"><table class="tbl bt"><thead><tr><th>건물</th><th>범위</th><th>담당</th><th>공개</th><th>상태</th><th class="num">임대료</th><th>임대인 (내부)</th><th>메모 (내부)</th><th></th></tr></thead><tbody>
+    ${bs.map(B => { const ls = xs.filter(L => L.buildingId === B.id).sort((x, y) => LST_ORDER[x.status] - LST_ORDER[y.status]), all = S.listings.filter(L => L.buildingId === B.id), owners = new Set(all.map(l => l.ownerId)), name = B.name || all[0]?.manual?.name || B.address;
+      return ls.map((L, j) => `<tr class="${j ? '' : 'bt-first'}">${j ? '' : `<td rowspan="${ls.length}" class="bt-b"><b>${esc(name)}</b>${B.status === '준공' ? '' : B.status === '인허가' ? ' <span class="chip warn">인허가</span>' : ' <span class="chip red">정보없음</span>'}${owners.size > 1 ? ` <span class="chip blue">브로커 ${owners.size}명</span>` : ''}<small>${esc(B.address)} · PNU ${B.pnu}</small></td>`}
+        <td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒 나만'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td>
+        <td><div class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn xs ghost" onclick="openModal({type:'detail',lid:'${L.id}'})">자세히</button><button class="btn xs ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button></div></td></tr>`).join(''); }).join('')}</tbody></table></div></div>`;
+}
 function adminBld() {
-  return `<div class="head"><h1>건물 · 매물</h1><span class="sub">${S.buildings.length}개 건물 · PNU 기준 통합</span></div>
-  ${S.buildings.map((B, i) => { const ls = S.listings.filter(L => L.buildingId === B.id), owners = new Set(ls.map(l => l.ownerId)); const open = U.open[B.id];
-    const name = B.name || ls[0]?.manual?.name || B.address;
-    return `<div class="panel a" style="--i:${i};padding:0;overflow:hidden">
-      <div class="row" style="padding:16px 20px;cursor:pointer" onclick="U.open['${B.id}']=!U.open['${B.id}'];render()">
-        <div style="width:54px;height:40px;border-radius:8px;background:url('${ls[0]?.photos[0] || ''}') center/cover #eee"></div>
-        <div style="flex:1"><div class="row"><b>${esc(name)}</b>${B.status === '준공' ? '<span class="chip ok">대장</span>' : B.status === '인허가' ? '<span class="chip warn">인허가</span>' : '<span class="chip red">정보없음</span>'}${owners.size > 1 ? `<span class="chip blue">브로커 ${owners.size}명</span>` : ''}</div><div class="sub">${esc(B.address)} · PNU ${B.pnu}</div></div>
-        <span class="chip">${ls.length}건</span><span class="sub" style="transition:transform .3s;transform:rotate(${open ? 180 : 0}deg)">⌄</span></div>
-      ${open ? `<div style="border-top:1px solid var(--line2);padding:6px 20px 14px;animation:fadeUp .3s var(--ease)"><table class="tbl"><thead><tr><th>범위</th><th>담당</th><th>공개</th><th>상태</th><th class="num">임대료</th><th>임대인 (내부)</th><th>메모 (내부)</th><th></th></tr></thead><tbody>
-        ${ls.map(L => `<tr><td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td><td><button class="btn xs" onclick="event.stopPropagation();openModal({type:'hist',lid:'${L.id}'})">이력</button></td></tr>`).join('')}</tbody></table></div>` : ''}</div>`; }).join('')}`;
+  const F = lf(), ls = S.listings.filter(L => lfPass(L));
+  const body = F.view === 'map' ? lfMap(ls) : byArea(ls).map(([a, xs]) => { const bs = S.buildings.filter(B => xs.some(L => L.buildingId === B.id));
+    return lsecHead(a, xs.length, ` · 건물 ${bs.length}개`) + bldTable(xs); }).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>';
+  return `<div class="head"><h1>건물 · 매물</h1><span class="sub">${S.buildings.length}개 건물 · PNU 기준 통합</span><div class="sp"></div>${lfView()}</div>
+  ${lfBar(ls.length, S.listings.length)}${body}`;
 }
 const freshMed = (off = true) => { MED = {tool: 'move', draft: [], sel: null, drag: null, off, refs: true, pop: null}; };
 /* ---------- new trade area: find a place, pull its OpenStreetMap roads and outlines, then draw the zone ---------- */
