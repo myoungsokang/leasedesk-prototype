@@ -436,7 +436,7 @@ textarea.in{resize:vertical;min-height:64px}
 .h1-in:hover{border-color:var(--line)}.h1-in:focus{outline:none;border-color:var(--accent);background:#fff}
 .cover-p{display:flex;gap:20px;align-items:center}.cover-p h3{margin:0 0 4px}.cp-th{width:240px;flex:none}
 .med-list{display:flex;flex-direction:column;gap:6px;max-height:236px;overflow:auto;padding-right:2px}
-.med-i{display:flex;align-items:center;gap:6px}.ac-w{position:relative;flex:1;min-width:0}.ac{display:none;position:fixed;z-index:200;min-width:260px;max-width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.12);padding:4px;max-height:260px;overflow:auto}.ac.on{display:block}.ac button{display:flex;align-items:center;gap:8px;white-space:nowrap;width:100%;text-align:left;border:0;background:none;padding:7px 9px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer}.ac button:hover{background:#f4f3ef}.ac small{color:var(--muted);font-size:11.5px}.ac .chip{margin-left:auto}.ac .ac-new{color:var(--accent-2);font-weight:600;border-top:1px solid var(--line2);border-radius:0 0 7px 7px}.med-i .chip{width:58px;justify-content:center;flex:none}.med-i .in{padding:5px 8px;font-size:12.5px}.med-i.on .in{border-color:var(--accent)}
+.med-i{display:flex;align-items:center;gap:6px}.ac-w{position:relative;flex:1;min-width:0}.ac{display:none;position:fixed;z-index:200;min-width:260px;max-width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.12);padding:4px;max-height:260px;overflow:auto}.ac.on{display:block}.ac button{display:flex;align-items:center;gap:8px;white-space:nowrap;width:100%;text-align:left;border:0;background:none;padding:7px 9px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer}.ac button:hover{background:#f4f3ef}.ac small{color:var(--muted);font-size:11.5px}.ac .chip{margin-left:auto}.ac-h{font-size:11px;font-weight:700;color:var(--muted);padding:6px 9px 2px}.ac .ac-new small{margin-left:auto}.ac .ac-new{color:var(--accent-2);font-weight:600;border-top:1px solid var(--line2);border-radius:0 0 7px 7px}.med-i .chip{width:58px;justify-content:center;flex:none}.med-i .in{padding:5px 8px;font-size:12.5px}.med-i.on .in{border-color:var(--accent)}
 .modal.map-modal{width:min(1280px,100%)}
 /* ---------- map-first proposal ---------- */
 .map-list{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.95);padding:12px 14px;max-width:300px}
@@ -1662,8 +1662,8 @@ function mapEditor(c) {
   const vwRow = `<div class="med-sec"><h4>지도 장 범위</h4><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '자동 · 상권 영역과 매물이 다 보이게'}</div>
     <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '자동으로'}</button>` : ''}</div>
     ${c.kind === 'group' ? `<label class="chk" style="margin-top:6px"><input type="checkbox" ${c.g.mapDim ? 'checked' : ''} onchange="medCtx().g.mapDim=this.checked;medRefresh()"> 상권 영역 밖 흐리게</label>` : ''}</div>`;
-  const row = m => { const br = m.kind === 'brand' || m.kind === 'ours', x = br && m.brandId && getBr(m.brandId);
-    return `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><div class="ac-w"><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="${br ? '브랜드 이름 (한글 · 영어)' : '이름'}" autocomplete="off" onkeydown="if(event.key==='Enter')this.blur()" ${br ? `oninput="acShow(this,'${m.id}')" onblur="setTimeout(()=>acHide(this),150)"` : ''} onchange="medName('${m.id}',this.value)"><div class="ac"></div></div>${br ? (x ? `<button class="chip blue" title="브랜드 정보" onclick="openModal({type:'brand',id:'${x.id}'})">↗ ${esc(x.name)}</button>` : m.name ? '<span class="chip warn" title="브랜드 목록에 없음">미연결</span>' : '') : ''}<button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`; };
+  const row = m => { const br = m.kind === 'brand' || m.kind === 'ours', x = br && m.brandId && getBr(m.brandId), mb = br && !x && m.mapBrandId && getMb(m.mapBrandId);
+    return `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><div class="ac-w"><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="${br ? '브랜드 이름 (한글 · 영어)' : '이름'}" autocomplete="off" onkeydown="if(event.key==='Enter')this.blur()" ${br ? `oninput="acShow(this,'${m.id}')" onblur="setTimeout(()=>acHide(this),150)"` : ''} onchange="medName('${m.id}',this.value)"><div class="ac"></div></div>${br ? (x ? `<button class="chip blue" title="클라이언트 브랜드 정보" onclick="openModal({type:'brand',id:'${x.id}'})">↗ ${esc(x.name)}</button>` : mb ? '<span class="chip" title="클라이언트가 아닌 지도용 이름">지도</span>' : '') : ''}<button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`; };
   return `<div class="med"><div class="med-main">
       <div class="row">${seg(tools, t, '(v=>medTool(v))')}${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
       <div class="sub">${MHINT[t]}</div>
@@ -1744,21 +1744,23 @@ function medName(id, v) {
   const m = medCtx().list.find(z => z.id === id); if (!m || MED.picked === id) return;
   m.name = v.trim();
   if (m.kind === 'brand' || m.kind === 'ours') {
-    if (!m.name) delete m.brandId;
-    else { const x = brMatch(m.name); if (x) m.brandId = x.id; else { m.brandId = brQuick(m.name).id; toast('새 브랜드 등록', `${m.name} · 브랜드 목록에 추가했습니다`); } }
+    if (m.name && !linkMark(m)) { m.mapBrandId = mbQuick(m.name).id; toast('지도 브랜드 추가', `${m.name} · 클라이언트 브랜드 목록에는 들어가지 않습니다`); }
+    if (!m.name) linkMark(m);
   }
   medRefresh();
 }
-/* the suggest list under a brand mark's name: existing brands by Korean or English name, then "새 브랜드로" */
+/* the suggest list under a brand mark's name: client brands first, then names already used on maps, then "지도 브랜드로 추가" */
 function acShow(inp, id) {
-  const box = inp.nextElementSibling, t = inp.value.trim(), hits = brFind(t), exact = brMatch(t);
-  box.innerHTML = t ? hits.map(x => `<button type="button" onmousedown="event.preventDefault();medPickBrand('${id}','${x.id}')"><b>${esc(x.name)}</b>${x.en && x.en !== x.name ? `<small>${esc(x.en)}</small>` : ''}${x.stage ? `<span class="chip ${stg(x)[1]}">${stg(x)[0]}</span>` : ''}</button>`).join('')
-    + (exact ? '' : `<button type="button" class="ac-new" onmousedown="event.preventDefault();this.closest('.ac-w').querySelector('input').blur()">+ "${esc(t)}" 새 브랜드로 등록</button>`) : '';
+  const box = inp.nextElementSibling, t = inp.value.trim(), cs = nameFind(S.brands, t), ms = nameFind(S.mapBrands, t), exact = brMatch(t) || nameMatch(S.mapBrands, t);
+  const opt = (x, kind) => `<button type="button" onmousedown="event.preventDefault();medPickBrand('${id}','${kind}','${x.id}')"><b>${esc(x.name)}</b>${x.en && x.en !== x.name ? `<small>${esc(x.en)}</small>` : ''}${kind === 'c' ? `<span class="chip blue">클라이언트 · ${stg(x)[0]}</span>` : ''}</button>`;
+  box.innerHTML = t ? (cs.length ? `<div class="ac-h">우리 클라이언트</div>${cs.map(x => opt(x, 'c')).join('')}` : '') + (ms.length ? `<div class="ac-h">지도 브랜드</div>${ms.map(x => opt(x, 'm')).join('')}` : '')
+    + (exact ? '' : `<button type="button" class="ac-new" onmousedown="event.preventDefault();this.closest('.ac-w').querySelector('input').blur()">+ "${esc(t)}" 지도 브랜드로 추가<small>클라이언트 목록에는 안 들어갑니다</small></button>`) : '';
   const r = inp.getBoundingClientRect(); Object.assign(box.style, {left: r.left + 'px', top: r.bottom + 4 + 'px', width: Math.max(260, r.width) + 'px'});
   box.classList.toggle('on', !!t);
 }
 function acHide(inp) { const box = inp?.nextElementSibling; if (box) box.classList.remove('on'); }
-function medPickBrand(id, bid) { const m = medCtx().list.find(z => z.id === id), x = getBr(bid); if (!m || !x) return; const typed = $('#mk-' + id)?.value || m.name; m.brandId = x.id; m.name = x.en && !/[가-힣]/.test(typed) ? x.en : x.name;
+function medPickBrand(id, kind, bid) { const m = medCtx().list.find(z => z.id === id), x = kind === 'c' ? getBr(bid) : getMb(bid); if (!m || !x) return; const typed = $('#mk-' + id)?.value || m.name;
+  delete m.brandId; delete m.mapBrandId; m[kind === 'c' ? 'brandId' : 'mapBrandId'] = x.id; m.name = x.en && !/[가-힣]/.test(typed) ? x.en : x.name;
   // re-rendering drops the focused input, which still fires its change with the half-typed text: ignore it
   MED.picked = id; medRefresh(); setTimeout(() => { MED.picked = null; }); }
 function medDel(id) { const c = medCtx(), i = c.list.findIndex(z => z.id === id); if (i >= 0) c.list.splice(i, 1); medRefresh(); }
@@ -1966,7 +1968,7 @@ function guide() {
 }
 function setRole(r) { U.role = r; U.prop = null; U.wiz = null; D = null; U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
 function setTab(t) { if (t === 'mine' || t === 'shared') { lf().scope = t; t = 'list'; } U.tab[U.role] = t; U.prop = null; U.amap = null; U.wiz = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
-function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); S.brands = seedBrands(S.today); linkSeedMarks(); D = null; U.prop = null; U.wiz = null; U.amap = null; U.modal = null; renderModal(); RET = null; Object.keys(LFS).forEach(k => delete LFS[k]); freshMed(); save(); render(); toast('초기화 완료'); }
+function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); S.brands = seedBrands(S.today); migrateBrands(); D = null; U.prop = null; U.wiz = null; U.amap = null; U.modal = null; renderModal(); RET = null; Object.keys(LFS).forEach(k => delete LFS[k]); freshMed(); save(); render(); toast('초기화 완료'); }
 
 function render() {
   const role = U.role, tab = U.tab[role];
@@ -2108,9 +2110,6 @@ function seedBrands(today) {
     B('BR11', '피어스 테일러링', 'Pierce Tailoring', '패션', 'brokerA', 'scout', ['한남', '가로수길'], [25, 40], 1100, '2027년 상반기', '대표 문태준', '맞춤 정장 쇼룸. 1층 아니어도 됨, 엘리베이터 필수.', 18, []),
     B('BR12', '슬로우 포어 와인바', 'Slow Pour', 'F&B', 'brokerB', 'scout', ['성수'], [30, 45], 900, '2027년 상반기', '운영이사 오세린', '골목 안쪽 조용한 자리 선호. 기존 주점 허가 자리면 우선.', 11, [['brokerB', 11, '첫 미팅, 성수 골목 안쪽 위주로 찾기로']]),
     B('BR13', '하우스 오브 린넨', 'House of Linen', '리빙', 'brokerA', 'pitch', ['성수'], [90, 130], 2600, '2027년 3월', '리테일개발 임채원 매니저', '리빙 플래그십. 2개 층, 화물 엘리베이터 필요.', 6, [['brokerA', 6, '성수 SE타워 1층 + 연무장길 39-21 비교안 전달']]),
-    ...[['블루보틀', 'Blue Bottle', '카페 · 베이커리'], ['디올', 'Dior', '패션'], ['킨포크', 'Kinfolk', '카페 · 베이커리'], ['무신사 스탠다드', 'Musinsa Standard', '패션'], ['탬버린즈', 'Tamburins', '뷰티'],
-      ['아모레', 'Amore', '뷰티'], ['페넥', 'Fennec', '패션'], ['애플', 'Apple', '리빙'], ['이솝', 'Aesop', '뷰티'], ['무신사', 'Musinsa', '패션'], ['르라보', 'Le Labo', '뷰티'], ['꼼데가르송', 'Comme des Garçons', '패션'],
-      ['올리브영', 'Olive Young', '뷰티'], ['자라', 'Zara', '패션'], ['유니클로', 'Uniqlo', '패션']].map(([name, en, cat], i) => B('BM' + (i + 1), name, en, cat, 'admin', '', [], ['', ''], '', '', '', '', 40 + i, [])),
     B('BR14', '누크 젤라또', 'Nook Gelato', '카페 · 베이커리', 'brokerB', 'won', ['명동'], [15, 25], 1300, '2026년 10월', '대표 한소율', '명동 1층 소형 계약 완료.', 27, [['brokerB', 27, '계약 완료']]),
   ];
 }
@@ -2134,11 +2133,11 @@ function brandsView() {
       <span class="sub">${ls.length === S.brands.length ? `${ls.length}개` : `${ls.length} / ${S.brands.length}개`}</span>${busy ? `<button class="btn xs ghost" onclick="delete BRF[me()];render()">필터 지우기</button>` : ''}</div>
     <div class="panel bt-p"><div class="bscroll"><table class="tbl br-t"><thead><tr><th>브랜드</th><th>업종</th><th>희망 상권</th><th class="num">면적</th><th class="num">임대료 상한</th><th>입점 희망</th><th>단계</th><th>담당</th><th class="num">업데이트</th></tr></thead><tbody>
       ${ls.map(x => `<tr onclick="openModal({type:'brand',id:'${x.id}'})"><td><b>${esc(x.name)}</b><small>${esc(x.en)}</small></td><td>${esc(x.cat || '–')}</td><td>${x.want.map(esc).join(' · ') || '–'}</td><td class="num">${x.pyMin || x.pyMax ? `${x.pyMin || ''}–${x.pyMax || ''}평` : '–'}</td><td class="num">${x.rentMax ? nf(x.rentMax) + '만원' : '–'}</td><td>${esc(x.when || '–')}</td>
-        <td>${x.stage ? `<span class="chip ${stg(x)[1]}">${stg(x)[0]}</span>` : '<span class="sub">지도 표시만</span>'}</td><td>${USERS[x.ownerId].name}</td><td class="num">${fmtDate(x.updated)}${x.posts.length ? `<small>글 ${x.posts.length}</small>` : ''}</td></tr>`).join('') || '<tr><td colspan="9" class="empty">조건에 맞는 브랜드가 없습니다</td></tr>'}</tbody></table></div></div>`;
+        <td><span class="chip ${stg(x)[1]}">${stg(x)[0]}</span></td><td>${USERS[x.ownerId].name}</td><td class="num">${fmtDate(x.updated)}${x.posts.length ? `<small>글 ${x.posts.length}</small>` : ''}</td></tr>`).join('') || '<tr><td colspan="9" class="empty">조건에 맞는 브랜드가 없습니다</td></tr>'}</tbody></table></div></div>`;
 }
 function brandModal(m) {
   const x = getBr(m.id), adm = me() === 'admin';
-  const kv = [['업종', esc(x.cat || '–')], ['단계', `${x.stage ? `<span class="chip ${stg(x)[1]}">${stg(x)[0]}</span>` : '<span class="sub">지도 표시만</span>'}`], ['희망 상권', x.want.map(esc).join(' · ') || '–'], ['면적', x.pyMin || x.pyMax ? `${x.pyMin || ''}–${x.pyMax || ''}평` : '–'],
+  const kv = [['업종', esc(x.cat || '–')], ['단계', `<span class="chip ${stg(x)[1]}">${stg(x)[0]}</span>`], ['희망 상권', x.want.map(esc).join(' · ') || '–'], ['면적', x.pyMin || x.pyMax ? `${x.pyMin || ''}–${x.pyMax || ''}평` : '–'],
     ['임대료 상한', x.rentMax ? `월 ${nf(x.rentMax)}만원` : '–'], ['입점 희망', esc(x.when || '–')], ['브랜드 담당자', esc(x.contact || '–')], ['담당', `${USERS[x.ownerId].name} · ${fmtDate(x.updated)} 업데이트`], ['지도 표시', brUses(x.id).map(esc).join(' · ') || '–']];
   return `<div class="modal wide"><div class="mh"><b>${esc(x.name)}</b><span class="sub">${esc(x.en)}</span><div class="sp"></div>
       ${adm ? '' : `<button class="btn sm" onclick="brandWiz('${x.id}')">이 브랜드로 제안서</button>`}${brCan(x) ? `<button class="btn sm ghost" onclick="openModal({type:'brEdit',id:'${x.id}'})">수정</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
@@ -2161,7 +2160,7 @@ function brEditModal(m) {
     <form class="mb" onsubmit="event.preventDefault();brSave(this,'${m.id || ''}')">
       <div class="fg"><div class="f"><label>브랜드명</label><input class="in" name="name" value="${esc(x.name)}" required></div><div class="f"><label>영문명</label><input class="in" name="en" value="${esc(x.en)}"></div>
         <div class="f"><label>업종</label><select class="in" name="cat"><option value="" ${x.cat ? '' : 'selected'}>–</option>${BCAT.map(c => `<option ${x.cat === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
-        <div class="f"><label>단계</label><select class="in" name="stage"><option value="" ${x.stage ? '' : 'selected'}>– 지도 표시만</option>${Object.entries(BSTAGE).map(([k, [l]]) => `<option value="${k}" ${x.stage === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="f"><label>단계</label><select class="in" name="stage">${Object.entries(BSTAGE).map(([k, [l]]) => `<option value="${k}" ${x.stage === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="f"><label>면적 (평)</label><div class="row" style="flex-wrap:nowrap;gap:6px"><input class="in" type="number" min="0" name="pyMin" value="${x.pyMin}" placeholder="최소"><input class="in" type="number" min="0" name="pyMax" value="${x.pyMax}" placeholder="최대"></div></div>
         <div class="f"><label>임대료 상한</label><div class="ui"><input class="in" type="number" min="0" name="rentMax" value="${x.rentMax}"><span>만원</span></div></div>
         <div class="f"><label>입점 희망</label><input class="in" name="when" value="${esc(x.when)}" placeholder="예: 2027년 1분기"></div>
@@ -2181,27 +2180,47 @@ function brSave(f, id) {
   commit(); openModal({type: 'brand', id: x.id}); toast(id ? '브랜드 수정' : '브랜드 등록', x.name);
 }
 function brDel(id) { const x = getBr(id); if (!confirm(`${x.name} 브랜드를 지울까요?`)) return; S.brands = S.brands.filter(b => b !== x); U.modal = null; renderModal(); commit(); toast('브랜드 삭제', x.name); }
-/* one brand registry for the board and the map: a brand or 자사 중개 mark on a map points at a brand by brandId.
-   A name matches a brand when, spaces and case aside, it is the brand's Korean or English name, or starts with
-   one followed by a branch word ("Dior 성수" → Dior). */
+/* Two name lists feed the brand and 자사 중개 marks on maps. S.brands are the company's client brands, kept only on
+   the brand board. S.mapBrands are names that exist only as map labels (other stores on the street); a new name typed
+   on a map lands here, never among the clients. A mark points at one or the other by brandId or mapBrandId.
+   A name matches when, spaces and case aside, it is the Korean or English name, or starts with one followed by a
+   branch word ("Dior 성수" → Dior). */
 const brKey = t => (t || '').toLowerCase().replace(/[\s·.\-']/g, '');
-function brMatch(t) {
+function nameMatch(list, t) {
   const k = brKey(t); if (!k) return null;
   const names = x => [x.name, x.en].filter(Boolean);
-  return S.brands.find(x => names(x).some(n => brKey(n) === k)) || S.brands.find(x => names(x).some(n => (t || '').toLowerCase().startsWith(n.toLowerCase() + ' '))) || null;
+  return list.find(x => names(x).some(n => brKey(n) === k)) || list.find(x => names(x).some(n => (t || '').toLowerCase().startsWith(n.toLowerCase() + ' '))) || null;
 }
-function brFind(t) {
+function nameFind(list, t, n = 5) {
   const k = brKey(t); if (!k) return [];
-  return S.brands.map(x => ({x, hit: [x.name, x.en].filter(Boolean).map(brKey).reduce((b, n) => Math.max(b, n.startsWith(k) ? 2 : n.includes(k) ? 1 : 0), 0)})).filter(r => r.hit).sort((a, b) => b.hit - a.hit).slice(0, 6).map(r => r.x);
+  return list.map(x => ({x, hit: [x.name, x.en].filter(Boolean).map(brKey).reduce((b, m) => Math.max(b, m.startsWith(k) ? 2 : m.includes(k) ? 1 : 0), 0)})).filter(r => r.hit).sort((a, b) => b.hit - a.hit).slice(0, n).map(r => r.x);
 }
-const brQuick = name => { const x = {id: 'BR' + Date.now().toString(36), name, en: /[가-힣]/.test(name) ? '' : name, cat: '', ownerId: me(), stage: '', want: [], pyMin: '', pyMax: '', rentMax: '', when: '', contact: '', memo: '', updated: S.today, posts: []}; S.brands.unshift(x); return x; };
-/* where a brand shows on maps: company maps and proposals' own layers */
+const brMatch = t => nameMatch(S.brands, t);
+const getMb = id => S.mapBrands.find(x => x.id === id);
+const MAP_BRANDS = [['블루보틀', 'Blue Bottle'], ['디올', 'Dior'], ['킨포크', 'Kinfolk'], ['무신사 스탠다드', 'Musinsa Standard'], ['탬버린즈', 'Tamburins'], ['아모레', 'Amore'], ['페넥', 'Fennec'],
+  ['애플', 'Apple'], ['이솝', 'Aesop'], ['무신사', 'Musinsa'], ['르라보', 'Le Labo'], ['꼼데가르송', 'Comme des Garçons'], ['올리브영', 'Olive Young'], ['자라', 'Zara'], ['유니클로', 'Uniqlo']];
+const seedMapBrands = () => MAP_BRANDS.map(([name, en], i) => ({id: 'MB' + (i + 1), name, en}));
+const mbQuick = name => { const x = {id: 'MB' + Date.now().toString(36), name, en: /[가-힣]/.test(name) ? '' : name}; S.mapBrands.unshift(x); return x; };
+/* where a client brand shows on maps: company maps and proposals' own layers */
 function brUses(id) {
   const out = []; S.areas.forEach(a => (a.marks || []).forEach(m => { if (m.brandId === id) out.push(a.name); }));
   visProps().forEach(p => p.groups.forEach(g => (g.marks || []).forEach(m => { if (m.brandId === id) out.push(`${p.clientName} 제안서`); })));
   return [...new Set(out)];
 }
-function linkSeedMarks() { S.areas.forEach(a => (a.marks || []).forEach(m => { if ((m.kind === 'brand' || m.kind === 'ours') && !m.brandId) { const x = brMatch(m.name); if (x) m.brandId = x.id; } })); }
+const allMarks = () => [...S.areas.flatMap(a => a.marks || []), ...S.proposals.flatMap(p => p.groups.flatMap(g => g.marks || []))];
+function linkMark(m) {
+  delete m.brandId; delete m.mapBrandId;
+  if (!m.name || (m.kind !== 'brand' && m.kind !== 'ours')) return null;
+  const c = brMatch(m.name); if (c) { m.brandId = c.id; return c; }
+  const x = nameMatch(S.mapBrands, m.name); if (x) m.mapBrandId = x.id; return x;
+}
+/* older saved data kept map-only names among the client brands (stage ''): move them out and relink */
+function migrateBrands() {
+  if (!S.mapBrands) S.mapBrands = seedMapBrands();
+  const stray = S.brands.filter(x => !x.stage); S.brands = S.brands.filter(x => x.stage);
+  stray.forEach(x => { if (!nameMatch(S.mapBrands, x.name) && !nameMatch(S.mapBrands, x.en)) S.mapBrands.push({id: x.id, name: x.name, en: x.en}); });
+  allMarks().forEach(m => { if (m.kind === 'brand' || m.kind === 'ours') { if (m.brandId && getBr(m.brandId)) return; linkMark(m); } });
+}
 /* "이 브랜드로 제안서": the wizard opens with the brand's name, terms and wanted trade areas filled in */
 function brandWiz(id) {
   const x = getBr(id); startWiz();
@@ -2883,7 +2902,8 @@ function toast(t, s) {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && U.modal) closeModal(); });
 
 if (!S) S = seed();
-if (!S.brands) { S.brands = seedBrands(S.today); linkSeedMarks(); }
+if (!S.brands) S.brands = seedBrands(S.today);
+migrateBrands();
 if (S.osm && window.MAP_DATA) Object.assign(window.MAP_DATA, S.osm); // trade areas created in this browser
 save(); render();
 </script>
