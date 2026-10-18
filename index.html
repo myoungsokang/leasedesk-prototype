@@ -19,7 +19,6 @@ body{margin:0;font-family:'Pretendard Variable',Pretendard,-apple-system,system-
 button{font:inherit;cursor:pointer;color:inherit}
 input,select,textarea{font:inherit;color:inherit}
 img{display:block}
-svg text{letter-spacing:normal}
 
 /* ---------- motion ---------- */
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -267,7 +266,7 @@ textarea.in{resize:vertical;min-height:64px}
 
 /* ---------- slides: 1280×720 design size, scaled to the box (13.333in × 7.5in at 96dpi = a 16:9 PowerPoint page) ---------- */
 .slw{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.08),0 12px 30px rgba(0,0,0,.06);--k:.5}
-.sl{position:absolute;left:0;top:0;width:1280px;height:720px;transform:scale(var(--k));transform-origin:0 0;background:#fff;color:var(--ink);overflow:hidden;font-size:16px;letter-spacing:-.01em}
+.sl{position:absolute;left:0;top:0;width:1280px;height:720px;zoom:var(--k);background:#fff;color:var(--ink);overflow:hidden;font-size:16px;letter-spacing:-.01em}
 .sl-brand{position:absolute;left:84px;top:64px;font-weight:800;letter-spacing:-.03em;font-size:22px;z-index:1}.sl-brand i{font-style:normal;color:#8fb8ec}
 .sl-cover{background:#222 center/cover;color:#fff}
 .sl-cover::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(10,12,16,.8),rgba(10,12,16,.2) 75%)}
