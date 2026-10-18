@@ -390,6 +390,35 @@ textarea.in{resize:vertical;min-height:64px}
 .med-list{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto}
 .med-i{display:flex;align-items:center;gap:6px}.med-i .in{padding:5px 8px;font-size:12.5px}.med-i.on .in{border-color:var(--accent)}
 .modal.map-modal{width:min(1280px,100%)}
+/* ---------- map-first proposal ---------- */
+.map-list{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.95);padding:12px 14px;max-width:300px}
+.map-list span{display:grid;grid-template-columns:22px 1fr;column-gap:8px;font-size:14px;font-weight:600;align-items:baseline}
+.map-list b{grid-row:span 2;width:22px;height:22px;border-radius:50%;background:#141414;color:#fff;font-size:11.5px;display:flex;align-items:center;justify-content:center}
+.map-list small{font-weight:400;font-size:12px;color:var(--muted)}
+.wz-steps{display:flex;gap:6px;margin-left:12px}
+.wz-steps span{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);padding:4px 10px 4px 4px;border-radius:999px;background:#ecebe6}
+.wz-steps b{width:20px;height:20px;border-radius:50%;background:#d6d4cd;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center}
+.wz-steps .on{background:var(--ink);color:#fff}.wz-steps .on b{background:#fff;color:var(--ink)}
+.wz-steps .done b{background:var(--ok)}
+.wz-a{padding:0;text-align:left;font:inherit;cursor:pointer;border:2px solid transparent}
+.wz-a.on{border-color:var(--ink)}
+.wz-n{position:absolute;left:10px;top:10px;width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
+.pk{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
+.pk.one{grid-template-columns:minmax(0,640px)}
+.pk-map{position:relative;border:1px solid var(--line);background:#e7e7e4}
+.pk-map svg{display:block;width:100%;height:auto}
+.pk-map .cd{cursor:pointer}
+.pk-leg{position:absolute;left:10px;bottom:10px;display:flex;gap:14px;background:rgba(255,255,255,.94);padding:7px 12px;font-size:12px}
+.pk-leg span{display:flex;align-items:center;gap:6px}.pk-leg i{font-style:normal;display:inline-flex;align-items:center;justify-content:center;border-radius:50%}
+.pk-leg .d-in{width:18px;height:18px;background:#141414;color:#fff;font-size:10px;font-weight:700}
+.pk-leg .d-fit{width:12px;height:12px;border:2.5px solid #141414;background:#fff}.pk-leg .d-no{width:12px;height:12px;border:2.5px solid #a3a39e;background:#ecece9}
+.pk-list{display:flex;flex-direction:column;gap:6px;max-height:640px;overflow:auto}
+.pk-i{display:flex;gap:10px;align-items:center;text-align:left;font:inherit;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer}
+.pk-i.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.pk-n{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:1.5px solid var(--line);color:var(--muted)}
+.pk-i.on .pk-n{background:var(--ink);border-color:var(--ink);color:#fff}
+.pk-ph{width:64px;height:48px;border-radius:8px;background:#eee center/cover;flex:none}
+.pk-b{display:flex;flex-direction:column;gap:3px;min-width:0}.pk-b small{color:var(--muted);font-size:12px}
 /* ---------- proposal editor ---------- */
 .ed-grid{display:grid;grid-template-columns:1fr 330px;gap:16px;align-items:start}
 .mods{display:flex;flex-direction:column;gap:6px}
@@ -453,7 +482,8 @@ textarea.in{resize:vertical;min-height:64px}
   .nav{flex-direction:row;gap:4px}
   .nav button{white-space:nowrap;padding:8px 12px}
   .main{padding:20px 16px 80px}
-  .ed-grid,.grp-b,.pcv,.pv-wrap,.med{grid-template-columns:1fr}
+  .ed-grid,.grp-b,.pcv,.pv-wrap,.med,.pk{grid-template-columns:1fr}
+  .wz-steps{margin-left:0;flex-basis:100%}
   .outl:not(.in-panel){display:none}
   .stats{grid-template-columns:repeat(2,1fr)}
   .guide{width:min(300px,calc(100vw - 24px));right:12px}
@@ -1011,14 +1041,14 @@ function seed() {
   props[0].groups[0].marks = [{id: 'MP1', kind: 'hl', name: '팝업 밀집 구역', pts: [[870, 470], [1015, 462], [1035, 545], [890, 560]]}];
   const M = (id, kind, x, y, name) => ({id, kind, x, y, name});
   const areas = [
-    {id: 'A1', name: '성수', osm: 'seongsu', dataKey: 'seongsu', hidden: [], zone: [[430, 290], [1060, 320], [1250, 470], [1150, 560], [560, 520], [400, 420]],
+    {id: 'A1', photo: PH.brick, style: st('wide', 'L', '#ffffff', 'bl'), name: '성수', osm: 'seongsu', dataKey: 'seongsu', hidden: [], zone: [[430, 290], [1060, 320], [1250, 470], [1150, 560], [560, 520], [400, 420]],
       marks: [M('M11', 'brand', 700, 470, 'Blue Bottle'), M('M12', 'brand', 985, 455, 'Dior 성수'), M('M13', 'brand', 1090, 505, 'Kinfolk'), M('M14', 'brand', 615, 430, 'Musinsa Standard'), M('M15', 'brand', 905, 545, 'Tamburins'),
         M('M16', 'ours', 760, 395, 'Amore 성수'), M('M17', 'ours', 1150, 440, 'Fennec'), M('M18', 'text', 560, 250, '아차산로'), M('M19', 'text', 800, 250, '성수역'), M('M1a', 'text', 1010, 392, '연무장길')]},
-    {id: 'A2', name: '가로수길', osm: 'sinsa', dataKey: 'sinsa', hidden: [], zone: [[760, 40], [1000, 40], [1000, 620], [760, 620]],
+    {id: 'A2', photo: PH.seoulStreet, style: st('serif', 'M', '#ffffff', 'mc'), name: '가로수길', osm: 'sinsa', dataKey: 'sinsa', hidden: [], zone: [[760, 40], [1000, 40], [1000, 620], [760, 620]],
       marks: [M('M21', 'brand', 905, 210, 'Apple 가로수길'), M('M22', 'brand', 905, 430, 'Aesop'), M('M23', 'brand', 790, 530, 'Tamburins'), M('M24', 'ours', 905, 300, 'Musinsa 가로수'), M('M25', 'text', 880, 665, '가로수길')]},
-    {id: 'A3', name: '한남', osm: 'hannam', dataKey: 'hannam', hidden: [], zone: [[560, 330], [900, 180], [980, 260], [950, 420], [640, 520], [520, 450]],
+    {id: 'A3', photo: PH.garden, style: st('sans', 'L', '#f2d16b', 'tl'), name: '한남', osm: 'hannam', dataKey: 'hannam', hidden: [], zone: [[560, 330], [900, 180], [980, 260], [950, 420], [640, 520], [520, 450]],
       marks: [M('M31', 'brand', 760, 300, 'Le Labo'), M('M32', 'brand', 880, 240, 'Comme des Garçons'), M('M33', 'ours', 640, 430, 'Maison 한남'), M('M34', 'text', 909, 140, '한강진역')]},
-    {id: 'A4', name: '명동', osm: 'myeongdong', dataKey: 'myeongdong', hidden: [], zone: [[700, 190], [1000, 190], [1000, 540], [720, 560]],
+    {id: 'A4', photo: PH.seoulNeon, style: st('wide', 'M', '#ffffff', 'br'), name: '명동', osm: 'myeongdong', dataKey: 'myeongdong', hidden: [], zone: [[700, 190], [1000, 190], [1000, 540], [720, 560]],
       marks: [M('M41', 'brand', 760, 300, 'Olive Young 명동'), M('M42', 'brand', 940, 330, 'Zara'), M('M43', 'brand', 880, 470, 'Uniqlo'), M('M44', 'ours', 790, 425, 'K-뷰티 플래그십'), M('M45', 'text', 954, 600, '명동역'), M('M46', 'text', 830, 250, '명동8길')]},
   ];
   return {
@@ -1330,12 +1360,15 @@ function mapSvg(a, o = {}) {
   const hide = new Set(o.hide || []), hb = new Set(a.hidden || []), ed = o.edit;
   const blds = zoneBuildings(a).filter(([id]) => ed === 'bld' || !hb.has(id));
   const co = (a.marks || []).filter(m => ed || !hide.has(m.id));
-  return `<svg class="tmap" viewBox="0 0 ${d.w} ${d.h}" preserveAspectRatio="xMidYMid ${ed ? 'meet' : 'slice'}" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="tmap" viewBox="0 0 ${d.w} ${d.h}" preserveAspectRatio="xMidYMid ${ed || o.meet ? 'meet' : 'slice'}" xmlns="http://www.w3.org/2000/svg">
     <rect width="${d.w}" height="${d.h}" fill="#e7e7e4"/>${a.zone.length > 2 ? `<path d="${ppath(a.zone)}" fill="#d8d8d4"/>` : ''}${mapBase(a.osm)}
     <g>${blds.map(([id, p]) => `<path data-b="${id}" d="${mpath(p)}Z" ${hb.has(id) ? 'class="bh" fill="none" stroke="#c23b3a" stroke-width="1.5" stroke-dasharray="4 3"' : 'fill="#bfbfbb" stroke="#fff" stroke-width="1"'}/>`).join('')}</g>
     <g fill="none" stroke="#2f9e44" stroke-width="6">${d.rail.map(r => `<path d="${mpath(r)}"/>`).join('')}</g>
     ${ed === 'zone' || ed === 'move' ? `<path d="${a.zone.length > 2 ? ppath(a.zone) : ''}" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="10 6"/>` : ''}
     ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '')).join('')}${(o.marks || []).map(m => markSvg(m, 'pr')).join('')}
+    ${(o.refs || []).map(q => `<g transform="translate(${q.x},${q.y})"><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/><text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text></g>`).join('')}
+    ${(o.cands || []).map(c => `<g data-lid="${c.id}" class="cd" transform="translate(${c.x},${c.y})">${c.st === 'in' ? `<circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
+      : `<circle r="13" fill="${c.st === 'fit' ? '#fff' : '#ecece9'}" stroke="${c.st === 'fit' ? '#141414' : '#a3a39e'}" stroke-width="3.5"/>`}<text x="${c.st === 'in' ? 25 : 19}" y="7" font-size="18" font-weight="600" fill="${c.st === 'nofit' ? '#8a8a85' : '#141414'}" ${halo}>${esc(c.label)}</text></g>`).join('')}
     ${(o.pins || []).map(q => `<g transform="translate(${q.x},${q.y})"><circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${q.n}</text></g>`).join('')}
     ${o.draft?.length ? `<path d="${o.draft.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join('')}" fill="rgba(42,120,214,.12)" stroke="#2a78d6" stroke-width="2.5"/>${o.draft.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="#fff" stroke="#2a78d6" stroke-width="2.5"/>`).join('')}` : ''}
   </svg>`;
@@ -1348,6 +1381,7 @@ function mapSlide(g, a, its) {
   const ours = (a.marks || []).some(m => m.kind === 'ours' && !(g.mapHide || []).includes(m.id));
   return `<div class="sl sl-std sl-map">${slHead(esc(tv(g.name)), {em: LG('지도', 'Map'), tag: esc(tv(a.name))})}
     <div class="map-box">${mapSvg(a, {pins: groupPins(g, its, a), hide: g.mapHide, marks: g.marks})}
+      <div class="map-list">${its.map((it, i) => { const L = getL(it.listingId); return `<span><b>${i + 1}</b>${esc(tv(bInfo(L).name))}<small>${esc(floorsTxt(L))} · ${nf(L.leaseArea * PYR, 1)}${LG('평', 'py')}</small></span>`; }).join('')}</div>
       <div class="map-leg"><span><i class="lp">1</i>${LG('제안 매물', 'Proposed site')}</span>${ours ? `<span><i class="lo">L</i>${LG('LeaseDesk 중개', 'LeaseDesk deal')}</span>` : ''}<span><i class="lb"></i>${LG('주요 브랜드', 'Key brands')}</span></div>
       <span class="map-src">© OpenStreetMap contributors · ${LG('예시 데이터', 'Sample data')}</span></div>${slFoot()}</div>`;
 }
@@ -1370,7 +1404,8 @@ function medRefresh() { // swap only the editor body, so the modal does not repl
 function mapEditor(c) {
   const tools = c.kind === 'area' ? MTOOLS_AREA : MTOOLS_GROUP, t = MED.tool;
   const pins = c.kind === 'group' ? groupPins(c.g, liveItems(c.p, c.g), c.a) : [];
-  const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, hide: c.hide, marks: c.kind === 'group' ? c.list : []});
+  const refs = c.kind === 'area' ? S.listings.filter(L => L.status === 'active').map(L => { const xy = listingXY(L, c.a); return xy && {x: xy[0], y: xy[1], label: bInfo(L).name}; }).filter(Boolean) : [];
+  const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : []});
   const row = m => `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="이름" onkeydown="if(event.key==='Enter')this.blur()" onchange="medName('${m.id}',this.value)"><button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`;
   return `<div class="med"><div class="med-main">
       <div class="row">${seg(tools, t, '(v=>medTool(v))')}${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
@@ -1379,7 +1414,9 @@ function mapEditor(c) {
     <div class="med-side">
       ${c.kind === 'area' ? `<div class="f"><label>상권 이름</label><input class="in" value="${esc(c.a.name)}" onchange="getA('${c.a.id}').name=this.value;commit()"></div>
         <div class="f"><label>상권 데이터</label><select class="in" onchange="getA('${c.a.id}').dataKey=this.value||null;commit()"><option value="">없음</option>${Object.entries(AREAS).map(([k, x]) => `<option value="${k}" ${c.a.dataKey === k ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
-        <div class="sub">건물 ${zoneBuildings(c.a).length - (c.a.hidden || []).length}개 표시 · ${(c.a.hidden || []).length}개 숨김 ${(c.a.hidden || []).length ? `<button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div>`
+        <div class="f"><label>상권 표지 기본값</label>${thumb(groupCoverSlide({name: c.a.name, photo: c.a.photo, style: c.a.style || {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}}))}
+          <div class="row"><label class="btn xs">업로드<input type="file" accept="image/*" hidden onchange="(f=>f&&readImg(f,src=>{getA('${c.a.id}').photo=src;commit()}))(this.files[0])"></label><button class="btn xs ghost" onclick="(a=>{a.photo=GROUP_PHOTOS[(GROUP_PHOTOS.indexOf(a.photo)+1)%GROUP_PHOTOS.length];commit()})(getA('${c.a.id}'))">샘플 바꾸기</button><span class="sub">새 제안서의 상권 표지로 복사</span></div></div>
+        <div class="sub">파란 점 = 진행 중 매물 위치 · 건물 ${zoneBuildings(c.a).length - (c.a.hidden || []).length}개 표시 · ${(c.a.hidden || []).length}개 숨김 ${(c.a.hidden || []).length ? `<button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div>`
         : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}</div>`}
       <b class="med-h">${c.kind === 'area' ? '회사 표시' : '이 제안서 표시'} <span class="sub">${c.list.length}</span></b>
       <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div>`;
@@ -1600,17 +1637,17 @@ function topbar() {
 function guide() {
   if (!U.guide) return '';
   return `<div class="guide"><div class="row" style="margin-bottom:8px"><b>시나리오</b><div class="sp"></div><button class="btn xs ghost" onclick="U.guide=false;render()">✕</button></div>
-  <h4>브로커A</h4><ol><li>제안서 → 모먼트커피 → 상권 4곳 · 표지 글자 조정</li><li>미리보기 → 표지 · 요약표 · 상권 비교 · 상권별 장표</li><li>언어 English · 통화 CNY로 바꿔 보기</li><li>매물을 다른 상권으로 이동 · 순서 변경</li><li>상권 → 지도 편집 · 회사 표시 숨기기 · 강조 영역</li><li>인쇄 · PPT 다운로드(목업)</li><li>매물 카드 → 장표 미리보기 · 이력</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li></ol>
+  <h4>브로커A</h4><ol><li>+ 새 제안서 → 조건 → 상권 → 지도에서 매물 고르기</li><li>제안서 → 모먼트커피 → 상권 4곳 · 표지 글자 조정</li><li>미리보기 → 표지 · 요약표 · 상권 비교 · 상권별 장표</li><li>언어 English · 통화 CNY로 바꿔 보기</li><li>매물을 다른 상권으로 이동 · 순서 변경</li><li>상권 → 지도 편집 · 회사 표시 숨기기 · 강조 영역</li><li>인쇄 · PPT 다운로드(목업)</li><li>매물 카드 → 장표 미리보기 · 이력</li><li>성수 7길 18(신축) 등록 · 층별 면적 · 영역 칠하기</li></ol>
   <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>상권 지도 → 성수 · 영역 · 건물 숨기기 · 브랜드 · 자사 중개</li><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol></div>`;
 }
-function setRole(r) { U.role = r; U.prop = null; D = null; U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
-function setTab(t) { U.tab[U.role] = t; U.prop = null; U.amap = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
+function setRole(r) { U.role = r; U.prop = null; U.wiz = null; D = null; U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
+function setTab(t) { U.tab[U.role] = t; U.prop = null; U.amap = null; U.wiz = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
 function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); D = null; U.prop = null; save(); render(); toast('초기화 완료'); }
 
 function render() {
   const role = U.role, tab = U.tab[role];
-  const key = [role, tab, D ? 'edit' : '', U.prop, U.pmode, U.amap].join('|');
+  const key = [role, tab, D ? 'edit' : '', U.prop, U.pmode, U.amap, U.wiz?.step, U.wiz?.tab].join('|');
   const anim = key !== lastView; lastView = key;
   const body = `<div class="layout"><aside class="side noprint">${sideNav()}</aside><main class="main">${role === 'admin' ? adminView() : brokerView()}</main></div>`;
   $('#app').innerHTML = topbar() + `<div class="${anim ? 'anim view' : ''}">${body}</div>` + guide();
@@ -1628,6 +1665,7 @@ function sideNav() {
 /* ---------- broker ---------- */
 function brokerView() {
   if (D) return listingForm();
+  if (U.wiz) return wizView();
   if (U.prop) return propEditor(getP(U.prop));
   const t = U.tab[me()];
   if (t === 'mine') return mineView();
@@ -1853,10 +1891,109 @@ function saveListing() {
   window.scrollTo({top: 0});
 }
 
+/* ---------- map-first proposal: conditions → trade areas → pick listings on each area's map ---------- */
+function listingXY(L, a) { const B = getB(L.buildingId), d = window.MAP_DATA?.[a.osm]; return B.lat && d ? llXY(d, B.lat, B.lng) : null; }
+function inMaster(L, a) { const xy = listingXY(L, a); return !!xy && a.zone.length > 2 && inPoly(xy[0], xy[1], a.zone); }
+const masterOf = L => S.areas.find(a => inMaster(L, a)) || null;
+const openListings = () => S.listings.filter(L => live(L, me()));
+const fitsAll = (L, a, crit) => fitOf(L, {name: a ? a.name : ''}, crit).every(([, v]) => v !== false);
+/* candidates as map dots: chosen ones carry their number, the rest show whether they meet the requested terms */
+function candDots(a, ls, chosen, crit) {
+  const seen = {};
+  return ls.map(L => {
+    const xy = listingXY(L, a); if (!xy) return null;
+    const off = seen[L.buildingId] = (seen[L.buildingId] ?? -1) + 1, n = chosen.indexOf(L.id);
+    return {id: L.id, x: xy[0] + off * 40, y: xy[1], n: n + 1, st: n >= 0 ? 'in' : fitsAll(L, a, crit) ? 'fit' : 'nofit', label: `${bInfo(L).name} ${floorLabel(L.floors, L.leaseType)}`};
+  }).filter(Boolean);
+}
+function pickRow(L, n, a, crit, fn) {
+  return `<button class="pk-i ${n ? 'on' : ''}" onclick="${fn}('${L.id}')"><span class="pk-n">${n || '+'}</span><span class="pk-ph" style="background-image:url('${L.photos[0] || ''}')"></span>
+    <span class="pk-b"><b>${esc(bInfo(L).name)}</b><small>${esc(floorLabel(L.floors, L.leaseType))} · ${nf(L.leaseArea * PYR, 1)}평 · ${priceShort(L.rent)}${L.ownerId !== me() ? ` · ${USERS[L.ownerId].name}` : ''}</small>${fitChips(fitOf(L, {name: a ? a.name : ''}, crit))}</span></button>`;
+}
+/* one picker for the wizard and for "+ 매물 추가": map on the left, the same listings as a list on the right */
+function picker(a, ls, chosen, crit, fn) {
+  const list = `<div class="pk-list">${ls.map(L => pickRow(L, chosen.indexOf(L.id) + 1, a, crit, fn)).join('') || '<div class="sub">이 상권 영역 안에 진행 중인 매물이 없습니다</div>'}</div>`;
+  if (!a) return `<div class="pk one">${list}</div>`;
+  return `<div class="pk"><div class="pk-map" onclick="(t=>t&&${fn}(t.dataset.lid))(event.target.closest('[data-lid]'))">${mapSvg(a, {meet: true, cands: candDots(a, ls, chosen, crit)})}
+      <div class="pk-leg"><span><i class="d-in">1</i>고름</span><span><i class="d-fit"></i>요청 조건 충족</span><span><i class="d-no"></i>조건 밖</span></div></div>${list}</div>`;
+}
+
+function startWiz(lid) {
+  U.wiz = {step: 1, name: '', lang: 'ko', cur: 'USD', crit: {rentMax: null, areaMin: null, areaMax: null}, areas: [], picks: {}, tab: null};
+  if (lid) { const a = masterOf(getL(lid)), k = a ? a.id : 'etc'; if (a) U.wiz.areas = [a.id]; U.wiz.picks[k] = [lid]; }
+  U.modal = null; renderModal(); U.prop = null; D = null; U.tab[me()] = 'props'; render(); window.scrollTo({top: 0});
+}
+const wizCrit = () => ({...U.wiz.crit, regions: U.wiz.areas.map(id => getA(id).name)});
+const wizOutside = () => openListings().filter(L => !U.wiz.areas.some(id => inMaster(L, getA(id))) && !S.areas.some(a => inMaster(L, a)));
+function wizGo(step) {
+  const w = U.wiz;
+  if (step > 1 && !w.name.trim()) { toast('클라이언트명을 입력하세요'); return; }
+  w.step = step; if (step === 3) w.tab = w.tab && (w.tab === 'etc' || w.areas.includes(w.tab)) ? w.tab : (w.areas[0] || 'etc');
+  render(); window.scrollTo({top: 0});
+}
+function wizArea(id) { const w = U.wiz, i = w.areas.indexOf(id); if (i >= 0) w.areas.splice(i, 1); else w.areas.push(id); render(); }
+function wizPick(lid) {
+  const w = U.wiz, k = w.tab, arr = w.picks[k] = w.picks[k] || [], i = arr.indexOf(lid);
+  if (i >= 0) arr.splice(i, 1); else arr.push(lid);
+  render();
+}
+function wizView() {
+  const w = U.wiz, crit = wizCrit(), steps = ['조건', '상권', '매물'];
+  const head = `<div class="head"><button class="btn ghost icon" onclick="U.wiz=null;render()">←</button><h1>새 제안서</h1><div class="wz-steps">${steps.map((s, i) => `<span class="${w.step === i + 1 ? 'on' : w.step > i + 1 ? 'done' : ''}"><b>${i + 1}</b>${s}</span>`).join('')}</div></div>`;
+  const total = Object.entries(w.picks).filter(([k]) => k === 'etc' || w.areas.includes(k)).reduce((n, [, v]) => n + v.length, 0);
+  if (w.step === 1) return head + `<div class="panel a" style="--i:0;max-width:760px"><h3>클라이언트와 요청 조건</h3><div class="fg" style="grid-template-columns:1fr 1fr">
+      <div class="f" style="grid-column:1/-1"><label>클라이언트명</label><input class="in" id="wz-name" value="${esc(w.name)}" placeholder="회사명" oninput="U.wiz.name=this.value" onkeydown="if(event.key==='Enter')wizGo(2)"></div>
+      <div class="f"><label>언어</label>${seg([['ko', '한국어'], ['en', 'English']], w.lang, "(v=>{U.wiz.lang=v;render()})")}</div>
+      <div class="f"><label>환산 통화</label><select class="in" onchange="U.wiz.cur=this.value">${[...CURS, 'KRW'].map(k => `<option value="${k}" ${w.cur === k ? 'selected' : ''}>${k === 'KRW' ? '원화만' : `${k} · ${CUR_NAME[k]}`}</option>`).join('')}</select></div>
+      <div class="f"><label>전체 면적 최소</label><div class="ui"><input class="in" type="number" value="${w.crit.areaMin ?? ''}" oninput="U.wiz.crit.areaMin=this.value===''?null:+this.value"><span>㎡</span></div></div>
+      <div class="f"><label>전체 면적 최대</label><div class="ui"><input class="in" type="number" value="${w.crit.areaMax ?? ''}" oninput="U.wiz.crit.areaMax=this.value===''?null:+this.value"><span>㎡</span></div></div>
+      <div class="f"><label>월 임대료 상한</label><div class="ui"><input class="in" type="number" value="${w.crit.rentMax ? w.crit.rentMax / 10000 : ''}" oninput="U.wiz.crit.rentMax=this.value===''?null:Math.round(this.value*10000)"><span>만원</span></div></div></div>
+      <div class="sub" style="margin-top:12px">희망 지역은 다음 단계에서 고르는 상권이 됩니다. 조건은 지도에서 매물을 고를 때와 요약표에 표시됩니다.</div>
+      <div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn pri" onclick="wizGo(2)">다음 · 상권 고르기 →</button></div></div>`;
+  if (w.step === 2) {
+    const ls = openListings(), out = wizOutside();
+    return head + `<div class="row a" style="--i:0;margin-bottom:12px"><span class="sub">제안할 상권을 순서대로 고르세요. 고른 순서가 제안서의 상권 순서가 됩니다.</span><div class="sp"></div>${w.areas.map((id, i) => `<span class="chip dark">${i + 1} ${esc(getA(id).name)}</span>`).join('')}</div>
+      <div class="grid">${S.areas.map((a, i) => { const inA = ls.filter(L => inMaster(L, a)), ok = inA.filter(L => fitsAll(L, a, {...crit, regions: [a.name]})).length, n = w.areas.indexOf(a.id) + 1;
+        return `<button class="card wz-a a ${n ? 'on' : ''}" style="--i:${i}" onclick="wizArea('${a.id}')"><div class="ph map-th">${mapSvg(a, {cands: candDots(a, inA, [], {...crit, regions: [a.name]})})}${n ? `<span class="wz-n">${n}</span>` : ''}</div>
+          <div class="bd"><div class="t">${esc(a.name)}</div><div class="kv"><span>진행 매물<b>${inA.length}건</b></span><span>조건 충족<b>${ok}건</b></span><span>상권 데이터<b>${AREAS[a.dataKey] ? '있음' : '없음'}</b></span></div></div></button>`; }).join('')}</div>
+      ${out.length ? `<div class="sub" style="margin-top:12px">어느 상권에도 속하지 않는 매물 ${out.length}건(${out.map(L => esc(bInfo(L).name)).join(', ')})은 다음 단계의 "상권 밖"에서 고를 수 있습니다.</div>` : ''}
+      <div class="sticky-foot"><button class="btn" onclick="wizGo(1)">← 이전</button><button class="btn pri" onclick="wizGo(3)">다음 · 매물 고르기 →</button></div>`;
+  }
+  const out = wizOutside(), tabs = [...w.areas.map(id => [id, getA(id).name]), ...(out.length ? [['etc', '상권 밖']] : [])];
+  const a = w.tab === 'etc' ? null : getA(w.tab), ls = a ? openListings().filter(L => inMaster(L, a)) : out;
+  return head + `<div class="row" style="margin-bottom:12px">${seg(tabs.map(([k, l]) => [k, `${l} ${(w.picks[k] || []).length || ''}`.trim()]), w.tab, "(v=>{U.wiz.tab=v;render()})")}<div class="sp"></div><span class="sub">지도의 점이나 목록을 누르면 넣고 뺍니다</span></div>
+    ${tabs.length ? picker(a, ls, w.picks[w.tab] || [], crit, 'wizPick') : '<div class="empty">고른 상권이 없습니다. 이전 단계에서 상권을 고르세요</div>'}
+    <div class="sticky-foot"><button class="btn" onclick="wizGo(2)">← 이전</button><span class="sub" style="align-self:center">상권 ${w.areas.length}곳 · 매물 ${total}건</span><button class="btn pri" ${total ? '' : 'disabled'} onclick="wizFinish()">제안서 만들기</button></div>`;
+}
+const newItem = lid => ({listingId: lid, comment: '', photo: null, layout: 2});
+function groupFromMaster(a, i) { return {...newGroup(a.name, i), photo: a.photo || GROUP_PHOTOS[i % GROUP_PHOTOS.length], style: clone(a.style || {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}), areaId: a.id}; }
+function wizFinish() {
+  const w = U.wiz, p = blankProp(w.name.trim(), w.lang, w.cur);
+  p.crit = wizCrit();
+  w.areas.forEach(id => { const g = groupFromMaster(getA(id), p.groups.length); (w.picks[id] || []).forEach(lid => g.items.push(newItem(lid))); p.groups.push(g); });
+  if ((w.picks.etc || []).length) { const g = {...newGroup('기타', p.groups.length), areaId: 'none'}; w.picks.etc.forEach(lid => g.items.push(newItem(lid))); p.groups.push(g); }
+  p.groups.forEach(g => g.items.forEach(it => { const L = getL(it.listingId); if (L.ownerId !== me()) note(L.ownerId, `${USERS[me()].name}님이 <b>${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</b>를 ${esc(p.clientName)} 제안서에 추가했습니다`); }));
+  S.proposals.unshift(p); U.wiz = null; save(); openProp(p.id); toast('제안서 생성', `상권 ${p.groups.length} · 매물 ${p.groups.reduce((n, g) => n + g.items.length, 0)}건`);
+}
+/* "+ 매물 추가" in the editor: the group's own map when it has a trade area */
+function pickBody(m) {
+  const p = getP(m.pid), g = p.groups[m.gi], a = groupMaster(g), mine = g.items.map(it => it.listingId);
+  const ls = openListings().filter(L => inMaster(L, a) && (mine.includes(L.id) || !p.groups.some(x => x.items.some(it => it.listingId === L.id))));
+  return picker(a, ls, mine, p.crit, 'groupPick');
+}
+function groupPick(lid) {
+  const p = getP(U.modal.pid), g = p.groups[U.modal.gi], i = g.items.findIndex(it => it.listingId === lid);
+  if (i >= 0) { g.items.splice(i, 1); save(); }
+  else if (p.groups.some(x => x.items.some(it => it.listingId === lid))) return toast('다른 상권에 이미 들어 있습니다', '편집 화면에서 상권 이동을 쓰세요');
+  else addItem(p.id, U.modal.gi, lid);
+  const mb = $('#modal-root .map-modal .mb'); // swap the body only, so the modal does not replay its opening animation
+  if (mb) mb.innerHTML = pickBody(U.modal); else renderModal();
+}
+
 /* ---------- proposals ---------- */
 function propsView() {
   const ps = visProps().filter(p => p.ownerId === me());
-  return `<div class="head"><h1>제안서</h1><span class="sub">${ps.length}건</span><div class="sp"></div><button class="btn pri" onclick="openModal({type:'newProp'})">+ 새 제안서</button></div>
+  return `<div class="head"><h1>제안서</h1><span class="sub">${ps.length}건</span><div class="sp"></div><button class="btn pri" onclick="startWiz()">+ 새 제안서</button></div>
   <div class="grid">${ps.map((p, i) => { const ls = p.groups.flatMap(g => g.items.map(it => getL(it.listingId))).filter(Boolean), ph = ls.slice(0, 3);
     return `<div class="card hov a" style="--i:${i}" onclick="openProp('${p.id}')"><div class="ph" style="display:grid;grid-template-columns:2fr 1fr;gap:2px;background:#ddd">${ph.map((L, j) => `<div style="background:url('${L.photos[0]}') center/cover;${j === 0 ? 'grid-row:span 2' : ''}"></div>`).join('')}</div>
       <div class="bd"><div class="t">${esc(p.clientName)}</div><div class="ad">${p.groups.map(g => esc(g.name)).join(' · ') || '상권 없음'}</div>
@@ -1902,7 +2039,7 @@ function propEditor(p) {
         <div class="ctl"><span>상권</span><select class="in" onchange="setG('${p.id}',${gi},'areaId',this.value||null)"><option value="">자동 · ${am ? esc(am.name) : '없음'}</option>${S.areas.map(x => `<option value="${x.id}" ${g.areaId === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}<option value="none" ${g.areaId === 'none' ? 'selected' : ''}>넣지 않음</option></select></div>
         <div class="ctl"><span>지도</span><button class="btn xs" ${groupMaster(g) ? '' : 'disabled'} onclick="MED={tool:'move',draft:[],sel:null,drag:null};openModal({type:'gmap',pid:'${p.id}',gi:${gi}})">지도 편집</button><span class="sub">${groupMaster(g) ? `표시 ${(groupMaster(g).marks || []).length - (g.mapHide || []).length + (g.marks || []).length}개` : '상권을 고르면 지도 장이 생깁니다'}</span></div>
       </div><div class="gi-list">${g.items.map((it, ii) => item(it, gi, ii, g)).join('') || '<div class="sub" style="padding:10px 0">매물을 추가하세요</div>'}
-        <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'pick',pid:'${p.id}',gi:${gi}})">+ 매물 추가</button></div></div></div>`;
+        <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'pick',pid:'${p.id}',gi:${gi}})">+ 매물 추가${groupMaster(g) ? ' · 지도에서' : ''}</button></div></div></div>`;
   };
   const tog = (on, l, s, fn) => `<label class="mod ${on ? 'on' : ''}"><div><b>${l}</b><span>${s}</span></div><input type="checkbox" ${on ? 'checked' : ''} onchange="${fn}"><i class="sw"></i></label>`;
   const mods = {...DEFAULT_MODS, ...(p.modules || {})}, c = p.crit;
@@ -1964,7 +2101,7 @@ function addItem(pid, gi, lid) {
   const p = getP(pid), L = getL(lid);
   if (p.groups.some(g => g.items.some(x => x.listingId === lid))) return toast('이미 포함된 물건');
   if (gi === 'new' || !p.groups[gi]) { p.groups.push(newGroup('새 상권', p.groups.length)); gi = p.groups.length - 1; }
-  p.groups[gi].items.push({listingId: lid, comment: '', photo: null, layout: 2});
+  p.groups[gi].items.push(newItem(lid));
   if (L.ownerId !== me()) note(L.ownerId, `${USERS[me()].name}님이 <b>${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</b>를 ${esc(p.clientName)} 제안서에 추가했습니다`);
   commit(); toast('추가됨', `${p.clientName} · ${p.groups[gi].name}`);
 }
@@ -1972,12 +2109,6 @@ function blankProp(name, lang, cur) {
   return {id: uid('P'), ownerId: me(), clientName: name, createdAt: stamp(), lang, cur, fx: clone(S.fx),
     cover: {title: '', region: 'SEOUL', date: S.today.slice(0, 7), photo: COVER_PHOTOS[0]},
     crit: {regions: [], rentMax: null, areaMin: null, areaMax: null}, slides: {summary: true, compare: true}, modules: {...DEFAULT_MODS}, groups: []};
-}
-function createProp(form) {
-  const name = form.cname.value.trim();
-  if (!name) return toast('클라이언트명을 입력하세요');
-  const p = blankProp(name, form.lang.value, form.cur.value);
-  S.proposals.unshift(p); U.modal = null; renderModal(); save(); openProp(p.id); toast('제안서 생성', '상권을 추가하고 매물을 넣으세요');
 }
 function createDup(form) {
   const src = getP(form.pid.value), name = form.cname.value.trim();
@@ -2066,7 +2197,11 @@ function renderModal() {
     h = `<div class="modal wide"><div class="mh"><b>${f.floor}F 임대 영역</b><span class="sub">클릭해서 꼭짓점 추가</span><div class="sp"></div>
       <button class="btn sm ghost" onclick="U.modal.pts.pop();renderModal()" ${m.pts.length ? '' : 'disabled'}>되돌리기</button><button class="btn sm ghost" onclick="U.modal.pts=[];renderModal()">초기화</button><button class="btn sm pri" onclick="savePoly()" ${m.pts.length >= 3 ? '' : 'disabled'}>완료</button></div>
       <div class="mb"><div class="stage" onclick="polyClick(event)"><img src="${plan.src}" draggable="false"><svg viewBox="0 0 1 1" preserveAspectRatio="none">${m.pts.length >= 2 ? `<polygon class="poly" vector-effect="non-scaling-stroke" points="${pts}"/>` : ''}</svg>${m.pts.map((p, i) => `<span class="pt ${i === 0 ? 'first' : ''}" style="left:${p[0] * 100}%;top:${p[1] * 100}%"></span>`).join('')}</div></div></div>`;
-  } else if (m.type === 'pick') {
+  } else if (m.type === 'pick' && groupMaster(getP(m.pid).groups[m.gi]) && window.MAP_DATA) {
+    const p = getP(m.pid), g = p.groups[m.gi], a = groupMaster(g);
+    h = `<div class="modal map-modal"><div class="mh"><b>${esc(g.name)} · 매물 고르기</b><span class="sub">${esc(a.name)} 영역 안의 진행 중 매물</span><div class="sp"></div><button class="btn sm ghost" onclick="openModal({type:'pickAll',pid:'${p.id}',gi:${m.gi}})">상권 밖 매물</button><button class="btn sm pri" onclick="closeModal();render()">완료</button></div>
+      <div class="mb">${pickBody(m)}</div></div>`;
+  } else if (m.type === 'pick' || m.type === 'pickAll') {
     const p = getP(m.pid), g = p.groups[m.gi], avail = S.listings.filter(L => live(L, me()) && !p.groups.some(x => x.items.some(it => it.listingId === L.id)));
     h = `<div class="modal"><div class="mh"><b>매물 추가</b><span class="sub">${esc(g.name)}</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
       ${avail.map(L => `<div class="pick"><div class="pi" style="background-image:url('${L.photos[0]}')"></div><div style="flex:1"><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span><div class="pick-kv"><span>1층 <b>${area1F(L.floors) != null ? nf(area1F(L.floors)) + '㎡' : '–'}</b></span><span>전체 <b>${nf(L.leaseArea)}㎡</b></span><span>임대료 <b>${priceShort(L.rent)}</b></span>${L.ownerId !== me() ? `<span>담당 <b>${USERS[L.ownerId].name}</b></span>` : ''}</div></div><button class="btn sm" onclick="addItem('${p.id}',${m.gi},'${L.id}');renderModal()">추가</button></div>`).join('') || '<div class="empty">추가할 물건 없음</div>'}</div></div>`;
@@ -2076,15 +2211,7 @@ function renderModal() {
       ${ps.map(p => { const has = p.groups.some(g => g.items.some(x => x.listingId === m.lid));
         return `<div class="pick"><div style="flex:1"><b>${esc(p.clientName)}</b><div class="sub">상권 ${p.groups.length} · 매물 ${p.groups.reduce((s, g) => s + g.items.length, 0)}건</div></div>${has ? '<span class="chip ok">포함됨</span>'
           : `<select class="in mini" id="tg-${p.id}">${p.groups.map((g, j) => `<option value="${j}">${esc(g.name)}</option>`).join('')}<option value="new">+ 새 상권</option></select><button class="btn sm" onclick="addItem('${p.id}',(v=>v==='new'?v:+v)($('#tg-${p.id}').value),'${m.lid}');renderModal()">추가</button>`}</div>`; }).join('') || '<div class="empty">제안서가 없습니다</div>'}
-      <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'newProp'})">+ 새 제안서</button></div></div>`;
-  } else if (m.type === 'newProp') {
-    h = `<div class="modal"><div class="mh"><b>새 제안서</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>
-      <form class="mb" onsubmit="event.preventDefault();createProp(this)"><div class="fg" style="grid-template-columns:1fr 1fr">
-      <div class="f" style="grid-column:1/-1"><label>클라이언트명</label><input class="in" name="cname" placeholder="회사명"></div>
-      <div class="f"><label>언어</label><select class="in" name="lang"><option value="ko">한국어</option><option value="en">English</option></select></div>
-      <div class="f"><label>환산 통화</label><select class="in" name="cur">${[...CURS, 'KRW'].map(k => `<option value="${k}">${k === 'KRW' ? '원화만' : k}</option>`).join('')}</select></div></div>
-      <div class="sub" style="margin-top:10px">환율은 지금 기준(${S.fx.month.replace('-', '년 ')}월 평균)으로 고정됩니다.</div>
-      <div class="row" style="justify-content:flex-end;margin-top:18px"><button type="button" class="btn" onclick="closeModal()">취소</button><button class="btn pri">생성</button></div></form></div>`;
+      <button class="btn sm" style="margin-top:10px" onclick="startWiz('${m.lid}')">+ 이 매물로 새 제안서</button></div></div>`;
   } else if (m.type === 'detail') {
     const L = getL(m.lid), own = L.ownerId === me(), lang = m.lang || 'ko';
     const sl = withDeck({lang, cur: 'USD', fx: S.fx, ownerId: L.ownerId}, () => listingSlide(L, null, 1, null)).replace('%PG%', '');
