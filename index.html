@@ -95,7 +95,13 @@ h1{font-size:23px;margin:0;letter-spacing:-.035em}
 .card .ph .ph-area{position:absolute;left:10px;bottom:10px;background:rgba(18,18,18,.78);color:#fff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
 .lf-bar{display:flex;gap:8px;align-items:center;margin:-8px 0 16px;flex-wrap:wrap}.lf-bar #lf-q{max-width:220px}.lf-bar select.in{width:auto}.lf-num{width:136px}.lf-num .in{padding-right:40px}
 .lsec{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}.lsec h2{font-size:17px;margin:0;letter-spacing:-.01em}
-.lm-i{align-items:flex-start}.lm-i .pk-n{margin-top:12px}.lm-act{display:flex;gap:6px;margin-top:4px}.lm .pk-map .cd{cursor:pointer}.bscroll{overflow-x:auto}.bt-p{padding:4px 18px 8px}.bt{min-width:980px}.bt td{vertical-align:top}.bt tr.bt-first td{border-top:1px solid var(--line)}.bt tbody tr:first-child td{border-top:0}.bt-b small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}.bt-b{max-width:260px}
+.lm-i{align-items:flex-start}.lm-i .pk-n{margin-top:12px}.lm-act{display:flex;gap:6px;margin-top:4px}.lm .pk-map .cd{cursor:pointer}.bscroll{overflow-x:auto}
+.br-t{min-width:980px}.br-t tbody tr{cursor:pointer}.br-t tbody tr:hover td{background:#f7f7f4}.br-t td small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
+.br-kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px 18px}.br-kv>div>span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}.br-kv b{font-size:13.5px;font-weight:600}
+.br-memo{margin-top:14px;padding:12px 14px;background:#f7f7f4;border-radius:10px;font-size:13.5px;line-height:1.6}
+.br-h{margin:20px 0 8px;font-size:14px}.br-new{display:flex;gap:8px;align-items:flex-end}.br-new textarea{flex:1;min-height:56px}
+.br-posts{display:flex;flex-direction:column;margin-top:10px}.br-post{padding:10px 0;border-top:1px solid var(--line2)}.br-post b{font-size:13px;margin-right:8px}.br-post p{margin:4px 0 0;font-size:13.5px;line-height:1.55}
+.br-want{display:flex;flex-wrap:wrap;gap:6px 14px}.bt-p{padding:4px 18px 8px}.bt{min-width:980px}.bt td{vertical-align:top}.bt tr.bt-first td{border-top:1px solid var(--line)}.bt tbody tr:first-child td{border-top:0}.bt-b small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}.bt-b{max-width:260px}
 .lm .pk-map{position:sticky;top:16px}.lm .pk-list{max-height:calc(100vh - 120px)}
 .card .ph .tags{position:absolute;left:10px;top:10px;display:flex;gap:5px}
 .card .ph .tags .chip{backdrop-filter:blur(8px);background:rgba(255,255,255,.88)}
@@ -430,7 +436,7 @@ textarea.in{resize:vertical;min-height:64px}
 .h1-in:hover{border-color:var(--line)}.h1-in:focus{outline:none;border-color:var(--accent);background:#fff}
 .cover-p{display:flex;gap:20px;align-items:center}.cover-p h3{margin:0 0 4px}.cp-th{width:240px;flex:none}
 .med-list{display:flex;flex-direction:column;gap:6px;max-height:236px;overflow:auto;padding-right:2px}
-.med-i{display:flex;align-items:center;gap:6px}.med-i .chip{width:58px;justify-content:center;flex:none}.med-i .in{padding:5px 8px;font-size:12.5px}.med-i.on .in{border-color:var(--accent)}
+.med-i{display:flex;align-items:center;gap:6px}.ac-w{position:relative;flex:1;min-width:0}.ac{display:none;position:fixed;z-index:200;min-width:260px;max-width:340px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.12);padding:4px;max-height:260px;overflow:auto}.ac.on{display:block}.ac button{display:flex;align-items:center;gap:8px;white-space:nowrap;width:100%;text-align:left;border:0;background:none;padding:7px 9px;border-radius:7px;font:inherit;font-size:13px;cursor:pointer}.ac button:hover{background:#f4f3ef}.ac small{color:var(--muted);font-size:11.5px}.ac .chip{margin-left:auto}.ac .ac-new{color:var(--accent-2);font-weight:600;border-top:1px solid var(--line2);border-radius:0 0 7px 7px}.med-i .chip{width:58px;justify-content:center;flex:none}.med-i .in{padding:5px 8px;font-size:12.5px}.med-i.on .in{border-color:var(--accent)}
 .modal.map-modal{width:min(1280px,100%)}
 /* ---------- map-first proposal ---------- */
 .map-list{position:absolute;right:14px;top:14px;display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,.95);padding:12px 14px;max-width:300px}
@@ -1656,7 +1662,8 @@ function mapEditor(c) {
   const vwRow = `<div class="med-sec"><h4>지도 장 범위</h4><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '자동 · 상권 영역과 매물이 다 보이게'}</div>
     <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '자동으로'}</button>` : ''}</div>
     ${c.kind === 'group' ? `<label class="chk" style="margin-top:6px"><input type="checkbox" ${c.g.mapDim ? 'checked' : ''} onchange="medCtx().g.mapDim=this.checked;medRefresh()"> 상권 영역 밖 흐리게</label>` : ''}</div>`;
-  const row = m => `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="이름" onkeydown="if(event.key==='Enter')this.blur()" onchange="medName('${m.id}',this.value)"><button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`;
+  const row = m => { const br = m.kind === 'brand' || m.kind === 'ours', x = br && m.brandId && getBr(m.brandId);
+    return `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><div class="ac-w"><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="${br ? '브랜드 이름 (한글 · 영어)' : '이름'}" autocomplete="off" onkeydown="if(event.key==='Enter')this.blur()" ${br ? `oninput="acShow(this,'${m.id}')" onblur="setTimeout(()=>acHide(this),150)"` : ''} onchange="medName('${m.id}',this.value)"><div class="ac"></div></div>${br ? (x ? `<button class="chip blue" title="브랜드 정보" onclick="openModal({type:'brand',id:'${x.id}'})">↗ ${esc(x.name)}</button>` : m.name ? '<span class="chip warn" title="브랜드 목록에 없음">미연결</span>' : '') : ''}<button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`; };
   return `<div class="med"><div class="med-main">
       <div class="row">${seg(tools, t, '(v=>medTool(v))')}${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
       <div class="sub">${MHINT[t]}</div>
@@ -1721,7 +1728,7 @@ function medDown(e) {
   if (t === 'bld' && b) { const a = c.a, id = +b.dataset.b; a.hidden = (a.hidden || []).includes(id) ? a.hidden.filter(z => z !== id) : [...(a.hidden || []), id]; return medRefresh(); }
   if (t === 'hide' && mk?.dataset.layer === 'co') { const id = mk.dataset.mk; c.g.mapHide = c.hide.includes(id) ? c.hide.filter(z => z !== id) : [...c.hide, id]; return medRefresh(); }
   if (MKIND[t] && t !== 'hl') {
-    const m = {id: uid('M'), kind: t, x, y, name: {brand: '새 브랜드', ours: '새 중개 매장', text: '도로 · 장소 이름'}[t]};
+    const m = {id: uid('M'), kind: t, x, y, name: t === 'text' ? '도로 · 장소 이름' : ''};
     c.list.push(m); MED.sel = m.id; medRefresh(); const i = $('#mk-' + m.id); if (i) { i.focus(); i.select(); }
   }
 }
@@ -1733,7 +1740,27 @@ function medDone() {
   else { const m = {id: uid('M'), kind: 'hl', pts: MED.draft, name: ''}; c.list.push(m); MED.sel = m.id; }
   MED.draft = []; MED.tool = 'move'; medRefresh();
 }
-function medName(id, v) { const m = medCtx().list.find(z => z.id === id); if (m) { m.name = v; medRefresh(); } }
+function medName(id, v) {
+  const m = medCtx().list.find(z => z.id === id); if (!m || MED.picked === id) return;
+  m.name = v.trim();
+  if (m.kind === 'brand' || m.kind === 'ours') {
+    if (!m.name) delete m.brandId;
+    else { const x = brMatch(m.name); if (x) m.brandId = x.id; else { m.brandId = brQuick(m.name).id; toast('새 브랜드 등록', `${m.name} · 브랜드 목록에 추가했습니다`); } }
+  }
+  medRefresh();
+}
+/* the suggest list under a brand mark's name: existing brands by Korean or English name, then "새 브랜드로" */
+function acShow(inp, id) {
+  const box = inp.nextElementSibling, t = inp.value.trim(), hits = brFind(t), exact = brMatch(t);
+  box.innerHTML = t ? hits.map(x => `<button type="button" onmousedown="event.preventDefault();medPickBrand('${id}','${x.id}')"><b>${esc(x.name)}</b>${x.en && x.en !== x.name ? `<small>${esc(x.en)}</small>` : ''}${x.stage ? `<span class="chip ${stg(x)[1]}">${stg(x)[0]}</span>` : ''}</button>`).join('')
+    + (exact ? '' : `<button type="button" class="ac-new" onmousedown="event.preventDefault();this.closest('.ac-w').querySelector('input').blur()">+ "${esc(t)}" 새 브랜드로 등록</button>`) : '';
+  const r = inp.getBoundingClientRect(); Object.assign(box.style, {left: r.left + 'px', top: r.bottom + 4 + 'px', width: Math.max(260, r.width) + 'px'});
+  box.classList.toggle('on', !!t);
+}
+function acHide(inp) { const box = inp?.nextElementSibling; if (box) box.classList.remove('on'); }
+function medPickBrand(id, bid) { const m = medCtx().list.find(z => z.id === id), x = getBr(bid); if (!m || !x) return; const typed = $('#mk-' + id)?.value || m.name; m.brandId = x.id; m.name = x.en && !/[가-힣]/.test(typed) ? x.en : x.name;
+  // re-rendering drops the focused input, which still fires its change with the half-typed text: ignore it
+  MED.picked = id; medRefresh(); setTimeout(() => { MED.picked = null; }); }
 function medDel(id) { const c = medCtx(), i = c.list.findIndex(z => z.id === id); if (i >= 0) c.list.splice(i, 1); medRefresh(); }
 
 /* slide chrome */
@@ -1939,7 +1966,7 @@ function guide() {
 }
 function setRole(r) { U.role = r; U.prop = null; U.wiz = null; D = null; U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
 function setTab(t) { if (t === 'mine' || t === 'shared') { lf().scope = t; t = 'list'; } U.tab[U.role] = t; U.prop = null; U.amap = null; U.wiz = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
-function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); D = null; U.prop = null; U.wiz = null; U.amap = null; U.modal = null; renderModal(); RET = null; Object.keys(LFS).forEach(k => delete LFS[k]); freshMed(); save(); render(); toast('초기화 완료'); }
+function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); S.brands = seedBrands(S.today); linkSeedMarks(); D = null; U.prop = null; U.wiz = null; U.amap = null; U.modal = null; renderModal(); RET = null; Object.keys(LFS).forEach(k => delete LFS[k]); freshMed(); save(); render(); toast('초기화 완료'); }
 
 function render() {
   const role = U.role, tab = U.tab[role];
@@ -1953,8 +1980,8 @@ function render() {
 function sideNav() {
   const u = USERS[me()], unread = S.notes.filter(n => n.to === me() && !n.read).length;
   const items = me() === 'admin'
-    ? [['over', '개요'], ['maps', '상권 지도'], ['bld', '건물 · 매물'], ['hist', '변경 이력'], ['handover', '이관'], ['notes', '알림']]
-    : [['list', '매물'], ['props', '제안서'], ['notes', '알림']];
+    ? [['over', '개요'], ['maps', '상권 지도'], ['bld', '건물 · 매물'], ['brands', '브랜드'], ['hist', '변경 이력'], ['handover', '이관'], ['notes', '알림']]
+    : [['list', '매물'], ['brands', '브랜드'], ['props', '제안서'], ['notes', '알림']];
   return `<div class="me"><b>${u.name}</b><span>${u.title}</span></div><nav class="nav">${items.map(([k, l]) => `<button class="${U.tab[me()] === k && !D && !U.prop ? 'on' : ''}" onclick="setTab('${k}')">${l}${k === 'notes' && unread ? `<span class="ndot">${unread}</span>` : ''}</button>`).join('')}</nav>`;
 }
 
@@ -1965,6 +1992,7 @@ function brokerView() {
   if (U.prop) return propEditor(getP(U.prop));
   const t = U.tab[me()];
   if (t === 'list') return listView();
+  if (t === 'brands') return brandsView();
   if (t === 'props') return propsView();
   if (t === 'notes') return notesView();
 }
@@ -2056,6 +2084,129 @@ function listView() {
   return `<div class="head"><h1>매물</h1><span class="sub">내 매물 ${mineN}건 진행 · 공유 매물 ${pool.filter(L => L.ownerId !== me()).length}건</span><div class="sp"></div>${lfView()}<button class="btn pri" onclick="newListing()">+ 등록</button></div>
     ${lfBar(ls.length, pool.length)}
     ${F.view === 'map' ? lfMap(ls) : byArea(ls).map(([a, xs]) => lsecHead(a, xs.length) + `<div class="grid">${xs.map((L, i) => listingCard(L, i, L.ownerId === me())).join('')}</div>`).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>'}`;
+}
+/* ---------- brands: the tenants brokers are looking for space for. Shared with every broker by default;
+   the owner and the admin edit, anyone writes in the activity log. Fields are placeholders until the
+   legacy tool's real list arrives. ---------- */
+const BCAT = ['F&B', '카페 · 베이커리', '패션', '뷰티', '라이프스타일', '리빙', '기타'];
+const stg = x => BSTAGE[x.stage] || ['–', ''];
+const BSTAGE = {scout: ['탐색 중', ''], pitch: ['제안 중', 'blue'], nego: ['협의 중', 'warn'], won: ['계약 완료', 'ok'], hold: ['보류', 'dark']};
+function seedBrands(today) {
+  const d = n => addDays(today, -n);
+  const B = (id, name, en, cat, ownerId, stage, want, py, rent, when, contact, memo, upd, posts) => ({id, name, en, cat, ownerId, stage, want, pyMin: py[0], pyMax: py[1], rentMax: rent, when, contact, memo, updated: d(upd), posts: posts.map(([by, n, text]) => ({by, at: d(n) + 'T10:00:00', text}))});
+  return [
+    B('BR1', '오르빗 커피 로스터스', 'Orbit Coffee Roasters', '카페 · 베이커리', 'brokerA', 'nego', ['성수', '한남'], [60, 90], 1800, '2027년 1분기', '공간기획팀 정우진 팀장', '로스팅 설비 들어갈 층고 4.5m 이상. 1층 전면 8m 이상 선호.', 2, [['brokerA', 2, '연무장5길 9-16 1층 2차 답사. 층고 4.2m라 설비 업체 확인 요청함'], ['brokerA', 12, '성수 1층 후보 4곳 1차 제안서 발송']]),
+    B('BR2', '메종 루멘', 'Maison Lumen', '뷰티', 'brokerA', 'pitch', ['가로수길'], [40, 70], 2500, '2027년 상반기', '리테일개발 한지민 매니저', '향수 · 캔들 플래그십. 코너 자리, 2개 층 연결 가능하면 우선.', 5, [['brokerA', 5, '가로수 24 1–2층 소개. 2층 천장 마감 사진 추가 요청']]),
+    B('BR3', '노스레인 아웃도어', 'Northlane Outdoor', '패션', 'brokerB', 'scout', ['성수', '명동'], [120, 200], 4500, '2027년 하반기', '영업본부 최성훈 부장', '국내 첫 단독 매장. 성수는 체험형, 명동은 관광객 동선 기준으로 각각 검토.', 9, [['brokerB', 9, '본사 미팅. 성수 · 명동 두 곳 모두 받아보기로 함']]),
+    B('BR4', '헤일앤오크 베이커리', 'Hale & Oak', '카페 · 베이커리', 'brokerB', 'pitch', ['성수'], [35, 55], 1200, '2026년 12월', '대표 윤가영', '제빵실 배기 필수. 기존 F&B 자리 선호(권리금 협의 가능).', 3, [['brokerB', 3, '연무장7길 3-1 1–2층 소개, 배기 경로 확인 중'], ['brokerA', 6, '연무장길 41-13 1층 기존 베이커리 자리 곧 나옵니다. 공유 매물로 올려둘게요']]),
+    B('BR5', '스튜디오 칸토 아이웨어', 'Studio Kanto Eyewear', '패션', 'brokerA', 'won', ['가로수길'], [20, 35], 900, '2026년 11월', '브랜드팀 이수아 과장', '가로수길 1층 계약 완료. 인테리어 착수.', 20, [['brokerA', 20, '계약 완료. 렌트프리 2개월 확정'], ['brokerA', 41, '가로수길 1층 3곳 제안']]),
+    B('BR6', '모노그램 서울', 'Monogram Seoul', '라이프스타일', 'brokerB', 'scout', ['한남', '성수'], [80, 140], 3000, '2027년 상반기', '리테일 총괄 김도윤 이사', '편집숍. 단독 건물이나 통임대 우선, 루프탑 있으면 가점.', 14, []),
+    B('BR7', '블룸하우스', 'Bloomhaus', '카페 · 베이커리', 'brokerA', 'hold', ['한남'], [30, 50], 1000, '미정', '대표 서하린', '플라워 카페. 투자 일정 밀려 내년 초 재개 예정.', 33, [['brokerA', 33, '대표 요청으로 잠시 보류. 2027년 1월 재연락']]),
+    B('BR8', '퀸스 스킨랩', 'Quince Skin Lab', '뷰티', 'brokerB', 'nego', ['명동'], [50, 80], 3500, '2027년 2월', '해외사업팀 박준영 차장', '외국인 관광객 비중 높은 1층. 면세 연계 검토.', 1, [['brokerB', 1, '명동 후보 임대인 측 렌트프리 3개월 제시'], ['brokerB', 8, '명동 1층 2곳 답사']]),
+    B('BR9', '틸 애슬레틱', 'Teal Athletic', '패션', 'brokerA', 'scout', ['성수', '가로수길'], [70, 110], 2200, '2027년 하반기', '마케팅본부 정다은 팀장', '러닝 커뮤니티 공간 겸 매장. 샤워실 둘 수 있는 지하 공간 있으면 좋음.', 7, [['brokerA', 7, '요청 조건 정리, 성수 후보부터 추리는 중']]),
+    B('BR10', '도담 한식 다이닝', 'Dodam', 'F&B', 'brokerB', 'pitch', ['한남'], [45, 70], 1600, '2027년 1분기', '대표 강민호', '저녁 위주 다이닝. 주차 3대 이상, 2층도 가능.', 4, [['brokerB', 4, '한남 2층 후보 2곳 제안서 발송']]),
+    B('BR11', '피어스 테일러링', 'Pierce Tailoring', '패션', 'brokerA', 'scout', ['한남', '가로수길'], [25, 40], 1100, '2027년 상반기', '대표 문태준', '맞춤 정장 쇼룸. 1층 아니어도 됨, 엘리베이터 필수.', 18, []),
+    B('BR12', '슬로우 포어 와인바', 'Slow Pour', 'F&B', 'brokerB', 'scout', ['성수'], [30, 45], 900, '2027년 상반기', '운영이사 오세린', '골목 안쪽 조용한 자리 선호. 기존 주점 허가 자리면 우선.', 11, [['brokerB', 11, '첫 미팅, 성수 골목 안쪽 위주로 찾기로']]),
+    B('BR13', '하우스 오브 린넨', 'House of Linen', '리빙', 'brokerA', 'pitch', ['성수'], [90, 130], 2600, '2027년 3월', '리테일개발 임채원 매니저', '리빙 플래그십. 2개 층, 화물 엘리베이터 필요.', 6, [['brokerA', 6, '성수 SE타워 1층 + 연무장길 39-21 비교안 전달']]),
+    ...[['블루보틀', 'Blue Bottle', '카페 · 베이커리'], ['디올', 'Dior', '패션'], ['킨포크', 'Kinfolk', '카페 · 베이커리'], ['무신사 스탠다드', 'Musinsa Standard', '패션'], ['탬버린즈', 'Tamburins', '뷰티'],
+      ['아모레', 'Amore', '뷰티'], ['페넥', 'Fennec', '패션'], ['애플', 'Apple', '리빙'], ['이솝', 'Aesop', '뷰티'], ['무신사', 'Musinsa', '패션'], ['르라보', 'Le Labo', '뷰티'], ['꼼데가르송', 'Comme des Garçons', '패션'],
+      ['올리브영', 'Olive Young', '뷰티'], ['자라', 'Zara', '패션'], ['유니클로', 'Uniqlo', '패션']].map(([name, en, cat], i) => B('BM' + (i + 1), name, en, cat, 'admin', '', [], ['', ''], '', '', '', '', 40 + i, [])),
+    B('BR14', '누크 젤라또', 'Nook Gelato', '카페 · 베이커리', 'brokerB', 'won', ['명동'], [15, 25], 1300, '2026년 10월', '대표 한소율', '명동 1층 소형 계약 완료.', 27, [['brokerB', 27, '계약 완료']]),
+  ];
+}
+const getBr = id => S.brands.find(x => x.id === id);
+const BRF = {};
+const brf = () => BRF[me()] = BRF[me()] || {q: '', cat: '', stage: '', who: me() === 'admin' ? '' : 'all'};
+function brPass(x, F = brf()) {
+  const q = F.q.replace(/\s/g, '').toLowerCase();
+  return (!q || `${x.name}${x.en}${x.contact}${x.want.join('')}`.replace(/\s/g, '').toLowerCase().includes(q)) && (!F.cat || x.cat === F.cat) && (!F.stage || x.stage === F.stage)
+    && (!F.who || F.who === 'all' || (F.who === 'mine' ? x.ownerId === me() : x.ownerId === F.who));
+}
+const brCan = x => me() === 'admin' || x.ownerId === me();
+function brandsView() {
+  const F = brf(), adm = me() === 'admin', ls = S.brands.filter(x => brPass(x)).sort((a, b) => b.updated.localeCompare(a.updated));
+  const busy = F.q || F.cat || F.stage || (adm ? F.who : F.who !== 'all');
+  return `<div class="head"><h1>브랜드</h1><span class="sub">${adm ? '전체 브로커가 올린 브랜드' : '모든 브로커가 같이 봅니다'} · ${S.brands.length}개</span><div class="sp"></div>${adm ? '' : '<button class="btn pri" onclick="openModal({type:\'brEdit\'})">+ 브랜드 등록</button>'}</div>
+    <div class="lf-bar">${adm ? `<select class="in" onchange="brf().who=this.value;render()"><option value="">모든 브로커</option>${Object.keys(USERS).filter(k => k !== 'admin').map(k => `<option value="${k}" ${F.who === k ? 'selected' : ''}>${USERS[k].name}</option>`).join('')}</select>` : seg([['all', '전체'], ['mine', '내 브랜드']], F.who, "(v=>{brf().who=v;render()})")}
+      <input class="in" id="lf-q" placeholder="브랜드 · 담당자 · 상권 검색" value="${esc(F.q)}" oninput="brf().q=this.value;lfRender()">
+      <select class="in" onchange="brf().cat=this.value;render()"><option value="">모든 업종</option>${BCAT.map(c => `<option ${F.cat === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>
+      <select class="in" onchange="brf().stage=this.value;render()"><option value="">모든 단계</option>${Object.entries(BSTAGE).map(([k, [l]]) => `<option value="${k}" ${F.stage === k ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <span class="sub">${ls.length === S.brands.length ? `${ls.length}개` : `${ls.length} / ${S.brands.length}개`}</span>${busy ? `<button class="btn xs ghost" onclick="delete BRF[me()];render()">필터 지우기</button>` : ''}</div>
+    <div class="panel bt-p"><div class="bscroll"><table class="tbl br-t"><thead><tr><th>브랜드</th><th>업종</th><th>희망 상권</th><th class="num">면적</th><th class="num">임대료 상한</th><th>입점 희망</th><th>단계</th><th>담당</th><th class="num">업데이트</th></tr></thead><tbody>
+      ${ls.map(x => `<tr onclick="openModal({type:'brand',id:'${x.id}'})"><td><b>${esc(x.name)}</b><small>${esc(x.en)}</small></td><td>${esc(x.cat || '–')}</td><td>${x.want.map(esc).join(' · ') || '–'}</td><td class="num">${x.pyMin || x.pyMax ? `${x.pyMin || ''}–${x.pyMax || ''}평` : '–'}</td><td class="num">${x.rentMax ? nf(x.rentMax) + '만원' : '–'}</td><td>${esc(x.when || '–')}</td>
+        <td>${x.stage ? `<span class="chip ${stg(x)[1]}">${stg(x)[0]}</span>` : '<span class="sub">지도 표시만</span>'}</td><td>${USERS[x.ownerId].name}</td><td class="num">${fmtDate(x.updated)}${x.posts.length ? `<small>글 ${x.posts.length}</small>` : ''}</td></tr>`).join('') || '<tr><td colspan="9" class="empty">조건에 맞는 브랜드가 없습니다</td></tr>'}</tbody></table></div></div>`;
+}
+function brandModal(m) {
+  const x = getBr(m.id), adm = me() === 'admin';
+  const kv = [['업종', esc(x.cat || '–')], ['단계', `${x.stage ? `<span class="chip ${stg(x)[1]}">${stg(x)[0]}</span>` : '<span class="sub">지도 표시만</span>'}`], ['희망 상권', x.want.map(esc).join(' · ') || '–'], ['면적', x.pyMin || x.pyMax ? `${x.pyMin || ''}–${x.pyMax || ''}평` : '–'],
+    ['임대료 상한', x.rentMax ? `월 ${nf(x.rentMax)}만원` : '–'], ['입점 희망', esc(x.when || '–')], ['브랜드 담당자', esc(x.contact || '–')], ['담당', `${USERS[x.ownerId].name} · ${fmtDate(x.updated)} 업데이트`], ['지도 표시', brUses(x.id).map(esc).join(' · ') || '–']];
+  return `<div class="modal wide"><div class="mh"><b>${esc(x.name)}</b><span class="sub">${esc(x.en)}</span><div class="sp"></div>
+      ${adm ? '' : `<button class="btn sm" onclick="brandWiz('${x.id}')">이 브랜드로 제안서</button>`}${brCan(x) ? `<button class="btn sm ghost" onclick="openModal({type:'brEdit',id:'${x.id}'})">수정</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
+    <div class="mb"><div class="br-kv">${kv.map(([k, v]) => `<div><span>${k}</span><b>${v}</b></div>`).join('')}</div>
+      ${x.memo ? `<div class="br-memo">${esc(x.memo)}</div>` : ''}
+      <h4 class="br-h">활동 <span class="sub">${x.posts.length}</span></h4>
+      <form class="br-new" onsubmit="event.preventDefault();brPost('${x.id}',this.t.value)"><textarea class="in" name="t" placeholder="답사, 제안, 연락 내용을 남기세요. 모든 브로커가 봅니다"></textarea><button class="btn sm pri">남기기</button></form>
+      <div class="br-posts">${x.posts.map(q => `<div class="br-post"><b>${USERS[q.by].name}</b><span class="sub">${fmtDate(q.at.slice(0, 10))}</span><p>${esc(q.text)}</p></div>`).join('') || '<div class="sub">아직 글이 없습니다</div>'}</div></div></div>`;
+}
+function brPost(id, t) {
+  t = (t || '').trim(); if (!t) return toast('내용을 입력하세요');
+  const x = getBr(id); x.posts.unshift({by: me(), at: stamp(), text: t}); x.updated = S.today;
+  if (x.ownerId !== me()) note(x.ownerId, `${USERS[me()].name}님이 <b>${esc(x.name)}</b>에 글을 남겼습니다`);
+  commit(); renderModal();
+}
+function brEditModal(m) {
+  const x = m.id ? getBr(m.id) : {name: '', en: '', cat: BCAT[0], stage: 'scout', want: [], pyMin: '', pyMax: '', rentMax: '', when: '', contact: '', memo: ''};
+  const opts = [...new Set([...S.areas.map(a => a.name), ...x.want])];
+  return `<div class="modal"><div class="mh"><b>${m.id ? '브랜드 수정' : '브랜드 등록'}</b><span class="sub">모든 브로커에게 공유됩니다</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div>
+    <form class="mb" onsubmit="event.preventDefault();brSave(this,'${m.id || ''}')">
+      <div class="fg"><div class="f"><label>브랜드명</label><input class="in" name="name" value="${esc(x.name)}" required></div><div class="f"><label>영문명</label><input class="in" name="en" value="${esc(x.en)}"></div>
+        <div class="f"><label>업종</label><select class="in" name="cat"><option value="" ${x.cat ? '' : 'selected'}>–</option>${BCAT.map(c => `<option ${x.cat === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
+        <div class="f"><label>단계</label><select class="in" name="stage"><option value="" ${x.stage ? '' : 'selected'}>– 지도 표시만</option>${Object.entries(BSTAGE).map(([k, [l]]) => `<option value="${k}" ${x.stage === k ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="f"><label>면적 (평)</label><div class="row" style="flex-wrap:nowrap;gap:6px"><input class="in" type="number" min="0" name="pyMin" value="${x.pyMin}" placeholder="최소"><input class="in" type="number" min="0" name="pyMax" value="${x.pyMax}" placeholder="최대"></div></div>
+        <div class="f"><label>임대료 상한</label><div class="ui"><input class="in" type="number" min="0" name="rentMax" value="${x.rentMax}"><span>만원</span></div></div>
+        <div class="f"><label>입점 희망</label><input class="in" name="when" value="${esc(x.when)}" placeholder="예: 2027년 1분기"></div>
+        <div class="f"><label>브랜드 담당자</label><input class="in" name="contact" value="${esc(x.contact)}" placeholder="부서 · 이름 · 직함"></div></div>
+      <div class="f" style="margin-top:12px"><label>희망 상권</label><div class="br-want">${opts.map(n => `<label class="chk"><input type="checkbox" name="want" value="${esc(n)}" ${x.want.includes(n) ? 'checked' : ''}> ${esc(n)}</label>`).join('')}</div></div>
+      <div class="f" style="margin-top:12px"><label>요청 사항</label><textarea class="in" name="memo">${esc(x.memo)}</textarea></div>
+      <div class="row" style="justify-content:flex-end;margin-top:16px">${m.id && brCan(x) ? `<button type="button" class="btn ghost danger" onclick="brDel('${m.id}')">삭제</button><div class="sp"></div>` : ''}<button type="button" class="btn" onclick="closeModal()">취소</button><button class="btn pri">저장</button></div></form></div>`;
+}
+function brSave(f, id) {
+  const v = k => f[k].value.trim(), n = k => f[k].value === '' ? '' : Math.max(0, +f[k].value);
+  if (!v('name')) return toast('브랜드명을 입력하세요');
+  const dup = [v('name'), v('en')].map(brMatch).find(b => b && b.id !== id);
+  if (dup && !f.dataset.ok) { f.dataset.ok = 1; return toast('이미 있는 브랜드일 수 있습니다', `${dup.name}${dup.en ? ` (${dup.en})` : ''} · 그래도 저장하려면 다시 누르세요`); }
+  const x = id ? getBr(id) : {id: 'BR' + Date.now().toString(36), ownerId: me(), posts: []};
+  Object.assign(x, {name: v('name'), en: v('en'), cat: f.cat.value, stage: f.stage.value, want: [...f.querySelectorAll('[name=want]:checked')].map(c => c.value), pyMin: n('pyMin'), pyMax: n('pyMax'), rentMax: n('rentMax'), when: v('when'), contact: v('contact'), memo: v('memo'), updated: S.today});
+  if (!id) S.brands.unshift(x);
+  commit(); openModal({type: 'brand', id: x.id}); toast(id ? '브랜드 수정' : '브랜드 등록', x.name);
+}
+function brDel(id) { const x = getBr(id); if (!confirm(`${x.name} 브랜드를 지울까요?`)) return; S.brands = S.brands.filter(b => b !== x); U.modal = null; renderModal(); commit(); toast('브랜드 삭제', x.name); }
+/* one brand registry for the board and the map: a brand or 자사 중개 mark on a map points at a brand by brandId.
+   A name matches a brand when, spaces and case aside, it is the brand's Korean or English name, or starts with
+   one followed by a branch word ("Dior 성수" → Dior). */
+const brKey = t => (t || '').toLowerCase().replace(/[\s·.\-']/g, '');
+function brMatch(t) {
+  const k = brKey(t); if (!k) return null;
+  const names = x => [x.name, x.en].filter(Boolean);
+  return S.brands.find(x => names(x).some(n => brKey(n) === k)) || S.brands.find(x => names(x).some(n => (t || '').toLowerCase().startsWith(n.toLowerCase() + ' '))) || null;
+}
+function brFind(t) {
+  const k = brKey(t); if (!k) return [];
+  return S.brands.map(x => ({x, hit: [x.name, x.en].filter(Boolean).map(brKey).reduce((b, n) => Math.max(b, n.startsWith(k) ? 2 : n.includes(k) ? 1 : 0), 0)})).filter(r => r.hit).sort((a, b) => b.hit - a.hit).slice(0, 6).map(r => r.x);
+}
+const brQuick = name => { const x = {id: 'BR' + Date.now().toString(36), name, en: /[가-힣]/.test(name) ? '' : name, cat: '', ownerId: me(), stage: '', want: [], pyMin: '', pyMax: '', rentMax: '', when: '', contact: '', memo: '', updated: S.today, posts: []}; S.brands.unshift(x); return x; };
+/* where a brand shows on maps: company maps and proposals' own layers */
+function brUses(id) {
+  const out = []; S.areas.forEach(a => (a.marks || []).forEach(m => { if (m.brandId === id) out.push(a.name); }));
+  visProps().forEach(p => p.groups.forEach(g => (g.marks || []).forEach(m => { if (m.brandId === id) out.push(`${p.clientName} 제안서`); })));
+  return [...new Set(out)];
+}
+function linkSeedMarks() { S.areas.forEach(a => (a.marks || []).forEach(m => { if ((m.kind === 'brand' || m.kind === 'ours') && !m.brandId) { const x = brMatch(m.name); if (x) m.brandId = x.id; } })); }
+/* "이 브랜드로 제안서": the wizard opens with the brand's name, terms and wanted trade areas filled in */
+function brandWiz(id) {
+  const x = getBr(id); startWiz();
+  Object.assign(U.wiz, {name: x.name, crit: {rentMax: x.rentMax ? x.rentMax * 10000 : null, areaMin: x.pyMin ? Math.round(x.pyMin / PYR) : null, areaMax: x.pyMax ? Math.round(x.pyMax / PYR) : null}, areas: S.areas.filter(a => x.want.includes(a.name)).map(a => a.id)});
+  render();
 }
 function toggleVis(id) {
   const L = getL(id); L.visibility = L.visibility === 'shared' ? 'private' : 'shared';
@@ -2518,6 +2669,7 @@ function adminView() {
   const t = U.tab.admin;
   if (t === 'over') return adminOver();
   if (t === 'bld') return adminBld();
+  if (t === 'brands') return brandsView();
   if (t === 'handover') return adminHand();
   if (t === 'maps') return adminMaps();
   if (t === 'notes') return notesView();
@@ -2696,6 +2848,10 @@ function renderModal() {
       <div class="na-res">${(m.results || []).map((r, i) => `<label class="na-i ${m.pick === i ? 'on' : ''}"><input type="radio" name="na" ${m.pick === i ? 'checked' : ''} onchange="U.modal.pick=${i};renderModal()"><span>${esc(r.name)}<small>${r.lat.toFixed(4)}, ${r.lng.toFixed(4)}</small></span></label>`).join('') || (m.results ? '<div class="sub">찾은 장소가 없습니다</div>' : '<div class="sub">장소를 찾으면 그 주변 약 1.7 × 0.8 km의 도로 · 건물 데이터를 OpenStreetMap에서 받아 지도를 만듭니다. 다음 단계에서 상권 영역을 그립니다.</div>')}</div>
       ${m.busy ? `<div class="sub" style="margin-top:10px">${m.busy}</div>` : ''}
       <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" onclick="closeModal()">취소</button><button class="btn pri" ${m.busy || m.pick == null ? 'disabled' : ''} onclick="naCreate()">지도 만들기</button></div></div></div>`;
+  } else if (m.type === 'brand') {
+    h = brandModal(m);
+  } else if (m.type === 'brEdit') {
+    h = brEditModal(m);
   } else if (m.type === 'hist') {
     const L = getL(m.lid), {full, hs} = histFor(m.lid);
     h = `<div class="modal wide"><div class="mh"><b>변경 이력</b><span class="sub">${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</span><div class="sp"></div>${full ? '' : '<span class="chip">공개 항목만</span>'}<button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">${histList(hs)}</div></div>`;
@@ -2727,6 +2883,7 @@ function toast(t, s) {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && U.modal) closeModal(); });
 
 if (!S) S = seed();
+if (!S.brands) { S.brands = seedBrands(S.today); linkSeedMarks(); }
 if (S.osm && window.MAP_DATA) Object.assign(window.MAP_DATA, S.osm); // trade areas created in this browser
 save(); render();
 </script>
