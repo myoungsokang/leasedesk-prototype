@@ -95,14 +95,27 @@ h1{font-size:23px;margin:0;letter-spacing:-.035em}
 .card .ph .ph-area{position:absolute;left:10px;bottom:10px;background:rgba(18,18,18,.78);color:#fff;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
 .lf-bar{display:flex;gap:8px;align-items:center;margin:-8px 0 16px;flex-wrap:wrap}.lf-bar #lf-q{max-width:220px}.lf-bar select.in{width:auto}.lf-num{width:136px}.lf-num .in{padding-right:40px}
 .lsec{display:flex;align-items:baseline;gap:10px;margin:26px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--line)}.lsec h2{font-size:17px;margin:0;letter-spacing:-.01em}
-.lm-i{align-items:flex-start}.lm-i .pk-n{margin-top:12px}.lm-act{display:flex;gap:6px;margin-top:4px}.lm .pk-map .cd{cursor:pointer}.bscroll{overflow-x:auto}
 .br-t{min-width:980px}.br-t tbody tr{cursor:pointer}.br-t tbody tr:hover td{background:#f7f7f4}.br-t td small{display:block;color:var(--muted);font-size:11.5px;margin-top:2px}
 .br-kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px 18px}.br-kv>div>span{display:block;font-size:11.5px;color:var(--muted);margin-bottom:3px}.br-kv b{font-size:13.5px;font-weight:600}
 .br-memo{margin-top:14px;padding:12px 14px;background:#f7f7f4;border-radius:10px;font-size:13.5px;line-height:1.6}
 .br-h{margin:20px 0 8px;font-size:14px}.br-new{display:flex;gap:8px;align-items:flex-end}.br-new textarea{flex:1;min-height:56px}
 .br-posts{display:flex;flex-direction:column;margin-top:10px}.br-post{padding:10px 0;border-top:1px solid var(--line2)}.br-post b{font-size:13px;margin-right:8px}.br-post p{margin:4px 0 0;font-size:13.5px;line-height:1.55}
 .br-want{display:flex;flex-wrap:wrap;gap:6px 14px}.bt-p{padding:4px 18px 8px}.bt{min-width:980px}.bt td{vertical-align:top}.bt tr.bt-first td{border-top:1px solid var(--line)}.bt tbody tr:first-child td{border-top:0}.bt-b small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}.bt-b{max-width:260px}
-.lm .pk-map{position:sticky;top:16px}.lm .pk-list{max-height:calc(100vh - 120px)}
+.lmap-w{position:relative;border:1px solid var(--line);overflow:hidden;z-index:0}#lmap{height:calc(100vh - 250px);min-height:480px;background:#f4f3ef}
+.lmap-w .lmap-lyr{left:auto;right:10px;z-index:500}.lmap-w .pk-leg{z-index:500}.lmap-hint{position:absolute;right:10px;bottom:26px;z-index:500;background:rgba(255,255,255,.94);padding:5px 12px;font-size:12px;color:var(--ink2);border-radius:999px;pointer-events:none;white-space:nowrap}
+.lp{width:16px;height:16px;border-radius:50%;flex:none;display:inline-block;background:var(--c);border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);box-sizing:border-box}
+.lp.near{background:#fff;border:4px solid var(--c)}.lp.far{background:#fff;border:3px dashed var(--c);box-shadow:0 0 0 1px #fff}
+.lp.sel{box-shadow:0 0 0 3px #fff,0 0 0 6px #d9822b}.lp-w{background:none;border:0;display:flex;align-items:center;justify-content:center}
+.lpop-w .leaflet-popup-content{margin:12px 14px;font:inherit;font-size:13px}.lpop-w .leaflet-popup-content-wrapper{border-radius:12px}
+.lpop-c{display:flex;gap:10px;cursor:pointer;border-radius:8px}.lpop-c:hover b{text-decoration:underline}.lpop .pk-b small{display:block}.lpop-a{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line2)}
+.lpop-k{font-weight:700;margin-bottom:8px}.lpop-o{padding:8px 0;border-top:1px solid var(--line2)}.lpop-kv{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:6px}.lpop-kv span{font-size:11.5px;color:var(--muted)}.lpop-kv b{display:block;font-size:13px;color:var(--ink)}
+.lpop-f{margin-top:6px;padding-top:8px;border-top:1px solid var(--line2);font-size:12.5px}
+.ztip.off{background:rgba(217,130,43,.9);font-size:11px;font-weight:600}
+.ztip{background:rgba(20,20,20,.82);color:#fff;border:0;box-shadow:none;font-weight:700;font-size:12px;padding:3px 8px;border-radius:999px}.ztip::before{display:none}
+.lf-areas{display:flex;align-items:center;gap:10px;margin:-6px 0 14px;overflow-x:auto;white-space:nowrap}.lf-areas .seg{flex:none}
+.lsub{margin:18px 0 10px;font-size:13px;font-weight:700;color:#a85a12}
+.card .ph .ph-area.near{background:rgba(168,90,18,.85)}.lm-act{display:flex;gap:6px;margin-top:4px}.bscroll{overflow-x:auto}.bt-p{padding:4px 18px 8px}.bt{min-width:980px}.bt td{vertical-align:top}.bt tr.bt-first td{border-top:1px solid var(--line)}.bt tbody tr:first-child td{border-top:0}.bt-b small{display:block;color:var(--muted);font-size:11.5px;margin-top:3px}.bt-b{max-width:260px}
+
 .card .ph .tags{position:absolute;left:10px;top:10px;display:flex;gap:5px}
 .card .ph .tags .chip{backdrop-filter:blur(8px);background:rgba(255,255,255,.88)}
 .card .ph .tags .chip.red{background:rgba(251,233,232,.95)}
@@ -543,7 +556,7 @@ button.chip{border:0;cursor:pointer}
   .nav button{white-space:nowrap;padding:8px 12px}
   .main{padding:20px 16px 80px}
   .ed-grid,.grp-b,.pcv,.pv-wrap,.med,.pk{grid-template-columns:1fr}
-  .lm .pk-map{position:relative;top:auto}.lm .pk-list{max-height:none}
+  #lmap{height:70vh}.lmap-hint{display:none}
   .cover-p{flex-direction:column;align-items:stretch}.cp-th{width:100%}
   .wz-steps{margin-left:0;flex-basis:100%}
   .outl:not(.in-panel){display:none}
@@ -602,6 +615,9 @@ button.chip{border:0;cursor:pointer}
 <div id="modal-root"></div>
 <div id="toasts"></div>
 <div id="print-root"></div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>window.Lf = window.L && L.noConflict();</script>
 <script src="map-data.js"></script>
 <script src="official-data.js"></script>
 <script>
@@ -1165,12 +1181,13 @@ function seed() {
       grants: [], createdAt: '2026-09-20T09:00:00'},
   ];
   L.forEach(l => l.leaseArea = sumArea(l.floors));
+const SSNEAR = [["아차산로11길","11",37.5447374,127.0593427],["성수일로","47",37.5447141,127.0495507],["성수이로","51",37.5402606,127.0551441]];
 const SS30 = [["연무장길","28-12",37.543023,127.052313],["연무장5길","9-16",37.544414,127.052676],["연무장길","39-21",37.543421,127.053963],["연무장길","41-13",37.543199,127.054015],["연무장길","39-29",37.543598,127.054045],["연무장길","41-25",37.54346,127.054143],["연무장길","43-1",37.542866,127.054192],["연무장7길","3-1",37.543118,127.054325],["연무장7길","13",37.544198,127.054377],["연무장7길","7",37.543351,127.054437],["연무장7길","11",37.543797,127.05445],["연무장7길","12",37.543666,127.054855],["연무장7가길","5",37.543198,127.054993],["연무장7길","16",37.54397,127.055123],["연무장7가길","5-1",37.543161,127.055118],["연무장7가길","8",37.542945,127.055254],["연무장7가길","7",37.543107,127.055271],["성수일로6길","47",37.544278,127.055287],["연무장7가길","7-1",37.543074,127.055393],["연무장7가길","10-1",37.542869,127.05549],["연무장7가길","12",37.542836,127.055599],["연무장7가길","11",37.543,127.055643],["연무장9길","7",37.542957,127.055763],["연무장5가길","32",37.543076,127.055811],["아차산로","116",37.544027,127.056611],["성수이로","90",37.542992,127.056857],["연무장11길","15",37.54339,127.057311],["연무장11길","10",37.542929,127.057555],["성수이로20길","12",37.543119,127.057955],["성수이로20길","16",37.543022,127.058386]];
   const rnd = (i, k) => ((i * 9301 + k * 49297 + 7) % 233280) / 233280, won = (v, u) => Math.round(v / u) * u;
   const PSET = [[PH.shopFront, PH.shopIn, PH.cafe], [PH.brick, PH.shopLoft, PH.cafeBar], [PH.apparel, PH.apparel2, PH.shopIn], [PH.cafeSign, PH.cafe, PH.terrace], [PH.openSign, PH.shopLoft, PH.apparel3]];
   const NOTES = ['연무장길 메인 동선 · 코너', '전면 폭 8m · 통유리', '팝업 운영 이력 다수', '테라스 사용 가능', '층고 4.2m', '', '', '대로변 가시성'];
-  const s30 = SS30.map(([road, no, lat, lng], i) => {
-    const r = k => rnd(i, k), B = {id: 'BS' + (i + 1), pnu: 'SS30-' + (i + 1), lat, lng, address: `서울 성동구 ${road} ${no}`, name: `${road} ${no}`, use: r(1) < .7 ? '제2종 근린생활시설' : '제1종 근린생활시설',
+  const mkSS = ([road, no, lat, lng], i, tag = '', j = i) => {
+    const r = k => rnd(j, k), B = {id: 'BS' + tag + (i + 1), pnu: (tag ? 'SSN-' : 'SS30-') + (i + 1), lat, lng, address: `서울 성동구 ${road} ${no}`, name: `${road} ${no}`, use: r(1) < .7 ? '제2종 근린생활시설' : '제1종 근린생활시설',
       above: 2 + Math.floor(r(2) * 4), below: r(3) < .55 ? 1 : 0, gfa: 280 + Math.round(r(4) * 900), year: 1984 + Math.floor(r(5) * 39), status: '준공', area: 'seongsu'};
     b.push(B);
     const py1 = 16 + Math.round(r(6) * 50), m1 = Math.round(py1 / .3025), shape = r(7), main = road === '연무장길';
@@ -1178,12 +1195,15 @@ const SS30 = [["연무장길","28-12",37.543023,127.052313],["연무장5길","9-
     const perPy = (main ? 30 : 19) + r(8) * (main ? 9 : 9), upper = floors.filter(f => f.floor !== 1).reduce((t, f) => t + f.area * .3025, 0);
     const rent = won((perPy * py1 + perPy * .42 * upper) * 10000, 100000), dep = won(rent * (r(9) < .5 ? 10 : 12), 10000000);
     const km = r(10), mg = r(11), ho = r(12), own = i % 3 === 0 ? 'brokerB' : 'brokerA';
-    return {id: 'LS' + (i + 1), buildingId: B.id, ownerId: own, visibility: own === 'brokerB' || i % 2 ? 'shared' : 'private', status: 'active', leaseType: 'partial', floors, plans: [], photos: PSET[i % PSET.length],
+    return {id: 'LS' + tag + (i + 1), buildingId: B.id, ownerId: own, visibility: own === 'brokerB' || i % 2 ? 'shared' : 'private', status: 'active', leaseType: 'partial', floors, plans: [], photos: PSET[i % PSET.length],
       exclArea: null, deposit: P('v', dep), rent: P('v', rent), mgmt: mg < .5 ? P('util') : mg < .8 ? P('v', won(1.4e4 * (py1 + upper), 10000)) : P('nego'),
       keyMoney: km < .35 ? P('none') : km < .6 ? P('nego') : P('v', won(3e7 + r(13) * 2.2e8, 1e7)), handover: ho < .3 ? P('now') : ho < .6 ? P('est', `2027-0${1 + Math.floor(r(14) * 4)}-01`) : P('nego'),
       note: NOTES[i % NOTES.length], mStart: '2026-09-01', mEnd: '2027-02-28', internal: {landlord: '', phone: '', fee: '임대료 1개월분', floor: '', memo: ''}, grants: [], createdAt: '2026-09-01T09:00:00'};
-  });
-  L.push(...s30); s30.forEach(l => l.leaseArea = sumArea(l.floors));
+  };
+  const s30 = SS30.map((row, i) => mkSS(row, i));
+  // just outside the 성수 zone (90–220 m), so the map and the lists show the "근처" case
+  const sNear = SSNEAR.map((row, i) => mkSS(row, i, 'N', 40 + i));
+  L.push(...s30, ...sNear); sNear.forEach(l => l.leaseArea = sumArea(l.floors)); s30.forEach(l => l.leaseArea = sumArea(l.floors));
   const st = (font, size, color, pos) => ({font, size, color, pos});
   const G = (id, name, photo, style, items, areaId = null) => ({id, name, photo, style, areaId, mapHide: [], marks: [], items: items.map(([listingId, comment, layout = 2]) => ({listingId, comment, photo: null, layout}))});
   const props = [{id: 'P1', ownerId: 'brokerA', clientName: '모먼트커피', createdAt: '2026-09-18T17:00:00',
@@ -1974,7 +1994,7 @@ function render() {
   const anim = key !== lastView; lastView = key;
   const body = `<div class="layout"><aside class="side noprint">${sideNav()}</aside><main class="main">${role === 'admin' ? adminView() : brokerView()}</main></div>`;
   $('#app').innerHTML = topbar() + `<div class="${anim ? 'anim view' : ''}">${body}</div>` + guide();
-  fitSlides();
+  fitSlides(); mountLMap();
 }
 
 function sideNav() {
@@ -2009,7 +2029,7 @@ function listingCard(L, i, own) {
     : `<span class="sub">${USERS[L.ownerId].name}</span><button class="btn sm ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button><div class="sp"></div><button class="btn sm" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>`;
   const toProp = L.status === 'active' && own ? `<button class="btn sm ghost" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : '';
   return `<div class="card hov a ${L.status !== 'active' ? 'dim' : ''}" style="--i:${i}" onclick="openModal({type:'detail',lid:'${L.id}'})">
-    <div class="ph" style="background-image:url('${L.photos[0] || ''}')"><div class="tags"><span class="chip ${sc}">${sl}</span>${vis}${dd}</div>${masterOf(L) ? `<span class="ph-area">${esc(masterOf(L).name)}</span>` : ''}</div>
+    <div class="ph" style="background-image:url('${L.photos[0] || ''}')"><div class="tags"><span class="chip ${sc}">${sl}</span>${vis}${dd}</div>${(P => P.a ? `<span class="ph-area ${P.d ? 'near' : ''}">${esc(placeTxt(P, true))}</span>` : '')(placeOf(L))}</div>
     <div class="bd"><div class="row"><div class="t">${esc(I.name)}</div><div class="sp"></div>${propsWith(L.id).length ? `<button class="chip blue" onclick="event.stopPropagation();openModal({type:'toProp',lid:'${L.id}'})">제안서 ${propsWith(L.id).length}</button>` : ''}</div><div class="ad">${esc(I.address)}</div>
       <div class="kv2">
         <div><span>임대 범위</span><b>${esc(floorLabel(L.floors, L.leaseType))}</b></div>
@@ -2021,69 +2041,164 @@ function listingCard(L, i, own) {
 }
 /* listing filters and view, one set per person: the broker's 매물 page and the admin's 건물 · 매물 page */
 const LFS = {};
-const lf = () => LFS[me()] = LFS[me()] || {q: '', area: '', status: me() === 'admin' ? 'all' : 'active', scope: 'all', owner: '', vis: '', rentMax: '', pyMin: '', view: 'list', mapArea: '', sel: null};
-const lfBusy = F => !!(F.bld || F.q || F.area || F.owner || F.vis || F.rentMax || F.pyMin || F.scope !== 'all' || F.status !== (me() === 'admin' ? 'all' : 'active'));
-function lfClear() { const F = lf(); delete LFS[me()]; Object.assign(lf(), {view: F.view, mapArea: F.mapArea}); render(); }
+const lf = () => LFS[me()] = LFS[me()] || {q: '', area: '', status: me() === 'admin' ? 'all' : 'active', scope: 'all', owner: '', vis: '', rentMax: '', pyMin: '', view: 'list', sel: null, mv: null, fly: false};
+const lfBusy = F => !!(F.bld || F.q || F.owner || F.vis || F.rentMax || F.pyMin || F.scope !== 'all' || F.status !== (me() === 'admin' ? 'all' : 'active'));
+function lfClear() { const F = lf(); delete LFS[me()]; Object.assign(lf(), {view: F.view, area: F.area, mv: F.mv}); render(); }
 function lfPass(L, F = lf()) {
-  if (F.area && F.area !== 'none' && !getA(F.area)) F.area = '';
-  const I = bInfo(L), a = masterOf(L), q = F.q.replace(/\s/g, '');
+  const I = bInfo(L), q = F.q.replace(/\s/g, '');
   return (!q || `${I.name}${I.address}${USERS[L.ownerId].name}`.replace(/\s/g, '').includes(q))
-    && (!F.area || (F.area === 'none' ? !a : a?.id === F.area))
     && (F.status === 'all' || L.status === 'active')
     && (F.scope === 'all' || (F.scope === 'mine') === (L.ownerId === me()))
     && (!F.bld || L.buildingId === F.bld) && (!F.owner || L.ownerId === F.owner) && (!F.vis || L.visibility === F.vis)
     && (!F.rentMax || (L.rent.s === 'v' && L.rent.v <= F.rentMax * 10000))
     && (!F.pyMin || L.leaseArea * PYR >= +F.pyMin);
 }
+/* the broker filters by whose listing and its state only; the admin also by text, broker, visibility, rent and size */
 function lfBar(n, total) {
   const F = lf(), adm = me() === 'admin', num = (k, unit, ph) => `<div class="ui lf-num"><input class="in" type="number" min="0" placeholder="${ph}" value="${F[k]}" onchange="lf().${k}=this.value;render()"><span>${unit}</span></div>`;
-  return `<div class="lf-bar">${adm ? '' : seg([['all', '전체'], ['mine', '내 매물'], ['shared', '공유 매물']], F.scope, "(v=>{lf().scope=v;render()})")}
-    <input class="in" id="lf-q" placeholder="이름 · 주소 · 담당 검색" value="${esc(F.q)}" oninput="lf().q=this.value;lfRender()">
-    <select class="in" onchange="lf().area=this.value;render()"><option value="">모든 상권</option>${S.areas.map(a => `<option value="${a.id}" ${F.area === a.id ? 'selected' : ''}>${esc(a.name)}</option>`).join('')}<option value="none" ${F.area === 'none' ? 'selected' : ''}>상권 밖</option></select>
+  return `<div class="lf-bar">${adm ? `<input class="in" id="lf-q" placeholder="이름 · 주소 · 담당 검색" value="${esc(F.q)}" oninput="lf().q=this.value;lfRender()">` : seg([['all', '전체'], ['mine', '내 매물'], ['shared', '공유 매물']], F.scope, "(v=>{lf().scope=v;render()})")}
     ${seg([['active', '진행 중'], ['all', '전체 상태']], F.status, "(v=>{lf().status=v;render()})")}
     ${adm ? `<select class="in" onchange="lf().owner=this.value;render()"><option value="">모든 브로커</option>${Object.keys(USERS).filter(k => k !== 'admin').map(k => `<option value="${k}" ${F.owner === k ? 'selected' : ''}>${USERS[k].name}</option>`).join('')}</select>
-      <select class="in" onchange="lf().vis=this.value;render()"><option value="">모든 공개 범위</option><option value="shared" ${F.vis === 'shared' ? 'selected' : ''}>공유</option><option value="private" ${F.vis === 'private' ? 'selected' : ''}>나만</option></select>` : ''}
-    ${num('rentMax', '만원', '임대료 상한')}${num('pyMin', '평', '면적 하한')}
+      <select class="in" onchange="lf().vis=this.value;render()"><option value="">모든 공개 범위</option><option value="shared" ${F.vis === 'shared' ? 'selected' : ''}>공유</option><option value="private" ${F.vis === 'private' ? 'selected' : ''}>나만</option></select>
+      ${num('rentMax', '만원', '임대료 상한')}${num('pyMin', '평', '면적 하한')}` : ''}
     ${F.bld && getB(F.bld) ? `<button class="chip dark" onclick="lf().bld='';render()">건물 · ${esc(getB(F.bld).name || getB(F.bld).address)} ✕</button>` : ''}<span class="sub">${n === total ? `${total}건` : `${n} / ${total}건`}</span>${lfBusy(F) ? '<button class="btn xs ghost" onclick="lfClear()">필터 지우기</button>' : ''}</div>`;
 }
 function lfRender() { const at = $('#lf-q')?.selectionStart; render(); const i = $('#lf-q'); if (i) { i.focus(); i.setSelectionRange(at, at); } }
 const lfView = () => seg([['list', me() === 'admin' ? '목록' : '카드'], ['map', '지도']], lf().view, "(v=>{lf().view=v;render()})");
-/* listings grouped by the company trade area they sit in, in the areas' order, with 상권 밖 last */
-function byArea(ls) {
-  const m = new Map(S.areas.map(a => [a.id, []])), out = [];
-  ls.forEach(L => { const a = masterOf(L); if (a) m.get(a.id).push(L); else out.push(L); });
-  return [...S.areas.map(a => [a, m.get(a.id)]), [null, out]].filter(([, xs]) => xs.length);
+
+/* where a listing sits against the company trade areas: inside one, just outside one (within NEAR_M of its
+   zone), or away from all of them */
+const NEAR_M = 300;
+function zoneDist(L, a) {
+  const xy = listingXY(L, a); if (!xy || a.zone.length < 3) return null;
+  return polyDist(xy[0], xy[1], a.zone);
 }
-const lsecHead = (a, n, extra = '') => `<div class="lsec"><h2>${a ? esc(a.name) : '상권 밖'}</h2><span class="sub">${n}건${extra}</span>${a ? `<button class="btn xs ghost" onclick="lf().view='map';lf().mapArea='${a.id}';lf().sel=null;render();window.scrollTo({top:0})">지도로 보기</button>` : ''}</div>`;
+function placeOf(L) {
+  const a = masterOf(L); if (a) return {a, d: 0};
+  let best = null;
+  S.areas.forEach(z => { const d = zoneDist(L, z); if (d != null && d <= NEAR_M && (!best || d < best.d)) best = {a: z, d}; });
+  return best || {a: null, d: null};
+}
+const placeTxt = (P, short) => !P.a ? '상권 밖' : P.d ? `${P.a.name} ${short ? '' : '영역 밖 '}${Math.round(P.d / 10) * 10}m` : P.a.name;
+/* listings by company trade area, in the areas' order: those inside, then those just outside; 상권 밖 last */
+function byArea(ls) {
+  const m = new Map(S.areas.map(a => [a.id, {a, inn: [], near: []}])), out = {a: null, inn: [], near: []};
+  ls.forEach(L => { const P = placeOf(L); if (!P.a) out.inn.push(L); else m.get(P.a.id)[P.d ? 'near' : 'inn'].push(L); });
+  return [...m.values(), out].filter(g => g.inn.length || g.near.length);
+}
+/* the 상권 chips: in the card view they jump to the section, on the map they fly there. Nothing is hidden */
+function areaChips(groups) {
+  const F = lf(); if (F.area && F.area !== 'none' && !getA(F.area)) F.area = '';
+  const opts = [['', '전체'], ...groups.map(g => [g.a ? g.a.id : 'none', `${g.a ? g.a.name : '상권 밖'} ${g.inn.length}${g.near.length ? `+${g.near.length}` : ''}`])];
+  return `<div class="lf-areas"><span class="sub">상권</span>${seg(opts, F.area, "(v=>lfFocus(v))")}</div>`;
+}
+function lfFocus(id) {
+  const F = lf(); F.area = id; F.fly = true; F.sel = null; render();
+  if (F.view !== 'map') { const el = $('#sec-' + (id || 'top')); if (el) el.scrollIntoView({behavior: 'smooth', block: 'start'}); }
+}
+const lsecHead = g => `<div class="lsec" id="sec-${g.a ? g.a.id : 'none'}"><h2>${g.a ? esc(g.a.name) : '상권 밖'}</h2><span class="sub">${g.inn.length}건${g.near.length ? ` · 근처 ${g.near.length}건` : ''}${g.a ? '' : ` · 어느 상권에서도 ${NEAR_M}m 넘게 떨어짐`}</span>${g.a ? `<button class="btn xs ghost" onclick="lf().view='map';lfFocus('${g.a.id}')">지도로 보기</button>` : ''}</div>`;
+const lnearHead = g => `<div class="lsub">${esc(g.a.name)} 영역 밖 · ${NEAR_M}m 이내 <span class="sub">${g.near.length}건</span></div>`;
 const LST_ORDER = {active: 0, expired: 1, done: 2, withdrawn: 3};
 /* pin colour: the broker tells own from shared, the admin tells live from closed */
 const lfPinFill = L => L.status !== 'active' ? '#a3a39e' : me() !== 'admin' && L.ownerId !== me() ? '#2a78d6' : '#141414';
-function lfMap(ls) {
-  const F = lf(), groups = byArea(ls), areas = groups.filter(([a]) => a), out = groups.find(([a]) => !a)?.[1] || [];
-  if (!areas.length) return `<div class="empty">상권 지도에 올릴 매물이 없습니다${out.length ? ` · 상권 밖 ${out.length}건은 ${me() === 'admin' ? '목록' : '카드'} 보기에서 보세요` : ''}</div>`;
-  let a = getA(F.mapArea);
-  if (!a || !areas.some(([x]) => x === a)) { a = areas[0][0]; F.mapArea = a.id; }
-  const its = areas.find(([x]) => x === a)[1].sort((x, y) => LST_ORDER[x.status] - LST_ORDER[y.status]), d = MAP_DATA[a.osm], seen = {};
-  const at = its.map(L => listingXY(L, a)), zk = `l:${a.id}`, view = zkView(zk, d, slideView(null, a, at.filter(Boolean).map(([x, y]) => ({x, y})))), k = view.w / d.w;
-  const dots = its.map((L, i) => { const xy = at[i]; if (!xy) return null; const off = seen[L.buildingId] = (seen[L.buildingId] ?? -1) + 1;
-    return {id: L.id, x: xy[0] + off * 40 * k, y: xy[1], n: i + 1, st: 'in', fill: lfPinFill(L), ring: F.sel === L.id, label: `${bInfo(L).name} ${floorLabel(L.floors, L.leaseType)}`}; }).filter(Boolean);
-  const adm = me() === 'admin', leg = adm ? '<span><i class="d-in">1</i>진행</span><span><i class="d-in" style="background:#a3a39e">1</i>완료 · 철회 · 만료</span>' : '<span><i class="d-in">1</i>내 매물</span><span><i class="d-in" style="background:#2a78d6">1</i>공유 매물</span>';
-  const row = (L, i) => { const on = F.sel === L.id, mine = L.ownerId === me();
-    return `<div class="pk-i lm-i ${on ? 'on' : ''}" id="lm-${L.id}" onclick="lfSel('${L.id}')"><span class="pk-n" style="background:${lfPinFill(L)};border-color:${lfPinFill(L)};color:#fff">${i + 1}</span><span class="pk-ph" style="background-image:url('${L.photos[0] || ''}')"></span>
-      <span class="pk-b"><b>${esc(bInfo(L).name)}</b><small>${esc(floorLabel(L.floors, L.leaseType))} · ${nf(L.leaseArea * PYR, 1)}평 · ${priceShort(L.rent)}${mine ? '' : ` · ${USERS[L.ownerId].name}`}</small>${L.status !== 'active' ? `<span><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></span>` : ''}
-      ${on ? `<span class="lm-act" onclick="event.stopPropagation()"><button class="btn xs" onclick="openModal({type:'detail',lid:'${L.id}'})">자세히</button>${adm ? `<button class="btn xs ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button>` : `${mine ? `<button class="btn xs ghost" onclick="editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn xs ghost" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}`}</span>` : ''}</span></div>`; };
-  return `<div class="row" style="margin-bottom:10px">${seg(areas.map(([x, xs]) => [x.id, `${x.name} ${xs.length}`]), a.id, "(v=>{lf().mapArea=v;lf().sel=null;render()})")}<div class="sp"></div>${out.length ? `<span class="sub">상권 밖 ${out.length}건은 ${adm ? '목록' : '카드'} 보기에서</span>` : ''}</div>
-    <div class="pk lm"><div class="pk-map">${zoomCtl(zk, a.osm)}<div onwheel="mWheel(event,'${zk}','${a.osm}')" onpointerdown="panStart(event,'${zk}','${a.osm}')" onpointermove="panMove(event)" onpointerup="if(!panEnd())(t=>t&&lfSel(t.dataset.lid))(event.target.closest('[data-lid]'))">${mapSvg(a, {meet: true, view, zk, cands: dots})}</div>
-      <div class="pk-leg">${leg}</div></div><div class="pk-list">${its.map(row).join('')}</div></div>`;
+
+/* ---------- the listing page's map: one tiled map of Seoul (Leaflet + CARTO/OSM tiles) with every listing
+   and the company trade areas. The per-area SVG maps stay for slides and the editors. ---------- */
+const xyLL = (d, x, y) => { const [s, w, n] = d.bbox, kx = Math.cos((s + n) / 2 * Math.PI / 180) * 111320; return [n - y / 110540, w + x / kx]; };
+const zoneLL = a => { const d = window.MAP_DATA?.[a.osm]; return d && a.zone.length > 2 ? a.zone.map(([x, y]) => xyLL(d, x, y)) : null; };
+let LMAP = null, LMAP_ITEMS = [];
+/* the map view is the map alone: markers open a short card, an empty spot tells what official area it is in */
+function lfMap(groups) {
+  const F = lf(), adm = me() === 'admin', ly = F.layers = F.layers || {zones: true, official: false};
+  LMAP_ITEMS = groups.flatMap(g => [...g.inn, ...g.near]).map(L => ({L, P: placeOf(L)}));
+  const leg = `${adm ? '<span><i class="lp" style="--c:#141414"></i>진행</span><span><i class="lp" style="--c:#a3a39e"></i>완료 · 철회 · 만료</span>' : '<span><i class="lp" style="--c:#141414"></i>내 매물</span><span><i class="lp" style="--c:#2a78d6"></i>공유 매물</span>'}
+    <span><i class="lp near" style="--c:#141414"></i>상권 근처 ${NEAR_M}m</span><span><i class="lp far" style="--c:#141414"></i>상권 밖</span>`;
+  const tog = (k, l) => `<button class="${ly[k] ? 'on' : ''}" onclick="lf().layers.${k}=!lf().layers.${k};lfKeep();render()">${l}</button>`;
+  return `<div class="lmap-w"><div id="lmap"></div><div class="lyr lmap-lyr">${tog('zones', '회사 상권')}${tog('official', '공식 상권')}</div><div class="pk-leg">${leg}</div>
+    <div class="lmap-hint">마커를 누르면 매물 요약 · 빈 곳을 누르면 그 자리의 공식 상권</div></div>`;
 }
-function lfSel(id) { const F = lf(); F.sel = F.sel === id ? null : id; render(); if (F.sel) $('#lm-' + id)?.scrollIntoView({block: 'nearest'}); }
+const lfKeep = () => { const F = lf(); if (LMAP) F.mv = {c: LMAP.getCenter(), z: LMAP.getZoom()}; };
+function lpCard(L) {
+  const P = placeOf(L), mine = L.ownerId === me(), adm = me() === 'admin';
+  return `<div class="lpop"><div class="lpop-c" onclick="openModal({type:'detail',lid:'${L.id}'})" title="장표 미리보기"><span class="pk-ph" style="background-image:url('${L.photos[0] || ''}')"></span>
+      <span class="pk-b"><b>${esc(bInfo(L).name)}</b><small>${esc(bInfo(L).address)}</small><small>${esc(floorLabel(L.floors, L.leaseType))} · ${nf(L.leaseArea * PYR, 1)}평 · 월 ${priceShort(L.rent)}</small>
+      <span class="row" style="gap:4px"><span class="chip ${P.d ? 'warn' : ''}">${esc(placeTxt(P))}</span>${L.status !== 'active' ? `<span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span>` : ''}<span class="chip">${mine ? (L.visibility === 'shared' ? '내 매물 · 공유' : '내 매물 · 🔒') : USERS[L.ownerId].name}</span></span></span></div>
+    <div class="lpop-a"><button class="btn xs" onclick="openModal({type:'detail',lid:'${L.id}'})">자세히</button>${adm ? `<button class="btn xs ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button>` : `${mine ? `<button class="btn xs ghost" onclick="editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn xs ghost" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}`}</div></div>`;
+}
+/* distance in metres from a point to a polygon in the same map's metres, 0 inside */
+function polyDist(x, y, poly) {
+  if (inPoly(x, y, poly)) return 0;
+  let b = Infinity;
+  poly.forEach((p, i) => { const q = poly[(i + 1) % poly.length], dx = q[0] - p[0], dy = q[1] - p[1], t = Math.max(0, Math.min(1, ((x - p[0]) * dx + (y - p[1]) * dy) / (dx * dx + dy * dy || 1)));
+    b = Math.min(b, Math.hypot(x - p[0] - t * dx, y - p[1] - t * dy)); });
+  return b;
+}
+/* what is at a clicked spot: the official areas over it, and how it sits against the company trade areas */
+function spotCard(lat, lng) {
+  const offs = [], P = {a: null, d: null};
+  Object.entries(window.MAP_DATA || {}).forEach(([k, d]) => { const [x, y] = llXY(d, lat, lng); if (x < 0 || y < 0 || x > d.w || y > d.h) return;
+    OFFICIAL.filter(o => o.osm === k && inPoly(x, y, o.poly)).forEach(o => offs.push(o));
+    S.areas.filter(a => a.osm === k && a.zone.length > 2).forEach(a => { const dd = polyDist(x, y, a.zone); if (P.d == null || dd < P.d) { P.a = a; P.d = dd; } }); });
+  const near = LMAP_ITEMS.filter(it => { const B = bInfo(it.L).B; return B.lat && Math.hypot((B.lat - lat) * 110540, (B.lng - lng) * 88200) <= 150; }).length;
+  const fig = o => { const d = o.data; return `<div class="lpop-o"><b>${esc(o.name)}</b> <span class="chip">${OTYPE[o.type]}</span><div class="lpop-kv"><span>일평균 유동인구<b>${nf(d.pop[2][1])}명</b></span><span>분기 매출<b>${nf(d.sales[d.sales.length - 1][1])}억</b></span><span>주말 매출<b>${d.week[1]}%</b></span><span>주요 연령<b>${[...d.age].sort((x, y) => y[1] - x[1])[0][0]}</b></span></div></div>`; };
+  const where = P.a == null ? '회사 상권 지도 밖' : P.d === 0 ? `회사 상권 <b>${esc(P.a.name)}</b> 안` : P.d <= NEAR_M ? `회사 상권 <b>${esc(P.a.name)}</b> 영역 밖 ${Math.round(P.d / 10) * 10}m` : `가장 가까운 회사 상권 ${esc(P.a.name)}에서 ${nf(Math.round(P.d / 10) * 10)}m`;
+  return `<div class="lpop spot"><div class="lpop-k">이 위치 <span class="sub">${lat.toFixed(5)}, ${lng.toFixed(5)}</span></div>
+    ${offs.length ? offs.map(fig).join('') : '<div class="sub">서울시 공식 상권 밖입니다</div>'}
+    <div class="lpop-f">${where}${near ? ` · 반경 150m 매물 ${near}건` : ''}</div>${offs.length ? `<div class="sub" style="font-size:11px">서울시 상권분석서비스 · ${esc(S.sync?.q || '')} · 예시 수치</div>` : ''}</div>`;
+}
+/* the base map: the OpenStreetMap roads, rail, parks and building outlines already shipped for the slide maps,
+   drawn on a canvas. Public tile servers now refuse keyless use (CARTO wants a key, tile.openstreetmap.org blocks
+   apps), and the real build will use a Korean map API with its own key. Places outside the shipped extracts stay blank. */
+const BASELL = {};
+function baseLayers(Lf, rend) {
+  return Object.entries(window.MAP_DATA || {}).map(([k, d]) => {
+    const c = BASELL[k] = BASELL[k] || (() => { const ll = pts => { const o = []; for (let i = 0; i < pts.length; i += 2) o.push(xyLL(d, pts[i], pts[i + 1])); return o; };
+      return {box: [xyLL(d, 0, 0), xyLL(d, d.w, d.h)], parks: d.parks.map(ll), blds: d.buildings.map(([, p]) => ll(p)), roads: d.roads.map(([cl, p]) => [cl, ll(p)]).sort((x, y) => x[0] - y[0]), rail: d.rail.map(ll)}; })();
+    const W = [1.2, 2, 3.5, 5];
+    return Lf.layerGroup([Lf.rectangle(c.box, {renderer: rend, stroke: false, fillColor: '#e6e5e0', fillOpacity: 1, interactive: false}),
+      ...c.parks.map(p => Lf.polygon(p, {renderer: rend, stroke: false, fillColor: '#d6e3cc', fillOpacity: 1, interactive: false})),
+      ...c.blds.map(p => Lf.polygon(p, {renderer: rend, color: '#fff', weight: .6, fillColor: '#cfcec9', fillOpacity: 1, interactive: false})),
+      ...c.roads.map(([cl, p]) => Lf.polyline(p, {renderer: rend, color: '#fff', weight: W[cl] || 1.2, interactive: false})),
+      ...c.rail.map(p => Lf.polyline(p, {renderer: rend, color: '#2f9e44', weight: 3.5, interactive: false}))]);
+  });
+}
+const lpIcon = (it, on) => window.Lf.divIcon({className: 'lp-w', iconSize: [20, 20], iconAnchor: [10, 10], popupAnchor: [0, -10], html: `<i class="lp ${!it.P.a ? 'far' : it.P.d ? 'near' : ''} ${on ? 'sel' : ''}" style="--c:${lfPinFill(it.L)}"></i>`});
+/* called after every render: rebuild the map in the fresh container, then fly to the chosen 상권, or keep the last view */
+function mountLMap() {
+  const el = $('#lmap'); if (LMAP) { LMAP.remove(); LMAP = null; } if (!el || !window.Lf) return;
+  const Lf = window.Lf, F = lf(), ly = F.layers;
+  LMAP = Lf.map(el, {zoomControl: true, scrollWheelZoom: true, minZoom: 11, maxZoom: 19, preferCanvas: true});
+  LMAP.attributionControl.setPrefix(false).addAttribution('© OpenStreetMap contributors · 예시 데이터');
+  const rend = Lf.canvas({padding: .5}); baseLayers(Lf, rend).forEach(g => g.addTo(LMAP));
+  if (ly.official) OFFICIAL.forEach(o => { const d = window.MAP_DATA?.[o.osm]; if (!d) return;
+    Lf.polygon(o.poly.map(([x, y]) => xyLL(d, x, y)), {color: '#d9822b', weight: 1.4, dashArray: '5 4', fillColor: '#d9822b', fillOpacity: .07, interactive: false}).addTo(LMAP)
+      .bindTooltip(esc(o.name), {permanent: true, direction: 'center', className: 'ztip off'}); });
+  const zones = {};
+  S.areas.forEach(a => { const ll = zoneLL(a); if (!ll) return; zones[a.id] = ll;
+    if (ly.zones) Lf.polygon(ll, {color: '#141414', weight: 2, fillColor: '#141414', fillOpacity: .06, interactive: false}).addTo(LMAP).bindTooltip(esc(a.name), {permanent: true, direction: 'center', className: 'ztip'}); });
+  const pts = {};
+  LMAP_ITEMS.forEach(it => { const B = bInfo(it.L).B; if (!B.lat) return;
+    const k = B.lat.toFixed(5) + B.lng.toFixed(5), dup = pts[k] = (pts[k] || 0) + 1, ll = [B.lat, B.lng + (dup - 1) * .00012], on = F.sel === it.L.id;
+    it.ll = ll; it.mk = Lf.marker(ll, {icon: lpIcon(it, on), zIndexOffset: on ? 1000 : 0, title: `${bInfo(it.L).name} ${floorLabel(it.L.floors, it.L.leaseType)}`}).addTo(LMAP)
+      .bindPopup(() => lpCard(it.L), {className: 'lpop-w', maxWidth: 340, minWidth: 300, autoPanPadding: [30, 30]})
+      .on('popupopen', () => { F.sel = it.L.id; }).on('popupclose', () => { if (F.sel === it.L.id) F.sel = null; }); });
+  LMAP.on('click', e => Lf.popup({className: 'lpop-w', maxWidth: 360, minWidth: 280}).setLatLng(e.latlng).setContent(spotCard(e.latlng.lat, e.latlng.lng)).openOn(LMAP));
+  const all = LMAP_ITEMS.filter(it => it.ll).map(it => it.ll);
+  const focus = F.area === 'none' ? LMAP_ITEMS.filter(it => !it.P.a && it.ll).map(it => it.ll)
+    : F.area ? [...(zones[F.area] || []), ...LMAP_ITEMS.filter(it => it.P.a?.id === F.area && it.ll).map(it => it.ll)] : all;
+  if (F.fly || !F.mv) { const b = focus.length ? focus : all; const pad = Math.min(50, el.clientWidth * .05); if (b.length) LMAP.fitBounds(b, {padding: [pad, pad], maxZoom: 17}); else LMAP.setView([37.55, 126.99], 12); F.fly = false; }
+  else LMAP.setView(F.mv.c, F.mv.z);
+  // the handler holds its own map: a moveend can still fire while a re-render is replacing LMAP
+  const m = LMAP; m.on('moveend', () => { if (m === LMAP) F.mv = {c: m.getCenter(), z: m.getZoom()}; });
+  const open = F.sel && LMAP_ITEMS.find(it => it.L.id === F.sel && it.mk); if (open) open.mk.openPopup();
+}
 function listView() {
   const F = lf(), pool = S.listings.filter(L => L.ownerId === me() || (L.visibility === 'shared' && L.status === 'active'));
   const ls = pool.filter(L => lfPass(L)).sort((x, y) => LST_ORDER[x.status] - LST_ORDER[y.status] || (y.ownerId === me()) - (x.ownerId === me()));
-  const mineN = pool.filter(L => L.ownerId === me() && L.status === 'active').length;
-  return `<div class="head"><h1>매물</h1><span class="sub">내 매물 ${mineN}건 진행 · 공유 매물 ${pool.filter(L => L.ownerId !== me()).length}건</span><div class="sp"></div>${lfView()}<button class="btn pri" onclick="newListing()">+ 등록</button></div>
-    ${lfBar(ls.length, pool.length)}
-    ${F.view === 'map' ? lfMap(ls) : byArea(ls).map(([a, xs]) => lsecHead(a, xs.length) + `<div class="grid">${xs.map((L, i) => listingCard(L, i, L.ownerId === me())).join('')}</div>`).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>'}`;
+  const mineN = pool.filter(L => L.ownerId === me() && L.status === 'active').length, groups = byArea(ls), card = L => listingCard(L, 0, L.ownerId === me());
+  return `<div class="head" id="sec-top"><h1>매물</h1><span class="sub">내 매물 ${mineN}건 진행 · 공유 매물 ${pool.filter(L => L.ownerId !== me()).length}건</span><div class="sp"></div>${lfView()}<button class="btn pri" onclick="newListing()">+ 등록</button></div>
+    ${lfBar(ls.length, pool.length)}${groups.length ? areaChips(groups) : ''}
+    ${F.view === 'map' ? lfMap(groups) : groups.map(g => lsecHead(g) + `<div class="grid">${g.inn.map(card).join('')}</div>${g.near.length ? lnearHead(g) + `<div class="grid">${g.near.map(card).join('')}</div>` : ''}`).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>'}`;
 }
 /* ---------- brands: the tenants brokers are looking for space for. Shared with every broker by default;
    the owner and the admin edit, anyone writes in the activity log. Fields are placeholders until the
@@ -2690,16 +2805,15 @@ function bldTable(xs) {
   const bs = S.buildings.filter(B => xs.some(L => L.buildingId === B.id));
   return `<div class="panel bt-p"><div class="bscroll"><table class="tbl bt"><thead><tr><th>건물</th><th>범위</th><th>담당</th><th>공개</th><th>상태</th><th class="num">임대료</th><th>임대인 (내부)</th><th>메모 (내부)</th><th></th></tr></thead><tbody>
     ${bs.map(B => { const ls = xs.filter(L => L.buildingId === B.id).sort((x, y) => LST_ORDER[x.status] - LST_ORDER[y.status]), all = S.listings.filter(L => L.buildingId === B.id), owners = new Set(all.map(l => l.ownerId)), name = B.name || all[0]?.manual?.name || B.address;
-      return ls.map((L, j) => `<tr class="${j ? '' : 'bt-first'}">${j ? '' : `<td rowspan="${ls.length}" class="bt-b"><b>${esc(name)}</b>${B.status === '준공' ? '' : B.status === '인허가' ? ' <span class="chip warn">인허가</span>' : ' <span class="chip red">정보없음</span>'}${owners.size > 1 ? ` <span class="chip blue">브로커 ${owners.size}명</span>` : ''}<small>${esc(B.address)} · PNU ${B.pnu}</small></td>`}
+      return ls.map((L, j) => `<tr class="${j ? '' : 'bt-first'}">${j ? '' : `<td rowspan="${ls.length}" class="bt-b"><b>${esc(name)}</b>${B.status === '준공' ? '' : B.status === '인허가' ? ' <span class="chip warn">인허가</span>' : ' <span class="chip red">정보없음</span>'}${owners.size > 1 ? ` <span class="chip blue">브로커 ${owners.size}명</span>` : ''}<small>${esc(B.address)} · PNU ${B.pnu}</small>${(P => P.d ? `<span class="chip warn" style="margin-top:4px">${esc(placeTxt(P))}</span>` : '')(placeOf(ls[0]))}</td>`}
         <td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒 나만'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td>
         <td><div class="row" style="gap:4px;flex-wrap:nowrap"><button class="btn xs ghost" onclick="openModal({type:'detail',lid:'${L.id}'})">자세히</button><button class="btn xs ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button></div></td></tr>`).join(''); }).join('')}</tbody></table></div></div>`;
 }
 function adminBld() {
   const F = lf(), ls = S.listings.filter(L => lfPass(L));
-  const body = F.view === 'map' ? lfMap(ls) : byArea(ls).map(([a, xs]) => { const bs = S.buildings.filter(B => xs.some(L => L.buildingId === B.id));
-    return lsecHead(a, xs.length, ` · 건물 ${bs.length}개`) + bldTable(xs); }).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>';
-  return `<div class="head"><h1>건물 · 매물</h1><span class="sub">${S.buildings.length}개 건물 · PNU 기준 통합</span><div class="sp"></div>${lfView()}</div>
-  ${lfBar(ls.length, S.listings.length)}${body}`;
+  const groups = byArea(ls), body = F.view === 'map' ? lfMap(groups) : groups.map(g => lsecHead(g) + bldTable([...g.inn, ...g.near])).join('') || '<div class="empty">조건에 맞는 매물이 없습니다</div>';
+  return `<div class="head" id="sec-top"><h1>건물 · 매물</h1><span class="sub">${S.buildings.length}개 건물 · PNU 기준 통합</span><div class="sp"></div>${lfView()}</div>
+  ${lfBar(ls.length, S.listings.length)}${groups.length ? areaChips(groups) : ''}${body}`;
 }
 const freshMed = (off = true) => { MED = {tool: 'move', draft: [], sel: null, drag: null, off, refs: true, pop: null}; };
 /* ---------- new trade area: find a place, pull its OpenStreetMap roads and outlines, then draw the zone ---------- */
