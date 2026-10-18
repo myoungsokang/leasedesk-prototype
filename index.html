@@ -417,6 +417,10 @@ textarea.in{resize:vertical;min-height:64px}
 .pk-leg .d-in{width:18px;height:18px;background:#141414;color:#fff;font-size:10px;font-weight:700}
 .pk-leg .d-fit{width:12px;height:12px;border:2.5px solid #141414;background:#fff}.pk-leg .d-no{width:12px;height:12px;border:2.5px solid #a3a39e;background:#ecece9}
 .pk-list{display:flex;flex-direction:column;gap:6px;max-height:640px;overflow:auto}
+.pk-new{justify-content:center;border-style:dashed}
+.it-links{gap:2px;margin-top:-4px}
+.med-map .rf{cursor:pointer}
+button.chip{border:0;cursor:pointer}
 .pk-i{display:flex;gap:10px;align-items:center;text-align:left;font:inherit;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;cursor:pointer}
 .pk-i.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .pk-n{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;border:1.5px solid var(--line);color:var(--muted)}
@@ -1409,7 +1413,7 @@ function mapSvg(a, o = {}) {
     <g fill="none" stroke="#2f9e44" stroke-width="6">${d.rail.map(r => `<path d="${mpath(r)}"/>`).join('')}</g>
     ${ed === 'zone' || ed === 'move' ? `<path d="${a.zone.length > 2 ? ppath(a.zone) : ''}" fill="none" stroke="#2a78d6" stroke-width="${2 * k}" stroke-dasharray="${10 * k} ${6 * k}"/>` : ''}
     ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '', k)).join('')}${(o.marks || []).map(m => markSvg(m, 'pr', '', k)).join('')}
-    ${(o.refs || []).map(q => `<g transform="${sc(q.x, q.y)}"><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/><text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text></g>`).join('')}
+    ${(o.refs || []).map(q => `<g data-ref="${q.id}" class="rf" transform="${sc(q.x, q.y)}"><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/><text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text></g>`).join('')}
     ${(o.cands || []).map(c => `<g data-lid="${c.id}" class="cd" transform="${sc(c.x, c.y)}">${c.st === 'in' ? `<circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
       : `<circle r="13" fill="${c.st === 'fit' ? '#fff' : '#ecece9'}" stroke="${c.st === 'fit' ? '#141414' : '#a3a39e'}" stroke-width="3.5"/>`}<text x="${c.st === 'in' ? 25 : 19}" y="7" font-size="18" font-weight="600" fill="${c.st === 'nofit' ? '#8a8a85' : '#141414'}" ${halo}>${esc(c.label)}</text></g>`).join('')}
     ${(o.pins || []).map(q => `<g transform="${sc(q.x, q.y)}"><circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${q.n}</text></g>`).join('')}
@@ -1434,7 +1438,7 @@ function mapSlide(g, a, its) {
 const MTOOLS_AREA = [['move', '선택 · 이동'], ['zone', '상권 영역'], ['bld', '건물 숨기기'], ['brand', '브랜드'], ['ours', '자사 중개'], ['text', '글자'], ['hl', '강조 영역']];
 const MTOOLS_GROUP = [['move', '선택 · 이동'], ['hide', '회사 표시 숨기기'], ['brand', '브랜드'], ['text', '글자'], ['hl', '강조 영역']];
 const MKIND = {brand: '브랜드', ours: '자사 중개', text: '글자', hl: '강조 영역'};
-const MHINT = {move: '표시를 끌어서 옮기고, 빈 곳을 끌면 지도가 움직입니다 · 휠이나 + − 로 확대 · 축소', zone: '지도를 눌러 꼭짓점을 찍고 완료를 누르세요. 영역 안의 건물만 지도에 그려집니다', bld: '건물을 누르면 숨기고, 다시 누르면 살립니다 (빨간 점선 = 숨김)',
+const MHINT = {move: '표시를 끌어서 옮기고, 빈 곳을 끌면 지도가 움직입니다 · 휠이나 + − 로 확대 · 축소 · 파란 점은 매물 상세', zone: '지도를 눌러 꼭짓점을 찍고 완료를 누르세요. 영역 안의 건물만 지도에 그려집니다', bld: '건물을 누르면 숨기고, 다시 누르면 살립니다 (빨간 점선 = 숨김)',
   brand: '지도를 누른 곳에 브랜드 표시를 놓습니다', ours: '지도를 누른 곳에 자사 중개 표시(로고)를 놓습니다', text: '지도를 누른 곳에 글자를 놓습니다', hl: '꼭짓점을 찍고 완료를 누르세요', hide: '회사 표시를 누르면 이 제안서에서만 숨깁니다 (흐린 표시 = 숨김)'};
 let MED = {tool: 'move', draft: [], sel: null, drag: null};
 function medCtx() {
@@ -1448,7 +1452,7 @@ function medRefresh() { // swap only the editor body, so the modal does not repl
 function mapEditor(c) {
   const tools = c.kind === 'area' ? MTOOLS_AREA : MTOOLS_GROUP, t = MED.tool;
   const pins = c.kind === 'group' ? groupPins(c.g, liveItems(c.p, c.g), c.a) : [];
-  const refs = c.kind === 'area' ? S.listings.filter(L => L.status === 'active').map(L => { const xy = listingXY(L, c.a); return xy && {x: xy[0], y: xy[1], label: bInfo(L).name}; }).filter(Boolean) : [];
+  const refs = c.kind === 'area' ? S.listings.filter(L => L.status === 'active').map(L => { const xy = listingXY(L, c.a); return xy && {id: L.id, x: xy[0], y: xy[1], label: bInfo(L).name}; }).filter(Boolean) : [];
   const d = MAP_DATA[c.a.osm], zk = medZk(c), saved = c.kind === 'area' ? c.a.view : c.g.view;
   const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : [], view: zkView(zk, d, saved || c.a.view), zk});
   const vwRow = `<div class="f"><label>지도 장에 보일 범위</label><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '지도 전체'}</div>
@@ -1475,6 +1479,8 @@ function medTool(v) { MED.tool = v; MED.draft = []; medRefresh(); }
 function medPt(e) { const svg = e.currentTarget.querySelector('svg'), pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse()); return [Math.round(p.x), Math.round(p.y)]; }
 function medDown(e) {
   const c = medCtx(), [x, y] = medPt(e), t = MED.tool, mk = e.target.closest('[data-mk]'), b = e.target.closest('[data-b]');
+  const rf = e.target.closest('[data-ref]');
+  if (t === 'move' && rf) return openModal({type: 'detail', lid: rf.dataset.ref});
   if (t === 'move' && !(mk && mk.dataset.layer === (c.kind === 'area' ? 'co' : 'pr'))) return panStart(e, medZk(c), c.a.osm);
   if (t === 'move') {
     const m = c.list.find(z => z.id === mk.dataset.mk); if (!m || m.kind === 'hl') return;
@@ -1641,11 +1647,11 @@ function deckSlides(p) {
   gs.forEach((x, gi) => {
     out.push({label: tv(x.g.name), group: gi, head: true, html: groupCoverSlide(x.g)});
     const ma = groupMaster(x.g);
-    if (ma && window.MAP_DATA?.[ma.osm] && x.its.length) out.push({label: LG(`${x.g.name} · 지도`, `${tv(x.g.name)} · Map`), group: gi, html: mapSlide(x.g, ma, x.its)});
+    if (ma && window.MAP_DATA?.[ma.osm] && x.its.length) out.push({label: LG(`${x.g.name} · 지도`, `${tv(x.g.name)} · Map`), group: gi, map: x.g.id, html: mapSlide(x.g, ma, x.its)});
     if (x.a) dataSlides(x.g, x.a, mods).forEach(d => out.push({...d, group: gi}));
     x.its.forEach((it, ii) => {
       const L = getL(it.listingId), nm = `${ii + 1}. ${tv(bInfo(L).name)}`;
-      out.push({label: nm, group: gi, html: listingSlide(L, it, ii + 1, x.g)});
+      out.push({label: nm, group: gi, lid: L.id, html: listingSlide(L, it, ii + 1, x.g)});
       photoSlides(L, it, ii + 1, x.g).forEach((h, j, a) => out.push({label: `${nm} · ${LG('사진', 'Photos')}${a.length > 1 ? ` ${j + 1}` : ''}`, group: gi, html: h}));
       planSlides(L, ii + 1, x.g).forEach((h, j, a) => out.push({label: `${nm} · ${LG('평면도', 'Plan')}${a.length > 1 ? ` ${j + 1}` : ''}`, group: gi, html: h}));
     });
@@ -1725,6 +1731,7 @@ function brokerView() {
   if (t === 'notes') return notesView();
 }
 const STATUS = {active: ['진행', 'ok'], done: ['거래완료', 'dark'], withdrawn: ['철회', ''], expired: ['만료', 'red']};
+const propsWith = lid => visProps().filter(p => p.ownerId === me() && p.groups.some(g => g.items.some(x => x.listingId === lid)));
 function listingCard(L, i, own) {
   const I = bInfo(L), [sl, sc] = STATUS[L.status], left = diffDays(L.mEnd, S.today), a1 = area1F(L.floors);
   const dd = L.status === 'active' && left <= 30 ? `<span class="chip ${left <= 14 ? 'warn' : ''}">D-${left}</span>` : '';
@@ -1734,16 +1741,17 @@ function listingCard(L, i, own) {
        <button class="btn sm ghost" onclick="toggleVis('${L.id}')">${L.visibility === 'shared' ? '공유 해제' : '공유'}</button><button class="btn sm ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button><div class="sp"></div>
        ${L.status === 'active' ? `<button class="btn sm ghost" onclick="setStatus('${L.id}','done')">완료</button><button class="btn sm ghost danger" onclick="setStatus('${L.id}','withdrawn')">철회</button>` : (L.mEnd >= S.today ? `<button class="btn sm ghost" onclick="setStatus('${L.id}','active')">재개</button>` : '')}`
     : `<span class="sub">${USERS[L.ownerId].name}</span><button class="btn sm ghost" onclick="openModal({type:'hist',lid:'${L.id}'})">이력</button><div class="sp"></div><button class="btn sm" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>`;
+  const toProp = L.status === 'active' && own ? `<button class="btn sm ghost" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : '';
   return `<div class="card hov a ${L.status !== 'active' ? 'dim' : ''}" style="--i:${i}" onclick="openModal({type:'detail',lid:'${L.id}'})">
     <div class="ph" style="background-image:url('${L.photos[0] || ''}')"><div class="tags"><span class="chip ${sc}">${sl}</span>${vis}${dd}</div></div>
-    <div class="bd"><div class="t">${esc(I.name)}</div><div class="ad">${esc(I.address)}</div>
+    <div class="bd"><div class="row"><div class="t">${esc(I.name)}</div><div class="sp"></div>${propsWith(L.id).length ? `<button class="chip blue" onclick="event.stopPropagation();openModal({type:'toProp',lid:'${L.id}'})">제안서 ${propsWith(L.id).length}</button>` : ''}</div><div class="ad">${esc(I.address)}</div>
       <div class="kv2">
         <div><span>임대 범위</span><b>${esc(floorLabel(L.floors, L.leaseType))}</b></div>
         <div><span>월 임대료</span><b>${priceShort(L.rent)}</b></div>
         <div><span>1층 면적</span><b>${a1 != null ? nf(a1) + '㎡' : '–'}</b></div>
         <div><span>전체 면적</span><b>${nf(L.leaseArea)}㎡</b></div>
       </div></div>
-    <div class="ft" onclick="event.stopPropagation()">${actions}</div></div>`;
+    <div class="ft" onclick="event.stopPropagation()">${actions}${toProp}</div></div>`;
 }
 function mineView() {
   const order = {active: 0, expired: 1, done: 2, withdrawn: 3};
@@ -1774,8 +1782,11 @@ function blankDraft() {
     deposit: P('v', ''), rent: P('v', ''), mgmt: P('v', ''), keyMoney: P('none'), handover: P('tbd'), note: '',
     visibility: 'private', mStart: S.today, mEnd: addDays(S.today, 182), internal: {landlord: '', phone: '', fee: '', floor: '', memo: ''}, q: '', range: {from: '', to: ''}};
 }
-function newListing() { D = blankDraft(); render(); window.scrollTo({top: 0}); }
-function editListing(id) {
+/* where the listing form returns to: {kind: 'prop', pid, gi, add} | {kind: 'wiz', add} | null (내 매물) */
+let RET = null;
+function newListing(ret) { RET = ret || null; U.modal = null; renderModal(); D = blankDraft(); render(); window.scrollTo({top: 0}); }
+function editListing(id, ret) {
+  RET = ret || null; U.modal = null; renderModal();
   const L = getL(id); D = {...clone(L), pnu: getB(L.buildingId).pnu, q: ''};
   const fs = L.floors.map(f => f.floor); D.range = {from: fmtF(Math.min(...fs)), to: fmtF(Math.max(...fs))};
   render(); window.scrollTo({top: 0});
@@ -1852,7 +1863,7 @@ function listingForm() {
   const stChip = s => s === '준공' ? '<span class="chip ok">건축물대장</span>' : s === '인허가' ? '<span class="chip warn">인허가 기준</span>' : '<span class="chip red">공공정보 없음</span>';
   const planOpts = sel => `<option value="">도면 없음</option>` + D.plans.map(p => `<option value="${p.id}" ${sel === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('');
   const am = U.unit;
-  return `<div class="head"><button class="btn ghost icon" onclick="D=null;render()">←</button><h1>${D.id ? '매물 수정' : '매물 등록'}</h1><div class="sp"></div></div>
+  return `<div class="head"><button class="btn ghost icon" onclick="leaveForm()">←</button><h1>${D.id ? '매물 수정' : '매물 등록'}</h1>${RET ? `<span class="chip blue">${RET.add ? '저장하면 바로 넣기' : '저장하면 돌아가기'} · ${retLabel()}</span>` : ''}<div class="sp"></div></div>
   ${!D.id && grants.length ? `<div class="panel a" style="--i:0"><h3>이관받은 매물 <span class="chip blue">${grants.length}</span></h3><div class="row">${grants.map(L => `<button class="btn sm" onclick="importFrom('${L.id}')">${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))} 가져오기</button>`).join('')}</div></div>` : ''}
   <div class="panel a" style="--i:1"><h3>건물</h3>
     ${r ? `<div class="bcard"><div style="flex:1"><div class="row"><b style="font-size:15px">${esc(info.name || D.manual?.name || '이름 없음')}</b>${stChip(info.status)}</div><div class="sub">${esc(r.address)}</div>
@@ -1902,7 +1913,7 @@ function listingForm() {
     <div class="f"><label>수수료</label><input class="in" value="${esc(D.internal.fee)}" oninput="D.internal.fee=this.value"></div>
     <div class="f"><label>하한 조건</label><input class="in" value="${esc(D.internal.floor || '')}" oninput="D.internal.floor=this.value"></div></div>
     <div class="f" style="margin-top:12px"><label>메모</label><textarea class="in" oninput="D.internal.memo=this.value">${esc(D.internal.memo)}</textarea></div></div>
-  <div class="sticky-foot"><button class="btn" onclick="D=null;render()">취소</button><button class="btn pri" onclick="saveListing()">${D.id ? '저장' : '등록'}</button></div>` : ''}`;
+  <div class="sticky-foot"><button class="btn" onclick="leaveForm()">취소</button><button class="btn pri" onclick="saveListing()">${D.id ? '저장' : '등록'}</button></div>` : ''}`;
 }
 function searchRes(res) {
   if (!D.q) return '';
@@ -1914,6 +1925,18 @@ function ensureBuilding(pnu) {
   let B = S.buildings.find(b => b.pnu === pnu);
   if (!B) { const r = REGISTRY.find(x => x.pnu === pnu); B = {id: uid('B'), ...clone(r)}; delete B.final; S.buildings.push(B); }
   return B;
+}
+function retLabel() {
+  if (!RET) return '';
+  if (RET.kind === 'wiz') return `새 제안서 · ${esc(U.wiz?.name || '')}`;
+  const p = getP(RET.pid); return p ? `${esc(p.clientName)}${RET.gi != null && p.groups[RET.gi] ? ` · ${esc(p.groups[RET.gi].name)}` : ''}` : '';
+}
+function leaveForm(savedId) {
+  const r = RET; RET = null; D = null;
+  if (r?.kind === 'wiz' && U.wiz) { if (savedId && r.add) { const k = U.wiz.tab, a = k && k !== 'etc' && getA(k); (U.wiz.picks[k] = U.wiz.picks[k] || []).push(savedId); if (a && !inMaster(getL(savedId), a)) toast('상권 영역 밖의 매물입니다', `${a.name} 그룹에 넣었습니다`); } render(); }
+  else if (r?.kind === 'prop' && getP(r.pid)) { if (savedId && r.add) addItem(r.pid, r.gi, savedId); U.prop = r.pid; U.pmode = 'edit'; U.tab[me()] = 'props'; render(); }
+  else render();
+  window.scrollTo({top: 0});
 }
 function saveListing() {
   if (!D.pnu) return toast('건물을 선택하세요');
@@ -1931,15 +1954,13 @@ function saveListing() {
     Object.assign(data, {id: uid('L'), ownerId: me(), status: 'active', grants: [], createdAt: stamp()});
     S.listings.push(data); logHist(data.id, me(), D.from ? '이관 등록' : '등록');
     if (D.from) { const src = getL(D.from); src.grants = (src.grants || []).filter(u => u !== me()); }
-    D = null; commit(); toast('등록 완료', B.status === '인허가' ? '인허가 정보 기준 · 대장 등록 시 자동 갱신' : '');
+    save(); toast('등록 완료', RET?.add ? `${retLabel().replace(/<[^>]+>/g, '')}에 넣었습니다` : B.status === '인허가' ? '인허가 정보 기준 · 대장 등록 시 자동 갱신' : ''); leaveForm(data.id); return;
   } else {
     const L = getL(D.id);
     const ch = diffListing(L, data); if (ch.length) logHist(L.id, me(), '수정', ch);
     Object.assign(L, data);
-    D = null; commit();
-    toast('저장 완료', '이 매물이 들어간 제안서 장표에 바로 반영');
+    save(); toast('저장 완료', '이 매물이 들어간 제안서 장표에 바로 반영'); leaveForm();
   }
-  window.scrollTo({top: 0});
 }
 
 /* ---------- map-first proposal: conditions → trade areas → pick listings on each area's map ---------- */
@@ -1962,8 +1983,8 @@ function pickRow(L, n, a, crit, fn) {
     <span class="pk-b"><b>${esc(bInfo(L).name)}</b><small>${esc(floorLabel(L.floors, L.leaseType))} · ${nf(L.leaseArea * PYR, 1)}평 · ${priceShort(L.rent)}${L.ownerId !== me() ? ` · ${USERS[L.ownerId].name}` : ''}</small>${fitChips(fitOf(L, {name: a ? a.name : ''}, crit))}</span></button>`;
 }
 /* one picker for the wizard and for "+ 매물 추가": map on the left, the same listings as a list on the right */
-function picker(a, ls, chosen, crit, fn) {
-  const list = `<div class="pk-list">${ls.map(L => pickRow(L, chosen.indexOf(L.id) + 1, a, crit, fn)).join('') || '<div class="sub">이 상권 영역 안에 진행 중인 매물이 없습니다</div>'}</div>`;
+function picker(a, ls, chosen, crit, fn, onNew) {
+  const list = `<div class="pk-list">${onNew ? `<button class="btn sm pk-new" onclick="${onNew}">+ 새 매물 등록 · 저장하면 바로 넣기</button>` : ''}${ls.map(L => pickRow(L, chosen.indexOf(L.id) + 1, a, crit, fn)).join('') || '<div class="sub">이 상권 영역 안에 진행 중인 매물이 없습니다</div>'}</div>`;
   if (!a) return `<div class="pk one">${list}</div>`;
   const zk = `p:${a.id}`, view = zkView(zk, MAP_DATA[a.osm], a.view), k = view.w / MAP_DATA[a.osm].w;
   return `<div class="pk"><div class="pk-map">${zoomCtl(zk, a.osm)}<div onwheel="mWheel(event,'${zk}','${a.osm}')" onpointerdown="panStart(event,'${zk}','${a.osm}')" onpointermove="panMove(event)" onpointerup="if(!panEnd())(t=>t&&${fn}(t.dataset.lid))(event.target.closest('[data-lid]'))">${mapSvg(a, {meet: true, view, zk, cands: candDots(a, ls, chosen, crit, k)})}</div>
@@ -2014,7 +2035,7 @@ function wizView() {
   const out = wizOutside(), tabs = [...w.areas.map(id => [id, getA(id).name]), ...(out.length ? [['etc', '상권 밖']] : [])];
   const a = w.tab === 'etc' ? null : getA(w.tab), ls = a ? openListings().filter(L => inMaster(L, a)) : out;
   return head + `<div class="row" style="margin-bottom:12px">${seg(tabs.map(([k, l]) => [k, `${l} ${(w.picks[k] || []).length || ''}`.trim()]), w.tab, "(v=>{U.wiz.tab=v;render()})")}<div class="sp"></div><span class="sub">지도의 점이나 목록을 누르면 넣고 뺍니다</span></div>
-    ${tabs.length ? picker(a, ls, w.picks[w.tab] || [], crit, 'wizPick') : '<div class="empty">고른 상권이 없습니다. 이전 단계에서 상권을 고르세요</div>'}
+    ${tabs.length ? picker(a, ls, w.picks[w.tab] || [], crit, 'wizPick', "newListing({kind:'wiz',add:true})") : '<div class="empty">고른 상권이 없습니다. 이전 단계에서 상권을 고르세요</div>'}
     <div class="sticky-foot"><button class="btn" onclick="wizGo(2)">← 이전</button><span class="sub" style="align-self:center">상권 ${w.areas.length}곳 · 매물 ${total}건</span><button class="btn pri" ${total ? '' : 'disabled'} onclick="wizFinish()">제안서 만들기</button></div>`;
 }
 const newItem = lid => ({listingId: lid, comment: '', photo: null, layout: 2});
@@ -2031,7 +2052,7 @@ function wizFinish() {
 function pickBody(m) {
   const p = getP(m.pid), g = p.groups[m.gi], a = groupMaster(g), mine = g.items.map(it => it.listingId);
   const ls = openListings().filter(L => inMaster(L, a) && (mine.includes(L.id) || !p.groups.some(x => x.items.some(it => it.listingId === L.id))));
-  return picker(a, ls, mine, p.crit, 'groupPick');
+  return picker(a, ls, mine, p.crit, 'groupPick', `newListing({kind:'prop',pid:'${p.id}',gi:${m.gi},add:true})`);
 }
 function groupPick(lid) {
   const p = getP(U.modal.pid), g = p.groups[U.modal.gi], i = g.items.findIndex(it => it.listingId === lid);
@@ -2073,6 +2094,7 @@ function propEditor(p) {
         <button class="btn xs ghost" ${ii ? '' : 'disabled'} onclick="moveItem('${p.id}',${gi},${ii},-1)">↑</button><button class="btn xs ghost" ${ii < n - 1 ? '' : 'disabled'} onclick="moveItem('${p.id}',${gi},${ii},1)">↓</button>
         ${p.groups.length > 1 ? `<select class="in mini" onchange="moveTo('${p.id}',${gi},${ii},this.value)"><option value="">상권 이동</option>${p.groups.map((x, j) => j === gi ? '' : `<option value="${j}">${esc(x.name)}</option>`).join('')}</select>` : ''}
         <button class="btn xs ghost danger" onclick="rmItem('${p.id}',${gi},${ii})">✕</button></div>
+      <div class="row it-links"><button class="btn xs ghost" onclick="goSlideBy('${p.id}',s=>s.lid==='${L.id}')">장표 보기</button>${L.ownerId === me() ? `<button class="btn xs ghost" onclick="editListing('${L.id}',{kind:'prop',pid:'${p.id}'})">매물 수정</button>` : `<span class="sub">${USERS[L.ownerId].name} 매물 · 수정은 담당자만</span>`}<button class="btn xs ghost" onclick="openModal({type:'detail',lid:'${L.id}'})">상세</button></div>
       ${ok ? fitChips(fitOf(L, g, p.crit)) : '<span><span class="chip dark">제안 종료 · 장표 제외</span></span>'}
       <textarea class="in" placeholder="COMMENTS · 한 줄에 한 항목 (매물 비고는 첫 줄에 자동으로 들어갑니다)" onchange="setComment('${p.id}',${gi},${ii},this.value)">${esc(it.comment)}</textarea>
       <div class="ph-ctl"><span>오버뷰 사진</span><div class="ph-pick">${L.photos.map(src => `<button class="${src === ov ? 'on' : ''}" style="background-image:url('${src}')" title="오버뷰 사진으로" onclick="setItem('${p.id}',${gi},${ii},'photo','${src}')"></button>`).join('')}</div></div>
@@ -2089,7 +2111,7 @@ function propEditor(p) {
         <div class="ctl"><span>색</span><div class="sws">${GCOLOR.map(c => `<button class="${st.color === c ? 'on' : ''}" style="background:${c}" title="${c}" onclick="${gs('color', `'${c}'`)}"></button>`).join('')}<input type="color" value="${st.color}" title="직접 고르기" onchange="${gs('color', 'this.value')}"></div></div>
         <div class="ctl"><span>위치</span><div class="pos9">${GPOS.map(k => `<button class="${st.pos === k ? 'on' : ''}" onclick="${gs('pos', `'${k}'`)}"></button>`).join('')}</div></div>
         <div class="ctl"><span>상권</span><select class="in" onchange="setG('${p.id}',${gi},'areaId',this.value||null)"><option value="">자동 · ${am ? esc(am.name) : '없음'}</option>${S.areas.map(x => `<option value="${x.id}" ${g.areaId === x.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}<option value="none" ${g.areaId === 'none' ? 'selected' : ''}>넣지 않음</option></select></div>
-        <div class="ctl"><span>지도</span><button class="btn xs" ${groupMaster(g) ? '' : 'disabled'} onclick="MED={tool:'move',draft:[],sel:null,drag:null};openModal({type:'gmap',pid:'${p.id}',gi:${gi}})">지도 편집</button><span class="sub">${groupMaster(g) ? `표시 ${(groupMaster(g).marks || []).length - (g.mapHide || []).length + (g.marks || []).length}개` : '상권을 고르면 지도 장이 생깁니다'}</span></div>
+        <div class="ctl"><span>지도</span><button class="btn xs" ${groupMaster(g) ? '' : 'disabled'} onclick="MED={tool:'move',draft:[],sel:null,drag:null};openModal({type:'gmap',pid:'${p.id}',gi:${gi}})">지도 편집</button>${groupMaster(g) && g.items.length ? `<button class="btn xs ghost" onclick="goSlideBy('${p.id}',s=>s.map==='${g.id}')">지도 장 보기</button>` : ''}<span class="sub">${groupMaster(g) ? `표시 ${(groupMaster(g).marks || []).length - (g.mapHide || []).length + (g.marks || []).length}개` : '상권을 고르면 지도 장이 생깁니다'}</span></div>
       </div><div class="gi-list">${g.items.map((it, ii) => item(it, gi, ii, g)).join('') || '<div class="sub" style="padding:10px 0">매물을 추가하세요</div>'}
         <button class="btn sm" style="margin-top:10px" onclick="openModal({type:'pick',pid:'${p.id}',gi:${gi}})">+ 매물 추가${groupMaster(g) ? ' · 지도에서' : ''}</button></div></div></div>`;
   };
@@ -2121,6 +2143,7 @@ function propEditor(p) {
       <div class="panel a" style="--i:5"><h3>구성 <span class="sub">${d.length}장</span></h3><nav class="outl in-panel">${outline}</nav></div>
     </div></div>`;
 }
+function goSlideBy(pid, f) { const i = deckOf(getP(pid)).findIndex(f); if (i < 0) return toast('장표에 없습니다', '제안 종료 매물이거나 지도 장이 꺼져 있습니다'); goSlide(i); }
 function goSlide(i) {
   if (U.pmode !== 'deck') { U.pmode = 'deck'; render(); }
   document.getElementById('sl-' + i)?.scrollIntoView({behavior: 'smooth', block: 'center'});
@@ -2256,13 +2279,13 @@ function renderModal() {
       <div class="mb">${pickBody(m)}</div></div>`;
   } else if (m.type === 'pick' || m.type === 'pickAll') {
     const p = getP(m.pid), g = p.groups[m.gi], avail = S.listings.filter(L => live(L, me()) && !p.groups.some(x => x.items.some(it => it.listingId === L.id)));
-    h = `<div class="modal"><div class="mh"><b>매물 추가</b><span class="sub">${esc(g.name)}</span><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
+    h = `<div class="modal"><div class="mh"><b>매물 추가</b><span class="sub">${esc(g.name)}</span><div class="sp"></div><button class="btn sm" onclick="newListing({kind:'prop',pid:'${p.id}',gi:${m.gi},add:true})">+ 새 매물 등록</button><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
       ${avail.map(L => `<div class="pick"><div class="pi" style="background-image:url('${L.photos[0]}')"></div><div style="flex:1"><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span><div class="pick-kv"><span>1층 <b>${area1F(L.floors) != null ? nf(area1F(L.floors)) + '㎡' : '–'}</b></span><span>전체 <b>${nf(L.leaseArea)}㎡</b></span><span>임대료 <b>${priceShort(L.rent)}</b></span>${L.ownerId !== me() ? `<span>담당 <b>${USERS[L.ownerId].name}</b></span>` : ''}</div></div><button class="btn sm" onclick="addItem('${p.id}',${m.gi},'${L.id}');renderModal()">추가</button></div>`).join('') || '<div class="empty">추가할 물건 없음</div>'}</div></div>`;
   } else if (m.type === 'toProp') {
     const ps = visProps().filter(p => p.ownerId === me()), L = getL(m.lid);
     h = `<div class="modal"><div class="mh"><b>${esc(bInfo(L).name)} → 제안서</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
       ${ps.map(p => { const has = p.groups.some(g => g.items.some(x => x.listingId === m.lid));
-        return `<div class="pick"><div style="flex:1"><b>${esc(p.clientName)}</b><div class="sub">상권 ${p.groups.length} · 매물 ${p.groups.reduce((s, g) => s + g.items.length, 0)}건</div></div>${has ? '<span class="chip ok">포함됨</span>'
+        return `<div class="pick"><div style="flex:1"><b>${esc(p.clientName)}</b><div class="sub">상권 ${p.groups.length} · 매물 ${p.groups.reduce((s, g) => s + g.items.length, 0)}건</div></div>${has ? `<span class="chip ok">포함됨</span><button class="btn sm" onclick="closeModal();openProp('${p.id}')">열기 →</button>`
           : `<select class="in mini" id="tg-${p.id}">${p.groups.map((g, j) => `<option value="${j}">${esc(g.name)}</option>`).join('')}<option value="new">+ 새 상권</option></select><button class="btn sm" onclick="addItem('${p.id}',(v=>v==='new'?v:+v)($('#tg-${p.id}').value),'${m.lid}');renderModal()">추가</button>`}</div>`; }).join('') || '<div class="empty">제안서가 없습니다</div>'}
       <button class="btn sm" style="margin-top:10px" onclick="startWiz('${m.lid}')">+ 이 매물로 새 제안서</button></div></div>`;
   } else if (m.type === 'detail') {
@@ -2270,7 +2293,8 @@ function renderModal() {
     const sl = withDeck({lang, cur: 'USD', fx: S.fx, ownerId: L.ownerId}, () => listingSlide(L, null, 1, null)).replace('%PG%', '');
     h = `<div class="modal wide"><div class="mh"><b>매물 장표 미리보기</b><span class="sub">제안서에 들어가는 모양</span><div class="sp"></div>
       ${seg([['ko', '한국어'], ['en', 'EN']], lang, "(v=>{U.modal.lang=v;renderModal()})")}
-      ${own ? `<button class="btn sm" onclick="closeModal();editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
+      ${propsWith(L.id).map(p => `<button class="btn sm ghost" onclick="closeModal();openProp('${p.id}')">${esc(p.clientName)} 제안서 →</button>`).join('')}
+      ${own ? `<button class="btn sm" onclick="editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <div class="mb">${thumb(sl)}</div></div>`;
   } else if (m.type === 'gmap' && groupMaster(getP(m.pid).groups[m.gi])) {
     const g = getP(m.pid).groups[m.gi];
