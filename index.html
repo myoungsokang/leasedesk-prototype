@@ -409,11 +409,16 @@ textarea.in{resize:vertical;min-height:64px}
 .pc-o{display:flex;flex-direction:column;gap:4px;padding-top:8px;border-top:1px solid var(--line2)}.pc-o:first-of-type{border-top:0;padding-top:0}
 .pc-h{display:flex;align-items:center;gap:6px}.pc-h b{font-size:13.5px}.pc-on{color:#a85a12}.pc-o .btn{align-self:flex-start;margin-top:2px}
 .bld-p h3{font-size:14.5px}.bp-lead{margin:8px 0 12px;font-size:13.5px;color:var(--ink2);line-height:1.6}.bp-lead b{color:var(--ink)}
-.bp-scroll{overflow-x:auto}.bp-t{min-width:760px}
+.bp-scroll{overflow-x:auto}.bp-t{min-width:900px}
 .bp-wc{white-space:nowrap}.bp-wc small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
-.bp-w{width:84px;display:inline-block}.bp-w .in{padding:4px 24px 4px 8px;text-align:right;font-weight:700}
-.bp-own .bp-w .in{border-color:#d9822b;background:#fff8f0}
-.bp-def{display:block;margin:3px 0 0 auto;border:0;background:none;color:var(--accent-2);font-size:11px;cursor:pointer;padding:0}.bp-t tr.bp-sum td{border-top:1px solid var(--ink);font-weight:700}
+.bp-st{display:inline-flex;align-items:stretch;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff}
+.bp-st button{width:34px;border:0;background:#f4f3ef;font-size:17px;font-weight:600;color:var(--ink2);cursor:pointer}.bp-st button:hover{background:#e9e7e0}
+.bp-st .ui{width:76px}.bp-st .in{border:0;border-radius:0;padding:8px 24px 8px 6px;text-align:right;font-weight:700;font-size:15px}
+.bp-own .bp-st{border-color:#d9822b}.bp-own .bp-st .in{background:#fff8f0}
+.bp-def{display:block;margin:6px 0 0 auto;padding:4px 10px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--accent-2);font-size:12px;font-weight:600;cursor:pointer}.bp-def:hover{background:#f4f3ef}
+.bp-auto{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);border-radius:9px;cursor:pointer;font-size:13px;font-weight:600}
+.bp-auto input{display:none}.bp-auto small{font-weight:400;color:var(--muted);font-size:11.5px}.bp-auto.on .sw{background:var(--accent)}.bp-auto.on .sw::after{transform:translateX(14px)}
+.bp-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}.bp-t tr.bp-sum td{border-top:1px solid var(--ink);font-weight:700}
 .bp-rules{margin:12px 0 0;padding-left:18px;font-size:12.5px;color:var(--ink2);line-height:1.8}
 .lyr{position:absolute;left:10px;top:10px;z-index:2;display:flex;gap:4px}
 .lyr button{border:1px solid var(--line);background:rgba(255,255,255,.92);font-size:12px;font-weight:600;color:var(--muted);padding:5px 10px;border-radius:999px;cursor:pointer}
@@ -878,11 +883,22 @@ function areaLinks(a) {
     .map(x => { let def = defaultShare(a, x.o); if (!def && inc.includes(x.o.code)) def = 1; const own = x.o.code in set; return {o: x.o, def, own, w: own ? set[x.o.code] : def}; })
     .filter(u => u.w > 0 || u.own).sort((x, y) => y.w - x.w);
 }
+/* With a.wauto on, a share typed for one area moves the others the opposite way, all by the same factor,
+   so the zone's total visitors stay where they were; each share stays within 0..100%. */
 function setShare(id, code, v) {
   const a = getA(id); a.wset = a.wset || {};
+  const before = a.wauto && v != null && v !== '' ? areaLinks(a) : null;
   if (v == null || v === '') delete a.wset[code]; else a.wset[code] = Math.min(100, Math.max(0, +v)) / 100;
+  if (before) {
+    const me = before.find(u => u.o.code === code), rest = before.filter(u => u !== me && u.w > 0), vis = u => u.o.data.pop[2][1];
+    const gone = me ? (a.wset[code] - me.w) * vis(me) : 0, pool = rest.reduce((t, u) => t + u.w * vis(u), 0);
+    if (gone && pool) { const f = Math.max(0, (pool - gone) / pool); rest.forEach(u => { const w = Math.min(1, Math.round(u.w * f * 1000) / 1000); if (Math.abs(w - u.w) >= .0005) a.wset[u.o.code] = w; });
+      const kept = rest.reduce((t, u) => t + a.wset[u.o.code] * vis(u), 0), miss = Math.round(pool - gone - kept);
+      if (Math.abs(miss) >= 1) toast('합계를 다 맞추지 못했습니다', `나머지 상권이 ${miss > 0 ? '0%' : '100%'}까지 가서 유동인구 합계가 ${nf(Math.abs(miss))}명 ${miss > 0 ? '늘었' : '줄었'}습니다`); }
+  }
   commit();
 }
+const stepShare = (id, code, cur, d) => setShare(id, code, Math.min(100, Math.max(0, Math.round((cur + d) / 5) * 5)));
 const DCACHE = {};
 function areaData(a) { // the official figures added up by overlap: counts scale with the share, rates are weighted averages
   const us = areaLinks(a); if (!us.length) return null;
@@ -2541,15 +2557,17 @@ function areaBuild(a) {
   const rows = us.map(u => { const sc = storeCount(a, u.o), vis = u.o.data.pop[2][1], sal = u.o.data.sales[u.o.data.sales.length - 1][1];
     return {u, sc, vis, sal, cv: Math.round(vis * u.w), cs: Math.round(sal * u.w), wk: u.o.data.week[1]}; });
   const how = u => { const c = storeCount(a, u.o); return c.inz || overlap(a.zone, u.o.poly) > 0 ? `${c.inz} / ${c.all}곳` : '영역 밖 · 직접 추가'; };
-  const own = rows.filter(r => r.u.own).length;
-  return `<div class="panel bld-p"><div class="row"><h3 style="margin:0">상권 데이터 구성</h3><span class="sub">${esc(S.sync?.q || '')} · 예시 수치</span><div class="sp"></div>${own ? `<span class="sub">반영 비율 ${own}곳 직접 조정</span><button class="btn xs" onclick="getA('${a.id}').wset={};commit()">모두 기본값으로</button>` : ''}</div>
+  const own = rows.filter(r => r.u.own).length, tot = rows.reduce((t, r) => t + r.cv, 0);
+  return `<div class="panel bld-p"><div class="row"><h3 style="margin:0">상권 데이터 구성</h3><span class="sub">${esc(S.sync?.q || '')} · 예시 수치</span></div>
     <p class="bp-lead"><b>${esc(a.name)}</b>의 상권 데이터는 겹치는 서울시 공식 상권 ${us.length}곳의 수치를 <b>각 공식 상권 점포 중 회사 영역 안에 있는 비율</b>만큼 가져와 합친 값입니다.</p>
-    <div class="bp-scroll"><table class="tbl bp-t"><thead><tr><th>공식 상권</th><th>유형</th><th class="num">영역 안 점포</th><th class="num">반영 비율</th><th class="num">일평균 유동인구</th><th class="num">→ 반영</th><th class="num">분기 매출</th><th class="num">→ 반영</th></tr></thead><tbody>
+    <div class="bp-tools"><label class="bp-auto ${a.wauto ? 'on' : ''}"><input type="checkbox" ${a.wauto ? 'checked' : ''} onchange="getA('${a.id}').wauto=this.checked;commit()"><i class="sw"></i>다른 상권 자동 조정<small>${a.wauto ? '켜짐 · 한 곳을 바꾸면 나머지가 반대로 움직여 유동인구 합계 유지' : '꺼짐 · 바꾼 상권만 바뀌고 합계가 따라 변함'}</small></label><div class="sp"></div>${own ? `<span class="sub">${own}곳 직접 조정</span><button class="btn sm" onclick="getA('${a.id}').wset={};commit()">모두 기본값으로</button>` : ''}</div>
+    <div class="bp-scroll"><table class="tbl bp-t"><thead><tr><th>공식 상권</th><th>유형</th><th class="num">영역 안 점포</th><th class="num">반영 비율</th><th class="num">일평균 유동인구</th><th class="num">→ 반영</th><th class="num">구성비</th><th class="num">분기 매출</th><th class="num">→ 반영</th></tr></thead><tbody>
       ${rows.map(r => `<tr class="${r.u.own ? 'bp-own' : ''}"><td><b>${esc(r.u.o.name)}</b></td><td>${OTYPE[r.u.o.type]}</td><td class="num">${how(r.u)}</td>
-        <td class="num bp-wc"><div class="ui bp-w"><input class="in" type="number" min="0" max="100" value="${Math.round(r.u.w * 100)}" onchange="setShare('${a.id}','${r.u.o.code}',this.value)"><span>%</span></div>
-          ${r.u.own ? `<button class="bp-def" onclick="setShare('${a.id}','${r.u.o.code}',null)" title="점포 비율로 계산한 기본값">기본값 ${Math.round(r.u.def * 100)}%로</button>` : '<small>기본값</small>'}</td><td class="num">${nf(r.vis)}명</td><td class="num">${nf(r.cv)}명</td><td class="num">${nf(r.sal)}억</td><td class="num">${nf(r.cs)}억</td></tr>`).join('')}
-      <tr class="bp-sum"><td colspan="5">${esc(a.name)} 상권 데이터</td><td class="num">${nf(D.pop[2][1])}명</td><td></td><td class="num">${nf(D.sales[D.sales.length - 1][1])}억</td></tr></tbody></table></div>
-    <ul class="bp-rules"><li><b>반영 비율</b>: 기본값은 그 공식 상권 점포 중 회사 영역 안에 있는 비율입니다. 숫자를 바꾸면 그 값을 쓰고, "기본값으로"를 누르면 돌아갑니다.</li>
+        <td class="num bp-wc"><div class="bp-st"><button title="5%p 내리기" onclick="stepShare('${a.id}','${r.u.o.code}',${r.u.w * 100},-5)">−</button><div class="ui"><input class="in" type="number" min="0" max="100" value="${+(r.u.w * 100).toFixed(1)}" step="0.1" onchange="setShare('${a.id}','${r.u.o.code}',this.value)"><span>%</span></div><button title="5%p 올리기" onclick="stepShare('${a.id}','${r.u.o.code}',${r.u.w * 100},5)">+</button></div>
+          ${r.u.own ? `<button class="bp-def" onclick="setShare('${a.id}','${r.u.o.code}',null)" title="점포 비율로 계산한 기본값">↺ 기본값 ${Math.round(r.u.def * 100)}%로</button>` : '<small>기본값</small>'}</td><td class="num">${nf(r.vis)}명</td><td class="num">${nf(r.cv)}명</td><td class="num">${tot ? Math.round(r.cv / tot * 100) : 0}%</td><td class="num">${nf(r.sal)}억</td><td class="num">${nf(r.cs)}억</td></tr>`).join('')}
+      <tr class="bp-sum"><td colspan="5">${esc(a.name)} 상권 데이터</td><td class="num">${nf(D.pop[2][1])}명</td><td class="num">100%</td><td></td><td class="num">${nf(D.sales[D.sales.length - 1][1])}억</td></tr></tbody></table></div>
+    <ul class="bp-rules"><li><b>반영 비율</b>: 기본값은 그 공식 상권 점포 중 회사 영역 안에 있는 비율입니다. 숫자나 −/+(5%p)로 바꾸면 그 값을 쓰고, "기본값으로"를 누르면 돌아갑니다. "다른 상권 자동 조정"을 켜면 나머지 상권이 같은 배율로 반대로 움직여 유동인구 합계가 그대로입니다.</li>
+      <li><b>구성비</b>: 회사 상권 유동인구 합계 중 그 공식 상권에서 온 몫입니다.</li>
       <li><b>인원 · 매출 · 세대 수</b>: 공식 상권 값 × 반영 비율을 모두 더합니다.</li>
       <li><b>비율 지표</b> (연령 · 시간대 · 주말 매출 비중 · 성별 · 외국인 비중): 반영 비율 × 유동인구로 가중 평균합니다. 예) 주말 매출 비중 ${rows.map(r => `${r.wk}%`).join(' · ')} → <b>${D.week[1]}%</b></li>
       <li><b>가까운 역</b>: 가장 많이 반영된 공식 상권의 역 (${esc(D.subway?.name || '–')})</li></ul></div>`;
