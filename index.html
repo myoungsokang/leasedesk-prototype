@@ -369,6 +369,14 @@ textarea.in{resize:vertical;min-height:64px}
 
 /* ---------- trade-area maps ---------- */
 .sl-map .map-box{position:relative;flex:1;min-height:0;margin-bottom:64px;border:1px solid var(--line);overflow:hidden;background:#e7e7e4}
+.sl-map .map-wrap{flex:1;min-height:0;display:grid;grid-template-columns:1fr 290px;gap:18px;margin-bottom:64px}
+.sl-map .map-wrap .map-box{margin-bottom:0}
+.map-side{display:flex;flex-direction:column;gap:7px;align-content:start;min-height:0;overflow:hidden}
+.map-side.c2{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:min-content;gap:7px 10px}
+.map-side span{display:grid;grid-template-columns:22px 1fr;column-gap:8px;font-size:13.5px;font-weight:600;align-items:baseline;line-height:1.3}
+.map-side.c2 span{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.map-side b{grid-row:span 2;width:20px;height:20px;border-radius:50%;background:#141414;color:#fff;font-size:10.5px;display:flex;align-items:center;justify-content:center}
+.map-side small{font-weight:400;font-size:11.5px;color:var(--muted)}
 .map-box svg{position:absolute;inset:0;width:100%;height:100%}
 .map-leg{position:absolute;left:14px;bottom:14px;display:flex;gap:18px;align-items:center;background:rgba(255,255,255,.94);padding:9px 14px;font-size:13px}
 .map-leg span{display:flex;align-items:center;gap:7px}
@@ -418,6 +426,9 @@ textarea.in{resize:vertical;min-height:64px}
 .pk-leg .d-fit{width:12px;height:12px;border:2.5px solid #141414;background:#fff}.pk-leg .d-no{width:12px;height:12px;border:2.5px solid #a3a39e;background:#ecece9}
 .pk-list{display:flex;flex-direction:column;gap:6px;max-height:640px;overflow:auto}
 .pk-new{justify-content:center;border-style:dashed}
+.na-res{display:flex;flex-direction:column;gap:6px;margin-top:12px;max-height:260px;overflow:auto}
+.na-i{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:10px;cursor:pointer;font-size:13px}
+.na-i.on{border-color:var(--ink)}.na-i small{display:block;color:var(--muted);font-size:11.5px}
 .it-links{gap:2px;margin-top:-4px}
 .med-map .rf{cursor:pointer}
 button.chip{border:0;cursor:pointer}
@@ -1398,6 +1409,19 @@ function panMove(e) {
 }
 function panEnd() { const P = MPAN; MPAN = null; return !!P?.moved; }
 const zoomCtl = (zk, osm) => `<div class="zm-ctl"><button title="확대" onclick="zoomAt('${zk}','${osm}',1/1.4)">+</button><button title="축소" onclick="zoomAt('${zk}','${osm}',1.4)">−</button><button title="전체 보기" onclick="MV['${zk}']=fullView(MAP_DATA['${osm}']);zmApply('${zk}')">전체</button></div>`;
+const pinR = n => n > 20 ? 13 : n > 10 ? 16 : 19;
+function declutter(pts, r) { // pairwise push until no two circles overlap (a few dozen points, so O(n²) is fine)
+  const q = pts.map(p => ({...p, ox: p.x, oy: p.y})), min = r * 2.1;
+  for (let it = 0; it < 60; it++) { let moved = false;
+    for (let i = 0; i < q.length; i++) for (let j = i + 1; j < q.length; j++) {
+      let dx = q[j].x - q[i].x, dy = q[j].y - q[i].y, dd = Math.hypot(dx, dy);
+      if (dd >= min) continue; if (!dd) { dx = Math.cos(j); dy = Math.sin(j); dd = 1; }
+      const f = (min - dd) / 2 / dd; q[i].x -= dx * f; q[i].y -= dy * f; q[j].x += dx * f; q[j].y += dy * f; moved = true;
+    }
+    if (!moved) break; }
+  return q;
+}
+const leader = (p, k) => Math.hypot(p.x - p.ox, p.y - p.oy) > 4 * k ? `<line x1="${p.ox}" y1="${p.oy}" x2="${p.x}" y2="${p.y}" stroke="#141414" stroke-width="${1.6 * k}"/><circle cx="${p.ox}" cy="${p.oy}" r="${3.2 * k}" fill="#141414"/>` : '';
 /* o.view: the window to draw (default the whole map) · o.zk: the live view this svg follows
    o.pins: [{x, y, n}] · o.hide: company marks this proposal hides · o.marks: the proposal's own marks
    o.edit: the editor tool, which also draws hidden outlines and hidden marks so they can come back */
@@ -1411,12 +1435,15 @@ function mapSvg(a, o = {}) {
     <rect width="${d.w}" height="${d.h}" fill="#e7e7e4"/>${a.zone.length > 2 ? `<path d="${ppath(a.zone)}" fill="#d8d8d4"/>` : ''}${mapBase(a.osm)}
     <g>${blds.map(([id, p]) => `<path data-b="${id}" d="${mpath(p)}Z" ${hb.has(id) ? 'class="bh" fill="none" stroke="#c23b3a" stroke-width="1.5" stroke-dasharray="4 3"' : 'fill="#bfbfbb" stroke="#fff" stroke-width="1"'}/>`).join('')}</g>
     <g fill="none" stroke="#2f9e44" stroke-width="6">${d.rail.map(r => `<path d="${mpath(r)}"/>`).join('')}</g>
+    ${o.dim && a.zone.length > 2 ? `<path d="M0 0H${d.w}V${d.h}H0Z${ppath(a.zone)}" fill="#fff" fill-opacity=".62" fill-rule="evenodd"/>` : ''}
     ${ed === 'zone' || ed === 'move' ? `<path d="${a.zone.length > 2 ? ppath(a.zone) : ''}" fill="none" stroke="#2a78d6" stroke-width="${2 * k}" stroke-dasharray="${10 * k} ${6 * k}"/>` : ''}
     ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '', k)).join('')}${(o.marks || []).map(m => markSvg(m, 'pr', '', k)).join('')}
     ${(o.refs || []).map(q => `<g data-ref="${q.id}" class="rf" transform="${sc(q.x, q.y)}"><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/><text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text></g>`).join('')}
-    ${(o.cands || []).map(c => `<g data-lid="${c.id}" class="cd" transform="${sc(c.x, c.y)}">${c.st === 'in' ? `<circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
-      : `<circle r="13" fill="${c.st === 'fit' ? '#fff' : '#ecece9'}" stroke="${c.st === 'fit' ? '#141414' : '#a3a39e'}" stroke-width="3.5"/>`}<text x="${c.st === 'in' ? 25 : 19}" y="7" font-size="18" font-weight="600" fill="${c.st === 'nofit' ? '#8a8a85' : '#141414'}" ${halo}>${esc(c.label)}</text></g>`).join('')}
-    ${(o.pins || []).map(q => `<g transform="${sc(q.x, q.y)}"><circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${q.n}</text></g>`).join('')}
+    ${(() => { const cs = o.cands || [], R = pinR(cs.length), lab = cs.length <= 10, q = declutter(cs, R * k);
+      return q.map(c => `${leader(c, k)}<g data-lid="${c.id}" class="cd" transform="${sc(c.x, c.y)}"><title>${esc(c.label)}</title>${c.st === 'in' ? `<circle r="${R}" fill="#141414" stroke="#fff" stroke-width="3"/><text y="${R * .37}" font-size="${R * 1.05}" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
+        : `<circle r="${R * .7}" fill="${c.st === 'fit' ? '#fff' : '#ecece9'}" stroke="${c.st === 'fit' ? '#141414' : '#a3a39e'}" stroke-width="3.5"/>`}${lab ? `<text x="${R + 6}" y="7" font-size="18" font-weight="600" fill="${c.st === 'nofit' ? '#8a8a85' : '#141414'}" ${halo}>${esc(c.label)}</text>` : ''}</g>`).join(''); })()}
+    ${(() => { const ps = o.pins || [], R = pinR(ps.length), q = declutter(ps, R * k);
+      return q.map(p => `${leader(p, k)}<g transform="${sc(p.x, p.y)}"><circle r="${R}" fill="#141414" stroke="#fff" stroke-width="3"/><text y="${R * .37}" font-size="${R * 1.05}" font-weight="700" fill="#fff" text-anchor="middle">${p.n}</text></g>`).join(''); })()}
     ${o.draft?.length ? `<path d="${o.draft.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join('')}" fill="rgba(42,120,214,.12)" stroke="#2a78d6" stroke-width="${2.5 * k}"/>${o.draft.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${6 * k}" fill="#fff" stroke="#2a78d6" stroke-width="${2.5 * k}"/>`).join('')}` : ''}
   </svg>`;
 }
@@ -1424,14 +1451,23 @@ function groupPins(g, its, a) {
   const d = MAP_DATA[a.osm];
   return its.map((it, i) => { const B = getB(getL(it.listingId).buildingId); if (!B.lat) return null; const [x, y] = llXY(d, B.lat, B.lng); return {x, y, n: i + 1}; }).filter(Boolean);
 }
-const slideView = (g, a) => { const d = MAP_DATA[a.osm], v = (g && g.view) || a.view; return v ? clampView(v, d) : null; };
+function fitView(d, pts, pad = .14) {
+  if (!pts.length) return null;
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  let x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const cw = (x1 - x0) * (1 + pad * 2), ch = (y1 - y0) * (1 + pad * 2), w = Math.max(cw, ch * d.w / d.h, d.w / 6);
+  return clampView({x: (x0 + x1) / 2 - w / 2, y: (y0 + y1) / 2 - w * d.h / d.w / 2, w}, d);
+}
+/* the slide's window: saved on the group, else the company's, else fitted to the zone and the pins */
+const slideView = (g, a, pins = []) => { const d = MAP_DATA[a.osm], v = (g && g.view) || a.view; return v ? clampView(v, d) : fitView(d, [...a.zone, ...pins.map(q => [q.x, q.y])]); };
 function mapSlide(g, a, its) {
+  const rows = its.map((it, i) => { const L = getL(it.listingId); return `<span><b>${i + 1}</b>${esc(tv(bInfo(L).name))}${its.length > 18 ? '' : `<small>${esc(floorsTxt(L))} · ${nf(L.leaseArea * PYR, 1)}${LG('평', 'py')}</small>`}</span>`; }).join('');
   const ours = (a.marks || []).some(m => m.kind === 'ours' && !(g.mapHide || []).includes(m.id));
   return `<div class="sl sl-std sl-map">${slHead(esc(tv(g.name)), {em: LG('지도', 'Map'), tag: esc(tv(a.name))})}
-    <div class="map-box">${mapSvg(a, {pins: groupPins(g, its, a), hide: g.mapHide, marks: g.marks, view: slideView(g, a)})}
-      <div class="map-list">${its.map((it, i) => { const L = getL(it.listingId); return `<span><b>${i + 1}</b>${esc(tv(bInfo(L).name))}<small>${esc(floorsTxt(L))} · ${nf(L.leaseArea * PYR, 1)}${LG('평', 'py')}</small></span>`; }).join('')}</div>
+    ${its.length > 8 ? '<div class="map-wrap">' : ''}<div class="map-box">${mapSvg(a, {pins: groupPins(g, its, a), hide: g.mapHide, marks: g.marks, dim: g.mapDim, view: slideView(g, a, groupPins(g, its, a))})}
+      ${its.length > 8 ? '' : `<div class="map-list">${rows}</div>`}
       <div class="map-leg"><span><i class="lp">1</i>${LG('제안 매물', 'Proposed site')}</span>${ours ? `<span><i class="lo">L</i>${LG('LeaseDesk 중개', 'LeaseDesk deal')}</span>` : ''}<span><i class="lb"></i>${LG('주요 브랜드', 'Key brands')}</span></div>
-      <span class="map-src">© OpenStreetMap contributors · ${LG('예시 데이터', 'Sample data')}</span></div>${slFoot()}</div>`;
+      <span class="map-src">© OpenStreetMap contributors · ${LG('예시 데이터', 'Sample data')}</span></div>${its.length > 8 ? `<div class="map-side ${its.length > 18 ? 'c2' : ''}">${rows}</div></div>` : ''}${slFoot()}</div>`;
 }
 
 /* ---------- map editor: one component for the company master and for a proposal's own layer ---------- */
@@ -1454,9 +1490,10 @@ function mapEditor(c) {
   const pins = c.kind === 'group' ? groupPins(c.g, liveItems(c.p, c.g), c.a) : [];
   const refs = c.kind === 'area' ? S.listings.filter(L => L.status === 'active').map(L => { const xy = listingXY(L, c.a); return xy && {id: L.id, x: xy[0], y: xy[1], label: bInfo(L).name}; }).filter(Boolean) : [];
   const d = MAP_DATA[c.a.osm], zk = medZk(c), saved = c.kind === 'area' ? c.a.view : c.g.view;
-  const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : [], view: zkView(zk, d, saved || c.a.view), zk});
-  const vwRow = `<div class="f"><label>지도 장에 보일 범위</label><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '지도 전체'}</div>
-    <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '전체로'}</button>` : ''}</div></div>`;
+  const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : [], view: zkView(zk, d, saved || slideView(c.kind === 'group' ? c.g : null, c.a, pins)), zk, dim: c.kind === 'group' && c.g.mapDim});
+  const vwRow = `<div class="f"><label>지도 장에 보일 범위</label><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '자동 · 상권 영역과 매물이 다 보이게'}</div>
+    <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '자동으로'}</button>` : ''}</div>
+    ${c.kind === 'group' ? `<label class="chk" style="margin-top:6px"><input type="checkbox" ${c.g.mapDim ? 'checked' : ''} onchange="medCtx().g.mapDim=this.checked;medRefresh()"> 상권 영역 밖 흐리게</label>` : ''}</div>`;
   const row = m => `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="이름" onkeydown="if(event.key==='Enter')this.blur()" onchange="medName('${m.id}',this.value)"><button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`;
   return `<div class="med"><div class="med-main">
       <div class="row">${seg(tools, t, '(v=>medTool(v))')}${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
@@ -1468,8 +1505,9 @@ function mapEditor(c) {
         <div class="f"><label>상권 표지 기본값</label>${thumb(groupCoverSlide({name: c.a.name, photo: c.a.photo, style: c.a.style || {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}}))}
           <div class="row"><label class="btn xs">업로드<input type="file" accept="image/*" hidden onchange="(f=>f&&readImg(f,src=>{getA('${c.a.id}').photo=src;commit()}))(this.files[0])"></label><button class="btn xs ghost" onclick="(a=>{a.photo=GROUP_PHOTOS[(GROUP_PHOTOS.indexOf(a.photo)+1)%GROUP_PHOTOS.length];commit()})(getA('${c.a.id}'))">샘플 바꾸기</button><span class="sub">새 제안서의 상권 표지로 복사</span></div></div>
         <div class="sub">파란 점 = 진행 중 매물 위치 · 건물 ${zoneBuildings(c.a).length - (c.a.hidden || []).length}개 표시 · ${(c.a.hidden || []).length}개 숨김 ${(c.a.hidden || []).length ? `<button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div>`
-        : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}</div>`}
+        : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}${c.hide.length < (c.a.marks || []).length ? ` <button class="btn xs ghost" onclick="(c=>{c.g.mapHide=(c.a.marks||[]).map(m=>m.id)})(medCtx());medRefresh()">모두 숨기기</button>` : ''}</div>`}
       ${vwRow}
+      ${c.kind === 'area' ? `<button class="btn xs ghost danger" style="align-self:flex-start" onclick="rmArea('${c.a.id}')">상권 지도 삭제</button>` : ''}
       <b class="med-h">${c.kind === 'area' ? '회사 표시' : '이 제안서 표시'} <span class="sub">${c.list.length}</span></b>
       <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div>`;
 }
@@ -1986,7 +2024,7 @@ function pickRow(L, n, a, crit, fn) {
 function picker(a, ls, chosen, crit, fn, onNew) {
   const list = `<div class="pk-list">${onNew ? `<button class="btn sm pk-new" onclick="${onNew}">+ 새 매물 등록 · 저장하면 바로 넣기</button>` : ''}${ls.map(L => pickRow(L, chosen.indexOf(L.id) + 1, a, crit, fn)).join('') || '<div class="sub">이 상권 영역 안에 진행 중인 매물이 없습니다</div>'}</div>`;
   if (!a) return `<div class="pk one">${list}</div>`;
-  const zk = `p:${a.id}`, view = zkView(zk, MAP_DATA[a.osm], a.view), k = view.w / MAP_DATA[a.osm].w;
+  const zk = `p:${a.id}`, pre = candDots(a, ls, chosen, crit), view = zkView(zk, MAP_DATA[a.osm], slideView(null, a, pre)), k = view.w / MAP_DATA[a.osm].w;
   return `<div class="pk"><div class="pk-map">${zoomCtl(zk, a.osm)}<div onwheel="mWheel(event,'${zk}','${a.osm}')" onpointerdown="panStart(event,'${zk}','${a.osm}')" onpointermove="panMove(event)" onpointerup="if(!panEnd())(t=>t&&${fn}(t.dataset.lid))(event.target.closest('[data-lid]'))">${mapSvg(a, {meet: true, view, zk, cands: candDots(a, ls, chosen, crit, k)})}</div>
       <div class="pk-leg"><span><i class="d-in">1</i>고름</span><span><i class="d-fit"></i>요청 조건 충족</span><span><i class="d-no"></i>조건 밖</span></div></div>${list}</div>`;
 }
@@ -2243,10 +2281,66 @@ function adminBld() {
         ${ls.map(L => `<tr><td><b>${esc(floorLabel(L.floors, L.leaseType))}</b></td><td>${USERS[L.ownerId].name}</td><td>${L.visibility === 'shared' ? '공유' : '🔒'}</td><td><span class="chip ${STATUS[L.status][1]}">${STATUS[L.status][0]}</span></td><td class="num">${priceShort(L.rent)}</td><td>${esc(L.internal.landlord)}</td><td class="sub">${esc(L.internal.memo)}</td><td><button class="btn xs" onclick="event.stopPropagation();openModal({type:'hist',lid:'${L.id}'})">이력</button></td></tr>`).join('')}</tbody></table></div>` : ''}</div>`; }).join('')}`;
 }
 const freshMed = () => { MED = {tool: 'move', draft: [], sel: null, drag: null}; };
+/* ---------- new trade area: find a place, pull its OpenStreetMap roads and outlines, then draw the zone ---------- */
+const OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter'];
+const ROADCLS = {motorway: 3, trunk: 3, primary: 3, secondary: 2, tertiary: 2, unclassified: 1, residential: 1, living_street: 1, pedestrian: 1, service: 0};
+async function fetchOsm(lat, lng) { // same window and encoding as tools/osm_extract.py: about 1.7 km × 0.8 km, whole metres from the top-left
+  const s0 = lat - .0036, n = lat + .0036, w = lng - .0095, e = lng + .0095, b = `${s0},${w},${n},${e}`;
+  const q = `[out:json][timeout:60];(way["highway"~"^(${Object.keys(ROADCLS).join('|')})$"](${b});way["railway"~"^(subway|rail|light_rail)$"]["tunnel"!="yes"](${b});way["leisure"="park"](${b});way["landuse"="grass"](${b});way["building"](${b}););out geom;`;
+  let r = null, why = '';
+  // public servers are often at capacity, and a busy reply carries no CORS header, so it reads as a network error: back off, then try the next host
+  hosts: for (const host of OVERPASS) for (const wait of [0, 4000]) {
+    if (wait) { U.modal && (U.modal.busy = `지도 서버가 붐빕니다 · ${wait / 1000}초 뒤 다시 시도`) && renderModal(); await new Promise(z => setTimeout(z, wait)); }
+    const ac = new AbortController(), t = setTimeout(() => ac.abort(), 35000);
+    try { r = await fetch(host, {method: 'POST', body: new URLSearchParams({data: q}), signal: ac.signal}); if (r.ok) break hosts; why = `${new URL(host).host} ${r.status}`; r = null; }
+    catch (e) { why = `${new URL(host).host} ${e.name === 'AbortError' ? '응답 없음' : '응답 거절'}`; } finally { clearTimeout(t); }
+  }
+  if (!r?.ok) throw new Error(`공용 지도 서버가 지금 붐빕니다. 잠시 뒤 다시 시도하세요 (${why})`);
+  const kx = Math.cos((s0 + n) / 2 * Math.PI / 180) * 111320, xy = g => [Math.round((g.lon - w) * kx), Math.round((n - g.lat) * 110540)];
+  const d = {bbox: [s0, w, n, e], w: Math.round((e - w) * kx), h: Math.round((n - s0) * 110540), roads: [], rail: [], parks: [], buildings: []};
+  for (const el of (await r.json()).elements) {
+    const t = el.tags || {}; if (!el.geometry) continue;
+    const pts = el.geometry.flatMap(xy);
+    if (t.building) d.buildings.push([el.id, pts]);
+    else if (t.railway) d.rail.push(pts);
+    else if (t.leisure === 'park' || t.landuse === 'grass') d.parks.push(pts);
+    else if (t.highway in ROADCLS) d.roads.push([ROADCLS[t.highway], pts]);
+  }
+  return d;
+}
+async function naSearch() {
+  const m = U.modal, q = (m.q || '').trim(); if (!q) return toast('찾을 장소를 입력하세요');
+  const local = REGISTRY.filter(r => r.lat && r.address.replace(/\s/g, '').includes(q.replace(/\s/g, ''))).map(r => ({name: r.address + (r.name ? ` · ${r.name}` : ''), lat: r.lat, lng: r.lng}));
+  m.busy = '찾는 중…'; m.results = local; renderModal();
+  try {
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&countrycodes=kr&limit=6&accept-language=ko&q=${encodeURIComponent(q)}`);
+    m.results = [...local, ...(await r.json()).map(x => ({name: x.display_name, lat: +x.lat, lng: +x.lon}))];
+  } catch (e) { toast('장소 검색에 실패했습니다', '등록된 건물 주소만 보여줍니다'); }
+  m.busy = ''; renderModal();
+}
+async function naCreate() {
+  const m = U.modal, name = (m.name || '').trim(), pick = m.results?.[m.pick];
+  if (!name) return toast('상권 이름을 입력하세요'); if (!pick) return toast('중심이 될 장소를 고르세요');
+  m.busy = '지도 데이터를 받는 중… (10–30초)'; renderModal();
+  try {
+    const d = await fetchOsm(pick.lat, pick.lng), key = uid('osm');
+    (S.osm = S.osm || {})[key] = d; window.MAP_DATA[key] = d;
+    const a = {id: uid('A'), name, osm: key, dataKey: null, hidden: [], zone: [], marks: [], photo: GROUP_PHOTOS[S.areas.length % GROUP_PHOTOS.length], style: {font: 'wide', size: 'L', color: '#ffffff', pos: 'bl'}};
+    S.areas.push(a); U.modal = null; renderModal(); U.amap = a.id; freshMed(); MED.tool = 'zone'; commit();
+    toast(`${name} 지도 생성`, `도로 ${d.roads.length} · 건물 ${d.buildings.length} · 이제 상권 영역을 그리세요`);
+  } catch (e) { m.busy = ''; renderModal(); toast('지도 데이터를 받지 못했습니다', String(e.message || e)); }
+}
+function rmArea(id) {
+  const a = getA(id), used = visProps().filter(p => p.groups.some(g => g.areaId === id || (!g.areaId && groupMaster(g) === a)));
+  if (!confirm(`${a.name} 상권 지도를 지울까요?${used.length ? `\n쓰는 제안서 ${used.length}건의 지도 장이 빠집니다.` : ''}`)) return;
+  used.forEach(p => p.groups.forEach(g => { if (g.areaId === id || (!g.areaId && groupMaster(g) === a)) g.areaId = 'none'; }));
+  S.areas = S.areas.filter(x => x.id !== id); if (S.osm?.[a.osm]) delete S.osm[a.osm];
+  U.amap = null; commit(); toast('상권 지도 삭제', a.name);
+}
 function adminMaps() {
   const a = U.amap && getA(U.amap);
   if (a) return `<div class="head"><button class="btn ghost icon" onclick="U.amap=null;freshMed();render()">←</button><h1>${esc(a.name)} 지도</h1><span class="sub">회사 상권 지도 · 모든 제안서가 같이 씁니다</span></div><div class="panel">${mapEditor(medCtx())}</div>`;
-  return `<div class="head"><h1>상권 지도</h1><span class="sub">회사가 정한 상권 영역 · 제안서 지도 장의 바탕</span></div>
+  return `<div class="head"><h1>상권 지도</h1><span class="sub">회사가 정한 상권 영역 · 제안서 지도 장의 바탕</span><div class="sp"></div><button class="btn pri" onclick="openModal({type:'newArea'})">+ 새 상권</button></div>
   <div class="grid">${S.areas.map((x, i) => `<div class="card hov a" style="--i:${i}" onclick="U.amap='${x.id}';freshMed();render()"><div class="ph map-th">${mapSvg(x, {view: slideView(null, x)})}</div>
     <div class="bd"><div class="t">${esc(x.name)}</div><div class="ad">${AREAS[x.dataKey] ? esc(AREAS[x.dataKey].name) : '상권 데이터 없음'}</div>
     <div class="kv"><span>건물<b>${zoneBuildings(x).length - (x.hidden || []).length}</b></span><span>표시<b>${(x.marks || []).length}</b></span><span>쓰는 제안서<b>${visProps().filter(p => p.groups.some(g => groupMaster(g) === x)).length}</b></span></div></div></div>`).join('')}</div>`;
@@ -2299,6 +2393,13 @@ function renderModal() {
   } else if (m.type === 'gmap' && groupMaster(getP(m.pid).groups[m.gi])) {
     const g = getP(m.pid).groups[m.gi];
     h = `<div class="modal map-modal"><div class="mh"><b>${esc(g.name)} 지도</b><span class="sub">이 제안서에만 적용</span><div class="sp"></div><button class="btn sm pri" onclick="closeModal();render()">완료</button></div><div class="mb">${mapEditor(medCtx())}</div></div>`;
+  } else if (m.type === 'newArea') {
+    h = `<div class="modal"><div class="mh"><b>새 상권 지도</b><div class="sp"></div><button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">
+      <div class="f"><label>상권 이름</label><input class="in" id="na-name" value="${esc(m.name || '')}" placeholder="예: 연남동" oninput="U.modal.name=this.value"></div>
+      <div class="f" style="margin-top:12px"><label>지도 중심 장소</label><div class="row" style="flex-wrap:nowrap"><input class="in" id="na-q" value="${esc(m.q || '')}" placeholder="주소나 장소 이름 (예: 연남동 경의선숲길)" oninput="U.modal.q=this.value" onkeydown="if(event.key==='Enter')naSearch()"><button class="btn" onclick="naSearch()">찾기</button></div></div>
+      <div class="na-res">${(m.results || []).map((r, i) => `<label class="na-i ${m.pick === i ? 'on' : ''}"><input type="radio" name="na" ${m.pick === i ? 'checked' : ''} onchange="U.modal.pick=${i};renderModal()"><span>${esc(r.name)}<small>${r.lat.toFixed(4)}, ${r.lng.toFixed(4)}</small></span></label>`).join('') || (m.results ? '<div class="sub">찾은 장소가 없습니다</div>' : '<div class="sub">장소를 찾으면 그 주변 약 1.7 × 0.8 km의 도로 · 건물 데이터를 OpenStreetMap에서 받아 지도를 만듭니다. 다음 단계에서 상권 영역을 그립니다.</div>')}</div>
+      ${m.busy ? `<div class="sub" style="margin-top:10px">${m.busy}</div>` : ''}
+      <div class="row" style="justify-content:flex-end;margin-top:16px"><button class="btn" onclick="closeModal()">취소</button><button class="btn pri" ${m.busy || m.pick == null ? 'disabled' : ''} onclick="naCreate()">지도 만들기</button></div></div></div>`;
   } else if (m.type === 'hist') {
     const L = getL(m.lid), {full, hs} = histFor(m.lid);
     h = `<div class="modal wide"><div class="mh"><b>변경 이력</b><span class="sub">${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</span><div class="sp"></div>${full ? '' : '<span class="chip">공개 항목만</span>'}<button class="btn sm ghost" onclick="closeModal()">✕</button></div><div class="mb">${histList(hs)}</div></div>`;
@@ -2330,6 +2431,7 @@ function toast(t, s) {
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && U.modal) closeModal(); });
 
 if (!S) S = seed();
+if (S.osm && window.MAP_DATA) Object.assign(window.MAP_DATA, S.osm); // trade areas created in this browser
 save(); render();
 </script>
 </body>
