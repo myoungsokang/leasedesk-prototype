@@ -1575,7 +1575,7 @@ function listingForm() {
   <div class="panel a" style="--i:4"><h3>조건</h3>
     ${priceRow('deposit', '보증금', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
     ${priceRow('rent', '월 임대료', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
-    ${priceRow('mgmt', '월 관리비', [['v', '금액'], ['nego', '협의'], ['tbd', '미정']])}
+    ${priceRow('mgmt', '월 관리비', [['v', '금액'], ['util', '실비정산'], ['nego', '협의'], ['tbd', '미정']])}
     ${priceRow('keyMoney', '권리금', [['v', '금액'], ['none', '없음'], ['nego', '협의'], ['tbd', '미정']])}
     ${priceRow('handover', '인도일', [['v', '확정일'], ['est', '예상일'], ['now', '즉시'], ['nego', '협의'], ['tbd', '미정']], true)}
     <div class="f" style="margin-top:12px"><label>비고 (공개)</label><input class="in" value="${esc(D.note)}" oninput="D.note=this.value" placeholder="예: 외벽 사인 가능"></div></div>
