@@ -381,7 +381,11 @@ textarea.in{resize:vertical;min-height:64px}
 .map-th{position:relative;overflow:hidden}.map-th svg{position:absolute;inset:0;width:100%;height:100%}
 .med{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:18px}
 .med-main{display:flex;flex-direction:column;gap:8px;min-width:0}
-.med-map{border:1px solid var(--line);background:#e7e7e4;touch-action:none;user-select:none}
+.med-map{position:relative;border:1px solid var(--line);background:#e7e7e4;touch-action:none;user-select:none;overflow:hidden}
+.zm-ctl{position:absolute;right:10px;top:10px;z-index:2;display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.zm-ctl button{border:0;background:#fff;width:34px;height:32px;font-size:17px;font-weight:600;color:var(--ink);cursor:pointer}
+.zm-ctl button+button{border-top:1px solid var(--line2)}.zm-ctl button:last-child{font-size:11px}
+.zm-ctl button:hover{background:#f3f2ee}
 .med-map svg{display:block;width:100%;height:auto;cursor:crosshair}
 .med-map.t-move svg{cursor:default}.med-map.t-move [data-layer] {cursor:grab}
 .med-map.t-bld [data-b],.med-map.t-hide [data-layer="co"]{cursor:pointer}
@@ -405,7 +409,7 @@ textarea.in{resize:vertical;min-height:64px}
 .wz-n{position:absolute;left:10px;top:10px;width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
 .pk{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:16px;align-items:start}
 .pk.one{grid-template-columns:minmax(0,640px)}
-.pk-map{position:relative;border:1px solid var(--line);background:#e7e7e4}
+.pk-map{position:relative;border:1px solid var(--line);background:#e7e7e4;overflow:hidden;touch-action:none;user-select:none}
 .pk-map svg{display:block;width:100%;height:auto}
 .pk-map .cd{cursor:pointer}
 .pk-leg{position:absolute;left:10px;bottom:10px;display:flex;gap:14px;background:rgba(255,255,255,.94);padding:7px 12px;font-size:12px}
@@ -1011,7 +1015,7 @@ function seed() {
   ];
   L.forEach(l => l.leaseArea = sumArea(l.floors));
   const st = (font, size, color, pos) => ({font, size, color, pos});
-  const G = (id, name, photo, style, items) => ({id, name, photo, style, areaId: null, mapHide: [], marks: [], items: items.map(([listingId, comment, layout = 2]) => ({listingId, comment, photo: null, layout}))});
+  const G = (id, name, photo, style, items, areaId = null) => ({id, name, photo, style, areaId, mapHide: [], marks: [], items: items.map(([listingId, comment, layout = 2]) => ({listingId, comment, photo: null, layout}))});
   const props = [{id: 'P1', ownerId: 'brokerA', clientName: '모먼트커피', createdAt: '2026-09-18T17:00:00',
     lang: 'ko', cur: 'USD', fx: {month: '2026-09', rates: fxFor('2026-09')},
     cover: {title: '', region: 'SEOUL', date: '2026-10', photo: PH.cheonggye},
@@ -1020,13 +1024,13 @@ function seed() {
     groups: [
       G('G1', '성수', PH.brick, st('wide', 'L', '#ffffff', 'bl'), [
         ['L2', '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 구성 가능\n즉시 입주 가능', 4],
-        ['L9', '평일 직장인 수요 중심의 오피스 1층 리테일\n관리비는 실비정산', 1]]),
+        ['L9', '평일 직장인 수요 중심의 오피스 1층 리테일\n관리비는 실비정산', 1]], 'A1'),
       G('G2', '가로수길', PH.seoulStreet, st('serif', 'M', '#ffffff', 'mc'), [
-        ['L1', '2층은 로스터리 쇼룸으로 활용 가능\n권리금은 현 임차인과 협의 필요', 2]]),
+        ['L1', '2층은 로스터리 쇼룸으로 활용 가능\n권리금은 현 임차인과 협의 필요', 2]], 'A2'),
       G('G3', '한남', PH.garden, st('sans', 'L', '#f2d16b', 'tl'), [
-        ['L3', '주말 매출 비중이 높아 브랜드 체험형 매장에 적합\n1층은 테라스 쪽 일부만 임대', 1]]),
+        ['L3', '주말 매출 비중이 높아 브랜드 체험형 매장에 적합\n1층은 테라스 쪽 일부만 임대', 1]], 'A3'),
       G('G4', '명동', PH.seoulNeon, st('wide', 'M', '#ffffff', 'br'), [
-        ['L5', '관광객 유동이 가장 많은 대안\n해외 고객 대상 플래그십으로 검토 권장', 4]]),
+        ['L5', '관광객 유동이 가장 많은 대안\n해외 고객 대상 플래그십으로 검토 권장', 4]], 'A4'),
     ]}];
   props.push({id: 'P2', hidden: true, ownerId: 'brokerB', clientName: '어반스레드', createdAt: '2026-09-25T10:30:00',
     lang: 'en', cur: 'CNY', fx: {month: '2026-09', rates: fxFor('2026-09')},
@@ -1034,9 +1038,9 @@ function seed() {
     crit: {regions: ['가로수길', '한남', '판교'], rentMax: null, areaMin: 240, areaMax: 400},
     slides: {summary: true, compare: true}, modules: {...DEFAULT_MODS, hinter: false},
     groups: [
-      G('G1', 'GAROSU-GIL', PH.seoulStreet, st('wide', 'L', '#ffffff', 'bl'), [['L1', 'Apparel stores have occupied this unit for nearly 10 years']]),
-      G('G2', 'HANNAM', PH.garden, st('wide', 'L', '#ffffff', 'bl'), [['L3', 'Part of the ground floor plus the 2nd floor splits showroom and fitting areas']]),
-      G('G3', 'PANGYO', PH.mall, st('wide', 'L', '#ffffff', 'bl'), [['L8', 'An option aimed at weekday office workers']]),
+      G('G1', 'GAROSU-GIL', PH.seoulStreet, st('wide', 'L', '#ffffff', 'bl'), [['L1', 'Apparel stores have occupied this unit for nearly 10 years']], 'A2'),
+      G('G2', 'HANNAM', PH.garden, st('wide', 'L', '#ffffff', 'bl'), [['L3', 'Part of the ground floor plus the 2nd floor splits showroom and fitting areas']], 'A3'),
+      G('G3', 'PANGYO', PH.mall, st('wide', 'L', '#ffffff', 'bl'), [['L8', 'An option aimed at weekday office workers']], 'none'),
     ]});
   props[0].groups[0].marks = [{id: 'MP1', kind: 'hl', name: '팝업 밀집 구역', pts: [[870, 470], [1015, 462], [1035, 545], [890, 560]]}];
   const M = (id, kind, x, y, name) => ({id, kind, x, y, name});
@@ -1320,6 +1324,7 @@ const liveItems = (p, g) => g.items.filter(it => { const L = getL(it.listingId);
 /* trade-area masters: the company's own area maps, shared by every proposal */
 const getA = id => S.areas.find(a => a.id === id);
 function autoMaster(g) { for (const it of g.items) { const L = getL(it.listingId), k = L && getB(L.buildingId).area, a = k && S.areas.find(x => x.dataKey === k); if (a) return a; } return null; }
+function pinMaster(g) { if (!g.areaId) g.areaId = autoMaster(g)?.id || null; }
 const groupMaster = g => g.areaId === 'none' ? null : g.areaId ? getA(g.areaId) : autoMaster(g);
 const groupArea = g => { const a = groupMaster(g); return a && AREAS[a.dataKey] ? AREAS[a.dataKey] : null; };
 
@@ -1346,41 +1351,80 @@ function zoneBuildings(a) { // outlines whose centre falls inside the area's zon
   return list;
 }
 const halo = 'paint-order="stroke" stroke="#fff" stroke-width="5" stroke-linejoin="round"';
-function markSvg(m, layer, cls = '') {
+function markSvg(m, layer, cls = '', k = 1) {
   const at = `data-mk="${m.id}" data-layer="${layer}" class="mk ${cls}"`;
-  if (m.kind === 'hl') return `<g ${at}><path d="${ppath(m.pts)}" fill="rgba(20,20,20,.08)" stroke="#141414" stroke-width="2" stroke-dasharray="8 6"/>${m.name ? `<text x="${m.pts[0][0]}" y="${m.pts[0][1] - 10}" font-size="19" font-weight="600" fill="#141414" ${halo}>${esc(tv(m.name))}</text>` : ''}</g>`;
-  if (m.kind === 'text') return `<g ${at} transform="translate(${m.x},${m.y})"><text font-size="20" fill="#7a7a7a" letter-spacing="1" text-anchor="middle" ${halo}>${esc(tv(m.name))}</text></g>`;
+  if (m.kind === 'hl') return `<g ${at}><path d="${ppath(m.pts)}" fill="rgba(20,20,20,.08)" stroke="#141414" stroke-width="${2 * k}" stroke-dasharray="${8 * k} ${6 * k}"/>${m.name ? `<text x="${m.pts[0][0]}" y="${m.pts[0][1] - 10 * k}" font-size="${19 * k}" font-weight="600" fill="#141414" paint-order="stroke" stroke="#fff" stroke-width="${5 * k}" stroke-linejoin="round">${esc(tv(m.name))}</text>` : ''}</g>`;
+  if (m.kind === 'text') return `<g ${at} transform="translate(${m.x},${m.y}) scale(${k})"><text font-size="20" fill="#7a7a7a" letter-spacing="1" text-anchor="middle" ${halo}>${esc(tv(m.name))}</text></g>`;
   const dot = m.kind === 'ours' ? `<rect x="-11" y="-11" width="22" height="22" fill="#141414"/><text y="6" font-size="15" font-weight="700" fill="#fff" text-anchor="middle">L</text>` : `<circle r="6" fill="#141414"/>`;
-  return `<g ${at} transform="translate(${m.x},${m.y})">${dot}<text x="${m.kind === 'ours' ? 17 : 12}" y="7" font-size="20" font-weight="${m.kind === 'ours' ? 700 : 500}" fill="#141414" ${halo}>${esc(tv(m.name))}</text></g>`;
+  return `<g ${at} transform="translate(${m.x},${m.y}) scale(${k})">${dot}<text x="${m.kind === 'ours' ? 17 : 12}" y="7" font-size="20" font-weight="${m.kind === 'ours' ? 700 : 500}" fill="#141414" ${halo}>${esc(tv(m.name))}</text></g>`;
 }
-/* o.pins: [{x, y, n}] · o.hide: company marks this proposal hides · o.marks: the proposal's own marks
+/* ---------- zoom and pan: a view is a window {x, y, w, h} onto the map, in metres, always the map's own shape ---------- */
+const MV = {}; let MZT = null, MPAN = null;
+const fullView = d => ({x: 0, y: 0, w: d.w, h: d.h});
+function clampView(v, d) { const w = Math.min(d.w, Math.max(d.w / 8, v.w)), h = w * d.h / d.w; return {x: Math.round(Math.min(d.w - w, Math.max(0, v.x))), y: Math.round(Math.min(d.h - h, Math.max(0, v.y))), w: Math.round(w), h: Math.round(h)}; }
+const zkView = (zk, d, saved) => MV[zk] || (MV[zk] = clampView(saved || fullView(d), d));
+function zoomAt(zk, osm, f, mx, my) {
+  const d = MAP_DATA[osm], v = MV[zk] || fullView(d);
+  if (mx == null) { mx = v.x + v.w / 2; my = v.y + v.h / 2; }
+  MV[zk] = clampView({x: mx - (mx - v.x) * f, y: my - (my - v.y) * f, w: v.w * f}, d); zmApply(zk);
+}
+function zmApply(zk) { // move the window now; redraw markers at their new scale once the wheel settles
+  const v = MV[zk]; document.querySelectorAll(`svg[data-zk="${zk}"]`).forEach(el => el.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`));
+  clearTimeout(MZT); MZT = setTimeout(zmRedraw, 180);
+}
+function zmRedraw() {
+  if (U.modal?.type === 'gmap') return medRefresh();
+  const mb = U.modal?.type === 'pick' && $('#modal-root .map-modal .mb'); if (mb) { mb.innerHTML = pickBody(U.modal); return; }
+  render();
+}
+function mWheel(e, zk, osm) {
+  e.preventDefault();
+  const svg = e.currentTarget.querySelector('svg'), pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+  const q = pt.matrixTransform(svg.getScreenCTM().inverse()); zoomAt(zk, osm, e.deltaY > 0 ? 1.18 : 1 / 1.18, q.x, q.y);
+}
+function panStart(e, zk, osm) { MPAN = {zk, osm, sx: e.clientX, sy: e.clientY, v: {...MV[zk]}, moved: false, el: e.currentTarget}; }
+function panMove(e) {
+  const P = MPAN; if (!P) return false;
+  const dx = e.clientX - P.sx, dy = e.clientY - P.sy;
+  if (!P.moved && Math.hypot(dx, dy) < 5) return true;
+  if (!P.moved) { P.moved = true; P.el.setPointerCapture?.(e.pointerId); }
+  const svg = P.el.querySelector('svg'), k = P.v.w / svg.getBoundingClientRect().width;
+  MV[P.zk] = clampView({x: P.v.x - dx * k, y: P.v.y - dy * k, w: P.v.w}, MAP_DATA[P.osm]);
+  const v = MV[P.zk]; svg.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`); return true;
+}
+function panEnd() { const P = MPAN; MPAN = null; return !!P?.moved; }
+const zoomCtl = (zk, osm) => `<div class="zm-ctl"><button title="확대" onclick="zoomAt('${zk}','${osm}',1/1.4)">+</button><button title="축소" onclick="zoomAt('${zk}','${osm}',1.4)">−</button><button title="전체 보기" onclick="MV['${zk}']=fullView(MAP_DATA['${osm}']);zmApply('${zk}')">전체</button></div>`;
+/* o.view: the window to draw (default the whole map) · o.zk: the live view this svg follows
+   o.pins: [{x, y, n}] · o.hide: company marks this proposal hides · o.marks: the proposal's own marks
    o.edit: the editor tool, which also draws hidden outlines and hidden marks so they can come back */
 function mapSvg(a, o = {}) {
   const d = window.MAP_DATA?.[a.osm]; if (!d) return '';
   const hide = new Set(o.hide || []), hb = new Set(a.hidden || []), ed = o.edit;
   const blds = zoneBuildings(a).filter(([id]) => ed === 'bld' || !hb.has(id));
   const co = (a.marks || []).filter(m => ed || !hide.has(m.id));
-  return `<svg class="tmap" viewBox="0 0 ${d.w} ${d.h}" preserveAspectRatio="xMidYMid ${ed || o.meet ? 'meet' : 'slice'}" xmlns="http://www.w3.org/2000/svg">
+  const v = o.view || fullView(d), k = +(v.w / d.w).toFixed(3), sc = (x, y) => `translate(${x},${y}) scale(${k})`;
+  return `<svg class="tmap" viewBox="${v.x} ${v.y} ${v.w} ${v.h}" ${o.zk ? `data-zk="${o.zk}"` : ''} preserveAspectRatio="xMidYMid ${ed || o.meet ? 'meet' : 'slice'}" xmlns="http://www.w3.org/2000/svg">
     <rect width="${d.w}" height="${d.h}" fill="#e7e7e4"/>${a.zone.length > 2 ? `<path d="${ppath(a.zone)}" fill="#d8d8d4"/>` : ''}${mapBase(a.osm)}
     <g>${blds.map(([id, p]) => `<path data-b="${id}" d="${mpath(p)}Z" ${hb.has(id) ? 'class="bh" fill="none" stroke="#c23b3a" stroke-width="1.5" stroke-dasharray="4 3"' : 'fill="#bfbfbb" stroke="#fff" stroke-width="1"'}/>`).join('')}</g>
     <g fill="none" stroke="#2f9e44" stroke-width="6">${d.rail.map(r => `<path d="${mpath(r)}"/>`).join('')}</g>
-    ${ed === 'zone' || ed === 'move' ? `<path d="${a.zone.length > 2 ? ppath(a.zone) : ''}" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="10 6"/>` : ''}
-    ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '')).join('')}${(o.marks || []).map(m => markSvg(m, 'pr')).join('')}
-    ${(o.refs || []).map(q => `<g transform="translate(${q.x},${q.y})"><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/><text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text></g>`).join('')}
-    ${(o.cands || []).map(c => `<g data-lid="${c.id}" class="cd" transform="translate(${c.x},${c.y})">${c.st === 'in' ? `<circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
+    ${ed === 'zone' || ed === 'move' ? `<path d="${a.zone.length > 2 ? ppath(a.zone) : ''}" fill="none" stroke="#2a78d6" stroke-width="${2 * k}" stroke-dasharray="${10 * k} ${6 * k}"/>` : ''}
+    ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '', k)).join('')}${(o.marks || []).map(m => markSvg(m, 'pr', '', k)).join('')}
+    ${(o.refs || []).map(q => `<g transform="${sc(q.x, q.y)}"><circle r="9" fill="#2a78d6" stroke="#fff" stroke-width="3"/><text x="14" y="6" font-size="16" fill="#1f5fb0" ${halo}>${esc(q.label)}</text></g>`).join('')}
+    ${(o.cands || []).map(c => `<g data-lid="${c.id}" class="cd" transform="${sc(c.x, c.y)}">${c.st === 'in' ? `<circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${c.n}</text>`
       : `<circle r="13" fill="${c.st === 'fit' ? '#fff' : '#ecece9'}" stroke="${c.st === 'fit' ? '#141414' : '#a3a39e'}" stroke-width="3.5"/>`}<text x="${c.st === 'in' ? 25 : 19}" y="7" font-size="18" font-weight="600" fill="${c.st === 'nofit' ? '#8a8a85' : '#141414'}" ${halo}>${esc(c.label)}</text></g>`).join('')}
-    ${(o.pins || []).map(q => `<g transform="translate(${q.x},${q.y})"><circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${q.n}</text></g>`).join('')}
-    ${o.draft?.length ? `<path d="${o.draft.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join('')}" fill="rgba(42,120,214,.12)" stroke="#2a78d6" stroke-width="2.5"/>${o.draft.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="6" fill="#fff" stroke="#2a78d6" stroke-width="2.5"/>`).join('')}` : ''}
+    ${(o.pins || []).map(q => `<g transform="${sc(q.x, q.y)}"><circle r="19" fill="#141414" stroke="#fff" stroke-width="3"/><text y="7" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">${q.n}</text></g>`).join('')}
+    ${o.draft?.length ? `<path d="${o.draft.map((p, i) => (i ? 'L' : 'M') + p[0] + ' ' + p[1]).join('')}" fill="rgba(42,120,214,.12)" stroke="#2a78d6" stroke-width="${2.5 * k}"/>${o.draft.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${6 * k}" fill="#fff" stroke="#2a78d6" stroke-width="${2.5 * k}"/>`).join('')}` : ''}
   </svg>`;
 }
 function groupPins(g, its, a) {
   const d = MAP_DATA[a.osm];
   return its.map((it, i) => { const B = getB(getL(it.listingId).buildingId); if (!B.lat) return null; const [x, y] = llXY(d, B.lat, B.lng); return {x, y, n: i + 1}; }).filter(Boolean);
 }
+const slideView = (g, a) => { const d = MAP_DATA[a.osm], v = (g && g.view) || a.view; return v ? clampView(v, d) : null; };
 function mapSlide(g, a, its) {
   const ours = (a.marks || []).some(m => m.kind === 'ours' && !(g.mapHide || []).includes(m.id));
   return `<div class="sl sl-std sl-map">${slHead(esc(tv(g.name)), {em: LG('지도', 'Map'), tag: esc(tv(a.name))})}
-    <div class="map-box">${mapSvg(a, {pins: groupPins(g, its, a), hide: g.mapHide, marks: g.marks})}
+    <div class="map-box">${mapSvg(a, {pins: groupPins(g, its, a), hide: g.mapHide, marks: g.marks, view: slideView(g, a)})}
       <div class="map-list">${its.map((it, i) => { const L = getL(it.listingId); return `<span><b>${i + 1}</b>${esc(tv(bInfo(L).name))}<small>${esc(floorsTxt(L))} · ${nf(L.leaseArea * PYR, 1)}${LG('평', 'py')}</small></span>`; }).join('')}</div>
       <div class="map-leg"><span><i class="lp">1</i>${LG('제안 매물', 'Proposed site')}</span>${ours ? `<span><i class="lo">L</i>${LG('LeaseDesk 중개', 'LeaseDesk deal')}</span>` : ''}<span><i class="lb"></i>${LG('주요 브랜드', 'Key brands')}</span></div>
       <span class="map-src">© OpenStreetMap contributors · ${LG('예시 데이터', 'Sample data')}</span></div>${slFoot()}</div>`;
@@ -1390,7 +1434,7 @@ function mapSlide(g, a, its) {
 const MTOOLS_AREA = [['move', '선택 · 이동'], ['zone', '상권 영역'], ['bld', '건물 숨기기'], ['brand', '브랜드'], ['ours', '자사 중개'], ['text', '글자'], ['hl', '강조 영역']];
 const MTOOLS_GROUP = [['move', '선택 · 이동'], ['hide', '회사 표시 숨기기'], ['brand', '브랜드'], ['text', '글자'], ['hl', '강조 영역']];
 const MKIND = {brand: '브랜드', ours: '자사 중개', text: '글자', hl: '강조 영역'};
-const MHINT = {move: '표시를 끌어서 옮깁니다', zone: '지도를 눌러 꼭짓점을 찍고 완료를 누르세요. 영역 안의 건물만 지도에 그려집니다', bld: '건물을 누르면 숨기고, 다시 누르면 살립니다 (빨간 점선 = 숨김)',
+const MHINT = {move: '표시를 끌어서 옮기고, 빈 곳을 끌면 지도가 움직입니다 · 휠이나 + − 로 확대 · 축소', zone: '지도를 눌러 꼭짓점을 찍고 완료를 누르세요. 영역 안의 건물만 지도에 그려집니다', bld: '건물을 누르면 숨기고, 다시 누르면 살립니다 (빨간 점선 = 숨김)',
   brand: '지도를 누른 곳에 브랜드 표시를 놓습니다', ours: '지도를 누른 곳에 자사 중개 표시(로고)를 놓습니다', text: '지도를 누른 곳에 글자를 놓습니다', hl: '꼭짓점을 찍고 완료를 누르세요', hide: '회사 표시를 누르면 이 제안서에서만 숨깁니다 (흐린 표시 = 숨김)'};
 let MED = {tool: 'move', draft: [], sel: null, drag: null};
 function medCtx() {
@@ -1405,12 +1449,15 @@ function mapEditor(c) {
   const tools = c.kind === 'area' ? MTOOLS_AREA : MTOOLS_GROUP, t = MED.tool;
   const pins = c.kind === 'group' ? groupPins(c.g, liveItems(c.p, c.g), c.a) : [];
   const refs = c.kind === 'area' ? S.listings.filter(L => L.status === 'active').map(L => { const xy = listingXY(L, c.a); return xy && {x: xy[0], y: xy[1], label: bInfo(L).name}; }).filter(Boolean) : [];
-  const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : []});
+  const d = MAP_DATA[c.a.osm], zk = medZk(c), saved = c.kind === 'area' ? c.a.view : c.g.view;
+  const svg = mapSvg(c.a, {edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : [], view: zkView(zk, d, saved || c.a.view), zk});
+  const vwRow = `<div class="f"><label>지도 장에 보일 범위</label><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '지도 전체'}</div>
+    <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '전체로'}</button>` : ''}</div></div>`;
   const row = m => `<div class="med-i ${MED.sel === m.id ? 'on' : ''}"><span class="chip">${MKIND[m.kind]}</span><input class="in" id="mk-${m.id}" value="${esc(m.name)}" placeholder="이름" onkeydown="if(event.key==='Enter')this.blur()" onchange="medName('${m.id}',this.value)"><button class="btn xs ghost danger" onclick="medDel('${m.id}')">✕</button></div>`;
   return `<div class="med"><div class="med-main">
       <div class="row">${seg(tools, t, '(v=>medTool(v))')}${t === 'zone' || t === 'hl' ? `<button class="btn xs" ${MED.draft.length ? '' : 'disabled'} onclick="MED.draft.pop();medRefresh()">되돌리기</button><button class="btn xs pri" ${MED.draft.length > 2 ? '' : 'disabled'} onclick="medDone()">완료</button>` : ''}</div>
       <div class="sub">${MHINT[t]}</div>
-      <div class="med-map t-${t}"><div onpointerdown="medDown(event)" onpointermove="medMove(event)" onpointerup="medUp(event)">${svg}</div></div></div>
+      <div class="med-map t-${t}">${zoomCtl(zk, c.a.osm)}<div onwheel="mWheel(event,'${zk}','${c.a.osm}')" onpointerdown="medDown(event)" onpointermove="medMove(event)" onpointerup="medUp(event)">${svg}</div></div></div>
     <div class="med-side">
       ${c.kind === 'area' ? `<div class="f"><label>상권 이름</label><input class="in" value="${esc(c.a.name)}" onchange="getA('${c.a.id}').name=this.value;commit()"></div>
         <div class="f"><label>상권 데이터</label><select class="in" onchange="getA('${c.a.id}').dataKey=this.value||null;commit()"><option value="">없음</option>${Object.entries(AREAS).map(([k, x]) => `<option value="${k}" ${c.a.dataKey === k ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
@@ -1418,14 +1465,18 @@ function mapEditor(c) {
           <div class="row"><label class="btn xs">업로드<input type="file" accept="image/*" hidden onchange="(f=>f&&readImg(f,src=>{getA('${c.a.id}').photo=src;commit()}))(this.files[0])"></label><button class="btn xs ghost" onclick="(a=>{a.photo=GROUP_PHOTOS[(GROUP_PHOTOS.indexOf(a.photo)+1)%GROUP_PHOTOS.length];commit()})(getA('${c.a.id}'))">샘플 바꾸기</button><span class="sub">새 제안서의 상권 표지로 복사</span></div></div>
         <div class="sub">파란 점 = 진행 중 매물 위치 · 건물 ${zoneBuildings(c.a).length - (c.a.hidden || []).length}개 표시 · ${(c.a.hidden || []).length}개 숨김 ${(c.a.hidden || []).length ? `<button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div>`
         : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}</div>`}
+      ${vwRow}
       <b class="med-h">${c.kind === 'area' ? '회사 표시' : '이 제안서 표시'} <span class="sub">${c.list.length}</span></b>
       <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div>`;
 }
+const medZk = c => c.kind === 'area' ? `a:${c.a.id}` : `g:${c.p.id}:${U.modal.gi}`;
+function medView(on) { const c = medCtx(), o = c.kind === 'area' ? c.a : c.g; o.view = on ? {...MV[medZk(c)]} : null; if (!on) delete MV[medZk(c)]; medRefresh(); toast(on ? '지도 장 범위 저장' : '범위 되돌림'); }
 function medTool(v) { MED.tool = v; MED.draft = []; medRefresh(); }
 function medPt(e) { const svg = e.currentTarget.querySelector('svg'), pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const p = pt.matrixTransform(svg.getScreenCTM().inverse()); return [Math.round(p.x), Math.round(p.y)]; }
 function medDown(e) {
   const c = medCtx(), [x, y] = medPt(e), t = MED.tool, mk = e.target.closest('[data-mk]'), b = e.target.closest('[data-b]');
-  if (t === 'move' && mk && mk.dataset.layer === (c.kind === 'area' ? 'co' : 'pr')) {
+  if (t === 'move' && !(mk && mk.dataset.layer === (c.kind === 'area' ? 'co' : 'pr'))) return panStart(e, medZk(c), c.a.osm);
+  if (t === 'move') {
     const m = c.list.find(z => z.id === mk.dataset.mk); if (!m || m.kind === 'hl') return;
     MED.drag = {m, el: mk, dx: x - m.x, dy: y - m.y}; MED.sel = m.id; e.currentTarget.setPointerCapture(e.pointerId); return;
   }
@@ -1437,8 +1488,8 @@ function medDown(e) {
     c.list.push(m); MED.sel = m.id; medRefresh(); const i = $('#mk-' + m.id); if (i) { i.focus(); i.select(); }
   }
 }
-function medMove(e) { if (!MED.drag) return; const [x, y] = medPt(e); MED.drag.el.setAttribute('transform', `translate(${x - MED.drag.dx},${y - MED.drag.dy})`); MED.drag.at = [x - MED.drag.dx, y - MED.drag.dy]; }
-function medUp() { const d = MED.drag; MED.drag = null; if (d?.at) { [d.m.x, d.m.y] = d.at; medRefresh(); } }
+function medMove(e) { if (panMove(e)) return; if (!MED.drag) return; const [x, y] = medPt(e); MED.drag.el.setAttribute('transform', `translate(${x - MED.drag.dx},${y - MED.drag.dy})`); MED.drag.at = [x - MED.drag.dx, y - MED.drag.dy]; }
+function medUp() { if (MPAN) return panEnd(); const d = MED.drag; MED.drag = null; if (d?.at) { [d.m.x, d.m.y] = d.at; medRefresh(); } }
 function medDone() {
   const c = medCtx();
   if (MED.tool === 'zone') { c.a.zone = MED.draft; toast('상권 영역 저장', `건물 ${zoneBuildings(c.a).length}개가 영역 안에 있습니다`); }
@@ -1898,12 +1949,12 @@ const masterOf = L => S.areas.find(a => inMaster(L, a)) || null;
 const openListings = () => S.listings.filter(L => live(L, me()));
 const fitsAll = (L, a, crit) => fitOf(L, {name: a ? a.name : ''}, crit).every(([, v]) => v !== false);
 /* candidates as map dots: chosen ones carry their number, the rest show whether they meet the requested terms */
-function candDots(a, ls, chosen, crit) {
+function candDots(a, ls, chosen, crit, k) {
   const seen = {};
   return ls.map(L => {
     const xy = listingXY(L, a); if (!xy) return null;
     const off = seen[L.buildingId] = (seen[L.buildingId] ?? -1) + 1, n = chosen.indexOf(L.id);
-    return {id: L.id, x: xy[0] + off * 40, y: xy[1], n: n + 1, st: n >= 0 ? 'in' : fitsAll(L, a, crit) ? 'fit' : 'nofit', label: `${bInfo(L).name} ${floorLabel(L.floors, L.leaseType)}`};
+    return {id: L.id, x: xy[0] + off * 40 * (k || 1), y: xy[1], n: n + 1, st: n >= 0 ? 'in' : fitsAll(L, a, crit) ? 'fit' : 'nofit', label: `${bInfo(L).name} ${floorLabel(L.floors, L.leaseType)}`};
   }).filter(Boolean);
 }
 function pickRow(L, n, a, crit, fn) {
@@ -1914,7 +1965,8 @@ function pickRow(L, n, a, crit, fn) {
 function picker(a, ls, chosen, crit, fn) {
   const list = `<div class="pk-list">${ls.map(L => pickRow(L, chosen.indexOf(L.id) + 1, a, crit, fn)).join('') || '<div class="sub">이 상권 영역 안에 진행 중인 매물이 없습니다</div>'}</div>`;
   if (!a) return `<div class="pk one">${list}</div>`;
-  return `<div class="pk"><div class="pk-map" onclick="(t=>t&&${fn}(t.dataset.lid))(event.target.closest('[data-lid]'))">${mapSvg(a, {meet: true, cands: candDots(a, ls, chosen, crit)})}
+  const zk = `p:${a.id}`, view = zkView(zk, MAP_DATA[a.osm], a.view), k = view.w / MAP_DATA[a.osm].w;
+  return `<div class="pk"><div class="pk-map">${zoomCtl(zk, a.osm)}<div onwheel="mWheel(event,'${zk}','${a.osm}')" onpointerdown="panStart(event,'${zk}','${a.osm}')" onpointermove="panMove(event)" onpointerup="if(!panEnd())(t=>t&&${fn}(t.dataset.lid))(event.target.closest('[data-lid]'))">${mapSvg(a, {meet: true, view, zk, cands: candDots(a, ls, chosen, crit, k)})}</div>
       <div class="pk-leg"><span><i class="d-in">1</i>고름</span><span><i class="d-fit"></i>요청 조건 충족</span><span><i class="d-no"></i>조건 밖</span></div></div>${list}</div>`;
 }
 
@@ -1954,7 +2006,7 @@ function wizView() {
     const ls = openListings(), out = wizOutside();
     return head + `<div class="row a" style="--i:0;margin-bottom:12px"><span class="sub">제안할 상권을 순서대로 고르세요. 고른 순서가 제안서의 상권 순서가 됩니다.</span><div class="sp"></div>${w.areas.map((id, i) => `<span class="chip dark">${i + 1} ${esc(getA(id).name)}</span>`).join('')}</div>
       <div class="grid">${S.areas.map((a, i) => { const inA = ls.filter(L => inMaster(L, a)), ok = inA.filter(L => fitsAll(L, a, {...crit, regions: [a.name]})).length, n = w.areas.indexOf(a.id) + 1;
-        return `<button class="card wz-a a ${n ? 'on' : ''}" style="--i:${i}" onclick="wizArea('${a.id}')"><div class="ph map-th">${mapSvg(a, {cands: candDots(a, inA, [], {...crit, regions: [a.name]})})}${n ? `<span class="wz-n">${n}</span>` : ''}</div>
+        return `<button class="card wz-a a ${n ? 'on' : ''}" style="--i:${i}" onclick="wizArea('${a.id}')"><div class="ph map-th">${mapSvg(a, {view: slideView(null, a), cands: candDots(a, inA, [], {...crit, regions: [a.name]}, slideView(null, a) ? slideView(null, a).w / MAP_DATA[a.osm].w : 1)})}${n ? `<span class="wz-n">${n}</span>` : ''}</div>
           <div class="bd"><div class="t">${esc(a.name)}</div><div class="kv"><span>진행 매물<b>${inA.length}건</b></span><span>조건 충족<b>${ok}건</b></span><span>상권 데이터<b>${AREAS[a.dataKey] ? '있음' : '없음'}</b></span></div></div></button>`; }).join('')}</div>
       ${out.length ? `<div class="sub" style="margin-top:12px">어느 상권에도 속하지 않는 매물 ${out.length}건(${out.map(L => esc(bInfo(L).name)).join(', ')})은 다음 단계의 "상권 밖"에서 고를 수 있습니다.</div>` : ''}
       <div class="sticky-foot"><button class="btn" onclick="wizGo(1)">← 이전</button><button class="btn pri" onclick="wizGo(3)">다음 · 매물 고르기 →</button></div>`;
@@ -1983,7 +2035,7 @@ function pickBody(m) {
 }
 function groupPick(lid) {
   const p = getP(U.modal.pid), g = p.groups[U.modal.gi], i = g.items.findIndex(it => it.listingId === lid);
-  if (i >= 0) { g.items.splice(i, 1); save(); }
+  if (i >= 0) { pinMaster(g); g.items.splice(i, 1); save(); }
   else if (p.groups.some(x => x.items.some(it => it.listingId === lid))) return toast('다른 상권에 이미 들어 있습니다', '편집 화면에서 상권 이동을 쓰세요');
   else addItem(p.id, U.modal.gi, lid);
   const mb = $('#modal-root .map-modal .mb'); // swap the body only, so the modal does not replay its opening animation
@@ -2093,8 +2145,9 @@ function rmGroup(pid, gi) {
   getP(pid).groups.splice(gi, 1); commit();
 }
 function moveItem(pid, gi, ii, d) { const it = getP(pid).groups[gi].items; [it[ii], it[ii + d]] = [it[ii + d], it[ii]]; commit(); }
-function moveTo(pid, gi, ii, to) { if (to === '') return; const gs = getP(pid).groups, [it] = gs[gi].items.splice(ii, 1); gs[+to].items.push(it); commit(); toast('상권 이동', gs[+to].name); }
-function rmItem(pid, gi, ii) { getP(pid).groups[gi].items.splice(ii, 1); commit(); toast('제외됨'); }
+function moveTo(pid, gi, ii, to) { if (to === '') return; const gs = getP(pid).groups; pinMaster(gs[gi]); pinMaster(gs[+to]);
+  const [it] = gs[gi].items.splice(ii, 1); gs[+to].items.push(it); commit(); toast('상권 이동', gs[+to].name); }
+function rmItem(pid, gi, ii) { pinMaster(getP(pid).groups[gi]); getP(pid).groups[gi].items.splice(ii, 1); commit(); toast('제외됨'); }
 function setItem(pid, gi, ii, k, v) { getP(pid).groups[gi].items[ii][k] = v; commit(); }
 function setComment(pid, gi, ii, v) { getP(pid).groups[gi].items[ii].comment = v; commit(); }
 function addItem(pid, gi, lid) {
@@ -2171,7 +2224,7 @@ function adminMaps() {
   const a = U.amap && getA(U.amap);
   if (a) return `<div class="head"><button class="btn ghost icon" onclick="U.amap=null;freshMed();render()">←</button><h1>${esc(a.name)} 지도</h1><span class="sub">회사 상권 지도 · 모든 제안서가 같이 씁니다</span></div><div class="panel">${mapEditor(medCtx())}</div>`;
   return `<div class="head"><h1>상권 지도</h1><span class="sub">회사가 정한 상권 영역 · 제안서 지도 장의 바탕</span></div>
-  <div class="grid">${S.areas.map((x, i) => `<div class="card hov a" style="--i:${i}" onclick="U.amap='${x.id}';freshMed();render()"><div class="ph map-th">${mapSvg(x)}</div>
+  <div class="grid">${S.areas.map((x, i) => `<div class="card hov a" style="--i:${i}" onclick="U.amap='${x.id}';freshMed();render()"><div class="ph map-th">${mapSvg(x, {view: slideView(null, x)})}</div>
     <div class="bd"><div class="t">${esc(x.name)}</div><div class="ad">${AREAS[x.dataKey] ? esc(AREAS[x.dataKey].name) : '상권 데이터 없음'}</div>
     <div class="kv"><span>건물<b>${zoneBuildings(x).length - (x.hidden || []).length}</b></span><span>표시<b>${(x.marks || []).length}</b></span><span>쓰는 제안서<b>${visProps().filter(p => p.groups.some(g => groupMaster(g) === x)).length}</b></span></div></div></div>`).join('')}</div>`;
 }
@@ -2219,7 +2272,7 @@ function renderModal() {
       ${seg([['ko', '한국어'], ['en', 'EN']], lang, "(v=>{U.modal.lang=v;renderModal()})")}
       ${own ? `<button class="btn sm" onclick="closeModal();editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <div class="mb">${thumb(sl)}</div></div>`;
-  } else if (m.type === 'gmap') {
+  } else if (m.type === 'gmap' && groupMaster(getP(m.pid).groups[m.gi])) {
     const g = getP(m.pid).groups[m.gi];
     h = `<div class="modal map-modal"><div class="mh"><b>${esc(g.name)} 지도</b><span class="sub">이 제안서에만 적용</span><div class="sp"></div><button class="btn sm pri" onclick="closeModal();render()">완료</button></div><div class="mb">${mapEditor(medCtx())}</div></div>`;
   } else if (m.type === 'hist') {
