@@ -427,7 +427,7 @@ textarea.in{resize:vertical;min-height:64px}
 .pk-list{display:flex;flex-direction:column;gap:6px;max-height:640px;overflow:auto}
 .pk-new{justify-content:center;border-style:dashed}
 .lk{display:flex;flex-direction:column;gap:5px;margin:8px 0 6px}
-.lk-i{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:9px;font-size:12.5px}
+.lk-i{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:9px;font-size:12.5px;cursor:pointer}
 .lk-i.on{border-color:#d9822b;background:#fff8f0}
 .lk-i>span{flex:1;min-width:0}.lk-i small{display:block;color:var(--muted);font-size:11px}
 .lk-d{width:10px;height:10px;border:2px dashed #d9822b;flex:none}.lk-p{color:#b4691c}
@@ -838,9 +838,19 @@ function overlap(zone, poly) { // share of the official area inside the zone: 5 
   return OCACHE[key] = Math.min(1, both * 25 / (polyArea(poly) || 1));
 }
 /* the official areas a company master draws on: automatic from its zone, or the admin's own picks and shares */
+const SCACHE = {};
+function storeShare(a, o) { // share of the official area's stores that sit inside the zone; falls back to its area share
+  const key = a.id + JSON.stringify(a.zone) + o.code; if (key in SCACHE) return SCACHE[key];
+  const d = window.MAP_DATA?.[o.osm]; let all = 0, inz = 0;
+  for (const [, p] of d ? d.buildings : []) { let x = 0, y = 0; for (let i = 0; i < p.length; i += 2) { x += p[i]; y += p[i + 1]; } x /= p.length / 2; y /= p.length / 2;
+    if (inPoly(x, y, o.poly)) { all++; if (inPoly(x, y, a.zone)) inz++; } }
+  return SCACHE[key] = all >= 5 ? inz / all : overlap(a.zone, o.poly);
+}
+/* the official areas a company master's data comes from: those its zone overlaps, give or take the admin's ticks */
 function areaLinks(a) {
-  if (a.link?.mode === 'manual') return a.link.units.map(u => ({o: getO(u.code), w: u.w})).filter(u => u.o && u.w > 0).sort((x, y) => y.w - x.w);
-  return OFFICIAL.filter(o => o.osm === a.osm).map(o => ({o, w: overlap(a.zone, o.poly)})).filter(u => u.w >= .05).sort((x, y) => y.w - x.w);
+  const inc = a.incl || [], exc = new Set(a.excl || []);
+  return OFFICIAL.filter(o => o.osm === a.osm && !exc.has(o.code)).map(o => ({o, ov: overlap(a.zone, o.poly)}))
+    .filter(x => x.ov >= .05 || inc.includes(x.o.code)).map(x => ({o: x.o, w: x.ov >= .05 ? storeShare(a, x.o) : 1})).filter(u => u.w > 0).sort((x, y) => y.w - x.w);
 }
 const DCACHE = {};
 function areaData(a) { // the official figures added up by overlap: counts scale with the share, rates are weighted averages
@@ -858,7 +868,7 @@ function areaData(a) { // the official figures added up by overlap: counts scale
     foreign: {...lead.foreign, daily: sum(d => d.foreign.daily), share: +avg(d => d.foreign.share).toFixed(1), salesShare: Math.round(avg(d => d.foreign.salesShare))},
     hinter: {hh: sum(d => d.hinter.hh), single: Math.round(avg(d => d.hinter.single)), income: Math.round(avg(d => d.hinter.income)), spend: Math.round(avg(d => d.hinter.spend))}};
 }
-const linkTxt = a => areaLinks(a).map(u => `${u.o.name} ${Math.round(u.w * 100)}%`).join(' · ');
+const linkTxt = a => areaLinks(a).map(u => u.o.name).join(' · ');
 /* quarterly full sync: data lands two months after each quarter ends (end of Feb, May, Aug, Nov) */
 function nextSync(today) { const [y, m] = today.split('-').map(Number), due = [[2, 28], [5, 31], [8, 31], [11, 30]].map(([mm, dd]) => [y, mm, dd]).concat([[y + 1, 2, 28]]).find(([yy, mm, dd]) => `${yy}-${pad2(mm)}-${pad2(dd)}` > today); return `${due[0]}-${pad2(due[1])}-${pad2(due[2])}`; }
 function syncNow(quiet) {
@@ -953,7 +963,7 @@ const EN = {
   '답사 요청': 'Visit requested', '면적': 'Area', '곳': '', '기타': 'Other', '재생': 'Play', '외화 선택': 'Select currency', '사진': 'photos', '도면': 'floor plans',
   '상권 평균 임대료 대비로는': 'vs market rent', '시간당 유동인구': 'Visitors per hour',
   // deck
-  '공식 상권': 'official areas', '합산': 'combined', '상권 영역과 겹친 비율로 합산한 추정치': 'estimated by overlap with the trade-area zone', '상권 비교': 'Area comparison', '상권 개요': 'Area overview', '상권 데이터': 'Area data',
+  '출처': 'Source', '기준 추정': '(estimate)', '상권 비교': 'Area comparison', '상권 개요': 'Area overview', '상권 데이터': 'Area data',
   '건물 통임대로 로스터리 · 카페 · 오피스를 한 건물에 구성 가능': 'Whole-building lease: roastery, cafe and office under one roof', '즉시 입주 가능': 'Available for immediate move-in',
   '평일 직장인 수요 중심의 오피스 1층 리테일': 'Ground-floor retail in an office tower, driven by weekday office workers', '관리비는 실비정산': 'CAM is utility charge only',
   '2층은 로스터리 쇼룸으로 활용 가능': 'The 2nd floor can serve as a roastery showroom', '권리금은 현 임차인과 협의 필요': 'Key money to be negotiated with the current tenant',
@@ -1529,7 +1539,7 @@ function mapSvg(a, o = {}) {
     <g fill="none" stroke="#2f9e44" stroke-width="6">${d.rail.map(r => `<path d="${mpath(r)}"/>`).join('')}</g>
     ${(o.official || []).sort((x, y) => x.w - y.w).map(u => { const hit = u.w >= .05, cx = u.poly.reduce((s, p) => s + p[0], 0) / u.poly.length, cy = u.poly.reduce((s, p) => s + p[1], 0) / u.poly.length;
       return `<g class="ofc ${hit ? 'hit' : ''}"><path d="${ppath(u.poly)}" fill="${hit ? 'rgba(217,130,43,.05)' : 'none'}" stroke="${hit ? '#d9822b' : '#9b9b95'}" stroke-width="${(hit ? 2.2 : 1.2) * k}" stroke-dasharray="${12 * k} ${6 * k}"/>
-        <text x="${cx}" y="${cy}" text-anchor="middle" font-size="${(hit ? 16 : 13) * k}" font-weight="${hit ? 700 : 500}" fill="${hit ? '#a85a12' : '#8a8a84'}" paint-order="stroke" stroke="#fff" stroke-width="${4 * k}">${esc(u.name)}${hit ? ` · ${Math.round(u.w * 100)}%` : ''}</text></g>`; }).join('')}
+        <text x="${cx}" y="${cy}" text-anchor="middle" font-size="${(hit ? 16 : 13) * k}" font-weight="${hit ? 700 : 500}" fill="${hit ? '#a85a12' : '#8a8a84'}" paint-order="stroke" stroke="#fff" stroke-width="${4 * k}">${esc(u.name)}</text></g>`; }).join('')}
     ${o.dim && a.zone.length > 2 ? `<path d="M0 0H${d.w}V${d.h}H0Z${ppath(a.zone)}" fill="#fff" fill-opacity=".62" fill-rule="evenodd"/>` : ''}
     ${ed === 'zone' || ed === 'move' ? `<path d="${a.zone.length > 2 ? ppath(a.zone) : ''}" fill="none" stroke="#2a78d6" stroke-width="${2 * k}" stroke-dasharray="${10 * k} ${6 * k}"/>` : ''}
     ${co.map(m => markSvg(m, 'co', hide.has(m.id) ? 'off' : '', k)).join('')}${(o.marks || []).map(m => markSvg(m, 'pr', '', k)).join('')}
@@ -1585,7 +1595,7 @@ function mapEditor(c) {
   const pins = c.kind === 'group' ? groupPins(c.g, liveItems(c.p, c.g), c.a) : [];
   const refs = c.kind === 'area' ? S.listings.filter(L => L.status === 'active').map(L => { const xy = listingXY(L, c.a); return xy && {id: L.id, x: xy[0], y: xy[1], label: bInfo(L).name}; }).filter(Boolean) : [];
   const d = MAP_DATA[c.a.osm], zk = medZk(c), saved = c.kind === 'area' ? c.a.view : c.g.view;
-  const official = MED.off ? OFFICIAL.filter(o => o.osm === c.a.osm).map(o => ({...o, w: overlap(c.a.zone, o.poly)})) : [];
+  const used = new Set(areaLinks(c.a).map(u => u.o.code)), official = MED.off ? OFFICIAL.filter(o => o.osm === c.a.osm).map(o => ({...o, w: used.has(o.code) ? 1 : 0})) : [];
   const svg = mapSvg(c.a, {official, edit: t, draft: MED.draft, pins, refs, hide: c.hide, marks: c.kind === 'group' ? c.list : [], view: zkView(zk, d, saved || slideView(c.kind === 'group' ? c.g : null, c.a, pins)), zk, dim: c.kind === 'group' && c.g.mapDim});
   const vwRow = `<div class="f"><label>지도 장에 보일 범위</label><div class="sub">${saved ? '이 범위로 저장됨' : c.kind === 'group' && c.a.view ? '회사 기본 범위 사용' : '자동 · 상권 영역과 매물이 다 보이게'}</div>
     <div class="row"><button class="btn xs" onclick="medView(true)">지금 화면으로 저장</button>${saved ? `<button class="btn xs ghost" onclick="medView(false)">${c.kind === 'group' ? '회사 기본으로' : '자동으로'}</button>` : ''}</div>
@@ -1608,21 +1618,17 @@ function mapEditor(c) {
       <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div>`;
 }
 function linkPanel(a) {
-  const man = a.link?.mode === 'manual', on = new Map(areaLinks(a).map(u => [u.o.code, u.w]));
-  const all = OFFICIAL.filter(o => o.osm === a.osm).map(o => ({o, ov: overlap(a.zone, o.poly)})).sort((x, y) => y.ov - x.ov);
-  const auto = all.filter(x => x.ov >= .01 || on.has(x.o.code)).map(x => x.o), rest = all.length - auto.length;
-  return `<div class="f"><label>상권 데이터 · 공식 상권 연결</label>${seg([['auto', '자동 · 영역 겹침'], ['manual', '직접 고르기']], man ? 'manual' : 'auto', `(v=>setLinkMode('${a.id}',v))`)}
-    <div class="lk">${auto.map(o => { const w = on.get(o.code), ov = Math.round(overlap(a.zone, o.poly) * 100);
-      if (man && !w && !a.link.units.some(u => u.code === o.code) && ov < .01) return '';
-      return `<div class="lk-i ${w ? 'on' : ''}">${man ? `<input type="checkbox" ${w ? 'checked' : ''} onchange="setUnit('${a.id}','${o.code}',this.checked?${Math.max(ov, 10)}:0)">` : `<i class="lk-d"></i>`}<span><b>${esc(o.name)}</b><small>${OTYPE[o.type]} · 영역 겹침 ${ov}%</small></span>
-        ${man && w ? `<div class="ui lk-w"><input class="in" type="number" min="1" max="100" value="${Math.round(w * 100)}" onchange="setUnit('${a.id}','${o.code}',+this.value)"><span>%</span></div>` : w ? `<b class="lk-p">${Math.round(w * 100)}%</b>` : '<span class="sub">연결 안 됨</span>'}</div>`; }).join('') || '<div class="sub">이 지도 안에 공식 상권 데이터가 없습니다 (예시 데이터는 성수 · 가로수길 · 한남 · 명동만)</div>'}</div>
-    ${rest ? `<div class="sub">이 지도의 다른 공식 상권 ${rest}곳은 영역과 겹치지 않습니다${man ? ` · <button class="btn xs ghost" onclick="(a=>{a.link.units.push(...OFFICIAL.filter(o=>o.osm===a.osm&&!a.link.units.some(u=>u.code===o.code)).map(o=>({code:o.code,w:0})))})(getA('${a.id}'));commit()">모두 목록에</button>` : ''}</div>` : ''}
-    <div class="sub">주황 점선 = 영역과 겹치는 공식 상권 · 회색 = 겹치지 않음 · ${man ? '고른 상권을 적은 비율만큼 합산' : '상권 영역과 5% 이상 겹치는 공식 상권을 겹친 비율만큼 합산'} · 동기화 ${fmtDate(S.sync?.at || '')} (${S.sync?.q || '–'})</div></div>`;
+  const on = new Set(areaLinks(a).map(u => u.o.code)), all = OFFICIAL.filter(o => o.osm === a.osm).map(o => ({o, ov: overlap(a.zone, o.poly)}));
+  const near = all.filter(x => x.ov >= .01 || on.has(x.o.code)).sort((x, y) => y.ov - x.ov), rest = all.filter(x => !near.includes(x)).sort((x, y) => x.o.name.localeCompare(y.o.name));
+  return `<div class="f"><label>상권 데이터</label><div class="sub">영역과 겹치는 서울시 공식 상권의 데이터를 합쳐 씁니다</div>
+    <div class="lk">${near.map(({o}) => `<label class="lk-i ${on.has(o.code) ? 'on' : ''}"><input type="checkbox" ${on.has(o.code) ? 'checked' : ''} onchange="toggleArea('${a.id}','${o.code}',this.checked)"><span><b>${esc(o.name)}</b><small>${OTYPE[o.type]}</small></span></label>`).join('') || '<div class="sub">영역과 겹치는 공식 상권이 없습니다</div>'}</div>
+    ${rest.length ? `<select class="in" onchange="this.value&&toggleArea('${a.id}',this.value,true)"><option value="">+ 다른 공식 상권 추가</option>${rest.map(({o}) => `<option value="${o.code}">${esc(o.name)} · ${OTYPE[o.type]}</option>`).join('')}</select>` : ''}
+    <div class="sub">주황 점선 = 쓰는 공식 상권 · 동기화 ${fmtDate(S.sync?.at || '')} (${S.sync?.q || '–'})</div></div>`;
 }
-function setLinkMode(id, v) { const a = getA(id); a.link = v === 'manual' ? {mode: 'manual', units: areaLinks(a).map(u => ({code: u.o.code, w: +u.w.toFixed(2)}))} : null; commit(); }
-function setUnit(id, code, pct) {
-  const a = getA(id), us = a.link.units.filter(u => u.code !== code);
-  us.push({code, w: pct > 0 ? Math.min(100, Math.max(1, pct)) / 100 : 0}); a.link.units = us; commit();
+function toggleArea(id, code, on) {
+  const a = getA(id); a.incl = (a.incl || []).filter(c => c !== code); a.excl = (a.excl || []).filter(c => c !== code);
+  const ov = overlap(a.zone, getO(code).poly) >= .05;
+  if (on && !ov) a.incl.push(code); if (!on && ov) a.excl.push(code); commit();
 }
 const medZk = c => c.kind === 'area' ? `a:${c.a.id}` : `g:${c.p.id}:${U.modal.gi}`;
 function medView(on) { const c = medCtx(), o = c.kind === 'area' ? c.a : c.g; o.view = on ? {...MV[medZk(c)]} : null; if (!on) delete MV[medZk(c)]; medRefresh(); toast(on ? '지도 장 범위 저장' : '범위 되돌림'); }
@@ -1769,14 +1775,14 @@ function modPanel(k, a) {
   return '';
 }
 function dataSlides(g, a, mods) {
-  const tag = `${esc(g.name)} · 공식 상권 ${a.units.length}곳 합산`, ins = areaInsight(a);
+  const tag = esc(g.name), ins = areaInsight(a);
   const tile = (l, v) => `<div class="tile"><span>${l}</span><b>${v}</b></div>`;
   const out = [{label: LG(`${g.name} · 상권 개요`, `${tv(g.name)} · Overview`), html: tr(`<div class="sl sl-std sl-dt">${slHead('상권 개요', {tag})}
     <div class="insight">${ins.html}</div>
     <div class="tiles">${tile('상권 유형', ins.type)}${tile('일평균 유동 인구', nf(a.pop[2][1]) + '명')}${tile('분기 추정 매출', nf(a.sales[a.sales.length - 1][1]) + '억원')}${tile('주말 매출 비중', a.week[1] + '%')}</div>
     <div class="charts c4"><div class="chart"><h5>인구 구성</h5>${hbars(a.pop, v => nf(v) + '명')}</div><div class="chart"><h5>분기 매출 추이 (억원)</h5>${lineChart(a.sales, '억')}</div>
       <div class="chart"><h5>시간대별 유동 인구 (%)</h5>${cols(a.hourly, '%')}</div><div class="chart"><h5>연령대별 유동 인구 (%)</h5>${cols(a.age, '%')}</div></div>
-    <div class="dt-src">서울시 상권분석서비스 · ${a.q} 기준 · ${a.units.map(u => `${esc(u.name)} ${Math.round(u.w * 100)}%`).join(' · ')} (상권 영역과 겹친 비율로 합산한 추정치) · 예시 데이터</div>${slFoot()}</div>`)}];
+    <div class="dt-src">출처: 서울시 상권분석서비스 ${a.q} · ${a.units.map(u => esc(u.name)).join(' · ')} 기준 추정 · 예시 데이터</div>${slFoot()}</div>`)}];
   const parts = MODULES.filter(([k]) => mods[k]).map(([k]) => modPanel(k, a)).filter(Boolean);
   for (let i = 0; i < parts.length; i += 2)
     out.push({label: LG(`${g.name} · 상권 데이터`, `${tv(g.name)} · Area data`), html: tr(`<div class="sl sl-std sl-dt">${slHead('상권 데이터', {tag})}<div class="dt-two">${parts.slice(i, i + 2).join('')}</div>${slFoot()}</div>`)});
