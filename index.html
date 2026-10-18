@@ -846,16 +846,16 @@ function deriveUnit(key, f, seed) { // sample figures: a template area scaled an
 const OSIZE = {U: 2.2, D: 1, A: .5, R: .35}; // sample figures grow with the official area's size and type
 const OFFICIAL = (window.OFFICIAL_AREAS || []).filter(o => AREAS[o.osm]).map(o => ({...o, data: deriveUnit(o.osm, Math.min(2.4, Math.max(.12, o.area / 150000)) * OSIZE[o.type], +o.code.slice(-3))}));
 const getO = code => OFFICIAL.find(o => o.code === code);
-const OCACHE = {};
+const OCACHE = new WeakMap(); // official polygon → (zone → overlap)
 const polyArea = pts => Math.abs(pts.reduce((s, p, i) => { const q = pts[(i + 1) % pts.length]; return s + p[0] * q[1] - q[0] * p[1]; }, 0)) / 2;
 function overlap(zone, poly) { // share of the official area inside the zone: 5 m samples over the zone, measured against the polygon's own area
-  const key = JSON.stringify(zone) + '|' + poly.length + ',' + poly[0]; if (key in OCACHE) return OCACHE[key];
-  if (zone.length < 3) return OCACHE[key] = 0;
+  const memo = OCACHE.get(poly) || new Map(), key = JSON.stringify(zone); OCACHE.set(poly, memo); if (memo.has(key)) return memo.get(key);
+  if (zone.length < 3) { memo.set(key, 0); return 0; }
   const zx = zone.map(p => p[0]), zy = zone.map(p => p[1]), px = poly.map(p => p[0]), py = poly.map(p => p[1]);
   const x0 = Math.max(Math.min(...zx), Math.min(...px)), x1 = Math.min(Math.max(...zx), Math.max(...px)), y0 = Math.max(Math.min(...zy), Math.min(...py)), y1 = Math.min(Math.max(...zy), Math.max(...py));
   let both = 0;
   for (let x = x0 + 2.5; x < x1; x += 5) for (let y = y0 + 2.5; y < y1; y += 5) if (inPoly(x, y, zone) && inPoly(x, y, poly)) both++;
-  return OCACHE[key] = Math.min(1, both * 25 / (polyArea(poly) || 1));
+  const v = Math.min(1, both * 25 / (polyArea(poly) || 1)); memo.set(key, v); return v;
 }
 /* the official areas a company master draws on: automatic from its zone, or the admin's own picks and shares */
 const SCACHE = {};
@@ -875,7 +875,7 @@ function areaLinks(a) {
   const inc = a.incl || [], exc = new Set(a.excl || []), set = a.wset || {};
   return OFFICIAL.filter(o => o.osm === a.osm && !exc.has(o.code)).map(o => ({o, ov: overlap(a.zone, o.poly)}))
     .filter(x => x.ov >= .05 || inc.includes(x.o.code))
-    .map(x => { const def = defaultShare(a, x.o), own = x.o.code in set; return {o: x.o, def, own, w: own ? set[x.o.code] : def}; })
+    .map(x => { let def = defaultShare(a, x.o); if (!def && inc.includes(x.o.code)) def = 1; const own = x.o.code in set; return {o: x.o, def, own, w: own ? set[x.o.code] : def}; })
     .filter(u => u.w > 0 || u.own).sort((x, y) => y.w - x.w);
 }
 function setShare(id, code, v) {
@@ -886,7 +886,7 @@ function setShare(id, code, v) {
 const DCACHE = {};
 function areaData(a) { // the official figures added up by overlap: counts scale with the share, rates are weighted averages
   const us = areaLinks(a); if (!us.length) return null;
-  const key = a.id + JSON.stringify(us.map(u => [u.o.code, +u.w.toFixed(3)])) + (S.sync?.q || ''); if (DCACHE[key]) return DCACHE[key];
+  const key = a.id + a.name + JSON.stringify(us.map(u => [u.o.code, +u.w.toFixed(3)])) + (S.sync?.q || ''); if (DCACHE[key]) return DCACHE[key];
   const W = us.map(u => u.w * u.o.data.pop[2][1]), tw = W.reduce((s, v) => s + v, 0) || 1;
   const sum = f => Math.round(us.reduce((s, u) => s + u.w * f(u.o.data), 0)), avg = f => us.reduce((s, u, i) => s + W[i] * f(u.o.data), 0) / tw;
   const mix = k => { const m = {}; us.forEach((u, i) => u.o.data[k].forEach(([n, v]) => { m[n] = (m[n] || 0) + W[i] * v; })); const rows = Object.entries(m).map(([n, v]) => [n, v / tw]), t = rows.reduce((s, r) => s + r[1], 0);
@@ -901,9 +901,10 @@ function areaData(a) { // the official figures added up by overlap: counts scale
 }
 const linkTxt = a => areaLinks(a).map(u => u.o.name).join(' · ');
 /* quarterly full sync: data lands two months after each quarter ends (end of Feb, May, Aug, Nov) */
+function pubs(y) { return [[y - 1, 3, `${y - 1}-11-30`], [y - 1, 4, `${y}-02-28`], [y, 1, `${y}-05-31`], [y, 2, `${y}-08-31`], [y, 3, `${y}-11-30`], [y, 4, `${y + 1}-02-28`]]; }
 function nextSync(today) { const [y, m] = today.split('-').map(Number), due = [[2, 28], [5, 31], [8, 31], [11, 30]].map(([mm, dd]) => [y, mm, dd]).concat([[y + 1, 2, 28]]).find(([yy, mm, dd]) => `${yy}-${pad2(mm)}-${pad2(dd)}` > today); return `${due[0]}-${pad2(due[1])}-${pad2(due[2])}`; }
 function syncNow(quiet) {
-  const [y, m] = S.today.split('-').map(Number), qEnd = m <= 2 ? [y - 1, 4] : m <= 5 ? [y, 1] : m <= 8 ? [y, 2] : m <= 11 ? [y, 3] : [y, 4];
+  const qEnd = pubs(+S.today.slice(0, 4)).filter(([, , d]) => d <= S.today).pop(); // the latest quarter already published
   S.sync = {at: S.today, q: `${qEnd[0]}년 ${qEnd[1]}분기`, units: OFFICIAL.length};
   Object.keys(DCACHE).forEach(k => delete DCACHE[k]); if (quiet) return; commit(); toast('상권 데이터 동기화', `공식 상권 ${OFFICIAL.length}곳 · ${S.sync.q} 데이터`);
 }
@@ -1331,7 +1332,7 @@ function advance(n) {
     }
   }
   commit();
-  toast(`${fmtDate(S.today)} (${DOW[new Date(S.today).getDay()]})`);
+  toast(`${fmtDate(S.today)} (${DOW[new Date(S.today + 'T00:00:00').getDay()]})`);
 }
 
 /* ---------- formatting ---------- */
@@ -1498,6 +1499,7 @@ function zoneBuildings(a) { // outlines whose centre falls inside the area's zon
   MZONE[a.id] = {key, list};
   return list;
 }
+const hiddenIn = a => { const ids = new Set(zoneBuildings(a).map(b => b[0])); return (a.hidden || []).filter(id => ids.has(id)).length; };
 const halo = 'paint-order="stroke" stroke="#fff" stroke-width="5" stroke-linejoin="round"';
 function markSvg(m, layer, cls = '', k = 1) {
   const at = `data-mk="${m.id}" data-layer="${layer}" class="mk ${cls}"`;
@@ -1537,11 +1539,13 @@ function panMove(e) {
   const dx = e.clientX - P.sx, dy = e.clientY - P.sy;
   if (!P.moved && Math.hypot(dx, dy) < 5) return true;
   if (!P.moved) { P.moved = true; P.el.setPointerCapture?.(e.pointerId); if (MED.pop) { MED.pop = null; document.querySelector('.mpop')?.remove(); } }
-  const svg = P.el.querySelector('svg'), k = P.v.w / svg.getBoundingClientRect().width;
+  const svg = P.el.querySelector('svg'), k = 1 / svg.getScreenCTM().a; // metres per screen pixel, right for letterboxed maps too
   MV[P.zk] = clampView({x: P.v.x - dx * k, y: P.v.y - dy * k, w: P.v.w}, MAP_DATA[P.osm]);
   const v = MV[P.zk]; svg.setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`); return true;
 }
 function panEnd() { const P = MPAN; MPAN = null; return !!P?.moved; }
+// a release or cancel anywhere ends a pan, so a press that left the map cannot keep panning on hover
+window.addEventListener('pointerup', () => { MPAN = null; }); window.addEventListener('pointercancel', () => { MPAN = null; MED.drag = null; });
 const zoomCtl = (zk, osm) => `<div class="zm-ctl"><button title="확대" onclick="zoomAt('${zk}','${osm}',1/1.4)">+</button><button title="축소" onclick="zoomAt('${zk}','${osm}',1.4)">−</button><button title="전체 보기" onclick="MV['${zk}']=fullView(MAP_DATA['${osm}']);zmApply('${zk}')">전체</button></div>`;
 const pinR = n => n > 20 ? 13 : n > 10 ? 16 : 19;
 function declutter(pts, r) { // pairwise push until no two circles overlap (a few dozen points, so O(n²) is fine)
@@ -1639,8 +1643,8 @@ function mapEditor(c) {
       <div class="med-map t-${t}">${zoomCtl(zk, c.a.osm)}${popCard(c)}<div class="lyr">${c.kind === 'area' ? `<button class="${MED.off ? 'on' : ''}" onclick="MED.off=!MED.off;medRefresh()">공식 상권</button><button class="${MED.refs !== false ? 'on' : ''}" onclick="MED.refs=MED.refs===false;medRefresh()">매물 위치</button>` : `<button class="${MED.off ? 'on' : ''}" onclick="MED.off=!MED.off;medRefresh()">공식 상권</button>`}</div><div onwheel="mWheel(event,'${zk}','${c.a.osm}')" onpointerdown="medDown(event)" onpointermove="medMove(event)" onpointerup="medUp(event)">${svg}</div></div></div>
     <div class="med-side">
       ${c.kind === 'area' ? `${linkPanel(c.a)}
-        <div class="med-sec"><h4>건물</h4><div class="sub">영역 안 ${zoneBuildings(c.a).length - (c.a.hidden || []).length}동 표시 · ${(c.a.hidden || []).length}동 숨김${(c.a.hidden || []).length ? ` <button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div></div>`
-        : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}${c.hide.length < (c.a.marks || []).length ? ` <button class="btn xs ghost" onclick="(c=>{c.g.mapHide=(c.a.marks||[]).map(m=>m.id)})(medCtx());medRefresh()">모두 숨기기</button>` : ''}</div>`}
+        <div class="med-sec"><h4>건물</h4><div class="sub">영역 안 ${zoneBuildings(c.a).length - hiddenIn(c.a)}동 표시 · ${hiddenIn(c.a)}동 숨김${(c.a.hidden || []).length ? ` <button class="btn xs ghost" onclick="getA('${c.a.id}').hidden=[];commit()">모두 살리기</button>` : ''}</div></div>`
+        : `<div class="sub">회사 상권 지도 <b>${esc(c.a.name)}</b> 위에 이 제안서 표시를 더합니다. 회사 표시 ${c.hide.filter(id => (c.a.marks || []).some(m => m.id === id)).length}개 숨김${c.hide.length ? ` <button class="btn xs ghost" onclick="medCtx().g.mapHide=[];medRefresh()">모두 보이기</button>` : ''}${c.hide.length < (c.a.marks || []).length ? ` <button class="btn xs ghost" onclick="(c=>{c.g.mapHide=(c.a.marks||[]).map(m=>m.id)})(medCtx());medRefresh()">모두 숨기기</button>` : ''}</div>`}
       ${vwRow}
       <div class="med-sec"><h4>${c.kind === 'area' ? '회사 표시' : '이 제안서 표시'} <span class="sub">${c.list.length}</span></h4>
       <div class="med-list">${c.list.map(row).join('') || '<div class="sub">아직 없음</div>'}</div></div></div></div>`;
@@ -1658,7 +1662,7 @@ function toggleArea(id, code, on) {
   const ov = overlap(a.zone, getO(code).poly) >= .05;
   if (on && !ov) a.incl.push(code); if (!on && ov) a.excl.push(code); commit();
 }
-const medZk = c => c.kind === 'area' ? `a:${c.a.id}` : `g:${c.p.id}:${U.modal.gi}`;
+const medZk = c => c.kind === 'area' ? `a:${c.a.id}` : `g:${c.p.id}:${c.g.id}`;
 function medView(on) { const c = medCtx(), o = c.kind === 'area' ? c.a : c.g; o.view = on ? {...MV[medZk(c)]} : null; if (!on) delete MV[medZk(c)]; medRefresh(); toast(on ? '지도 장 범위 저장' : '범위 되돌림'); }
 /* a plain click on the map: which official areas contain this point, and what to do with them */
 function medPop(e) {
@@ -1710,7 +1714,7 @@ function medDone() {
   MED.draft = []; MED.tool = 'move'; medRefresh();
 }
 function medName(id, v) { const m = medCtx().list.find(z => z.id === id); if (m) { m.name = v; medRefresh(); } }
-function medDel(id) { const c = medCtx(); c.list.splice(c.list.findIndex(z => z.id === id), 1); medRefresh(); }
+function medDel(id) { const c = medCtx(), i = c.list.findIndex(z => z.id === id); if (i >= 0) c.list.splice(i, 1); medRefresh(); }
 
 /* slide chrome */
 const slBrand = '<span class="sl-brand">Lease<i>Desk</i></span>';
@@ -1782,13 +1786,20 @@ function summarySlides(p, gs) {
       <td>${handoverTxt(r.L.handover)}</td>${fit ? `<td>${fitChips(fitOf(r.L, r.g, p.crit))}</td>` : ''}</tr>`).join('')}
     </tbody></table>${slFoot()}</div>`);
 }
+function trKeep(h, raws) { // English decks: translate the deck's own words, keep place names as typed unless the dictionary has them
+  if (U.lang !== 'en') return h;
+  const ns = [...new Set(raws.filter(r => r && !(r in EN)))].sort((x, y) => y.length - x.length).map(esc);
+  ns.forEach((e, i) => { h = h.split(e).join(`\u0001${i}\u0002`); });
+  h = tr(h); ns.forEach((e, i) => { h = h.split(`\u0001${i}\u0002`).join(e); });
+  return h;
+}
 function compareSlide(gs) {
   const rows = gs.filter(x => x.its.length), A = rows.filter(x => x.a);
   const fl = a => a.pop[2][1], sl = a => a.sales[a.sales.length - 1][1], mx = f => Math.max(...A.map(x => f(x.a)));
   const top = arr => arr.reduce((m, v) => v[1] > m[1] ? v : m);
   const bar = (v, m, lbl) => `<div class="xb"><b>${lbl}</b><span><i style="--w:${(v / m) * 100}%"></i></span></div>`;
   const busy = A.reduce((m, x) => !m || fl(x.a) > fl(m.a) ? x : m, null), wknd = A.reduce((m, x) => !m || x.a.week[1] > m.a.week[1] ? x : m, null);
-  return tr(`<div class="sl sl-std">${slHead('상권 비교', {tag: '서울시 상권분석서비스 · 예시 데이터'})}
+  return trKeep(`<div class="sl sl-std">${slHead('상권 비교', {tag: '서울시 상권분석서비스 · 예시 데이터'})}
     <p class="sl-lead">${LG(`일평균 유동인구는 <b>${esc(busy.g.name)}</b>이 ${nf(fl(busy.a))}명으로 가장 많고, 주말 매출 비중은 <b>${esc(wknd.g.name)}</b>이 ${wknd.a.week[1]}%로 가장 높습니다.`, `<b>${esc(tv(busy.g.name))}</b> has the most daily visitors (${nf(fl(busy.a))}); <b>${esc(tv(wknd.g.name))}</b> has the highest weekend sales share (${wknd.a.week[1]}%).`)}</p>
     <table class="tbl xt"><thead><tr><th>상권</th><th>유형</th><th>일평균 유동인구</th><th>분기 추정 매출</th><th>주말 매출 비중</th><th>유동 피크</th><th>주 연령대</th><th>최다 업종</th></tr></thead><tbody>
     ${rows.map(({g, a}) => { if (!a) return `<tr><td><b>${esc(g.name)}</b></td><td colspan="7" class="sub">상권 데이터 없음</td></tr>`;
@@ -1797,7 +1808,7 @@ function compareSlide(gs) {
         <td>${bar(fl(a), mx(fl), nf(fl(a)) + '명')}</td><td>${bar(sl(a), mx(sl), nf(sl(a)) + '억원')}</td><td>${bar(a.week[1], 100, a.week[1] + '%')}</td>
         <td><b>${top(a.hourly)[0]}시</b></td><td><b>${ag[0]}</b> <span class="sub">${ag[1]}%</span></td>
         <td><div class="xs"><span class="ico">${icon(st[0])}</span><div><b>${st[0]}</b><span>${st[1]}%</span></div></div></td></tr>`; }).join('')}
-    </tbody></table>${slFoot()}</div>`);
+    </tbody></table>${slFoot()}</div>`, rows.flatMap(x => [x.g.name, x.a?.name]));
 }
 function line2(rowsA, rowsB, unit) {
   const W = 300, H = 130, pad = 22, all = [...rowsA, ...rowsB].map(r => r[1]), mx = Math.max(...all) * 1.08;
@@ -1825,17 +1836,17 @@ function modPanel(k, a) {
   return '';
 }
 function dataSlides(g, a, mods) {
-  const tag = esc(g.name), ins = areaInsight(a);
+  const tag = esc(g.name), ins = areaInsight(a), keep = [g.name, a.name, ...(a.units || []).map(u => u.name)];
   const tile = (l, v) => `<div class="tile"><span>${l}</span><b>${v}</b></div>`;
-  const out = [{label: LG(`${g.name} · 상권 개요`, `${tv(g.name)} · Overview`), html: tr(`<div class="sl sl-std sl-dt">${slHead('상권 개요', {tag})}
+  const out = [{label: LG(`${g.name} · 상권 개요`, `${tv(g.name)} · Overview`), html: trKeep(`<div class="sl sl-std sl-dt">${slHead('상권 개요', {tag})}
     <div class="insight">${ins.html}</div>
     <div class="tiles">${tile('상권 유형', ins.type)}${tile('일평균 유동 인구', nf(a.pop[2][1]) + '명')}${tile('분기 추정 매출', nf(a.sales[a.sales.length - 1][1]) + '억원')}${tile('주말 매출 비중', a.week[1] + '%')}</div>
     <div class="charts c4"><div class="chart"><h5>인구 구성</h5>${hbars(a.pop, v => nf(v) + '명')}</div><div class="chart"><h5>분기 매출 추이 (억원)</h5>${lineChart(a.sales, '억')}</div>
       <div class="chart"><h5>시간대별 유동 인구 (%)</h5>${cols(a.hourly, '%')}</div><div class="chart"><h5>연령대별 유동 인구 (%)</h5>${cols(a.age, '%')}</div></div>
-    <div class="dt-src">출처: 서울시 상권분석서비스 ${a.q} · ${a.units.map(u => esc(u.name)).join(' · ')} 기준 추정 · 예시 데이터</div>${slFoot()}</div>`)}];
+    <div class="dt-src">출처: 서울시 상권분석서비스 ${a.q} · ${a.units.map(u => esc(u.name)).join(' · ')} 기준 추정 · 예시 데이터</div>${slFoot()}</div>`, keep)}];
   const parts = MODULES.filter(([k]) => mods[k]).map(([k]) => modPanel(k, a)).filter(Boolean);
   for (let i = 0; i < parts.length; i += 2)
-    out.push({label: LG(`${g.name} · 상권 데이터`, `${tv(g.name)} · Area data`), html: tr(`<div class="sl sl-std sl-dt">${slHead('상권 데이터', {tag})}<div class="dt-two">${parts.slice(i, i + 2).join('')}</div>${slFoot()}</div>`)});
+    out.push({label: LG(`${g.name} · 상권 데이터`, `${tv(g.name)} · Area data`), html: trKeep(`<div class="sl sl-std sl-dt">${slHead('상권 데이터', {tag})}<div class="dt-two">${parts.slice(i, i + 2).join('')}</div>${slFoot()}</div>`, keep)});
   return out;
 }
 function contactSlide(p) {
@@ -1906,9 +1917,9 @@ function guide() {
   <h4>브로커B</h4><ol><li>A의 비공개 매물 안 보임</li><li>A 공유 매물 → 내 제안서 (A 알림)</li><li>연무장길 45 등록 → 관리자 충돌</li></ol>
   <h4>관리자</h4><ol><li>상권 지도 → 성수 · 영역 · 건물 숨기기 · 브랜드 · 자사 중개</li><li>변경 이력 (전체)</li><li>층 중복 · 건물별 전체 매물</li><li>을지로 만료 매물 → B 이관</li><li>+30일 두 번 → 신축 대장 · 환율</li></ol></div>`;
 }
-function setRole(r) { U.role = r; U.prop = null; U.wiz = null; D = null; U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
+function setRole(r) { U.role = r; U.prop = null; U.wiz = null; D = null; Object.assign(LF, {q: '', area: '', all: false}); U.modal = null; save(); render(); renderModal(); window.scrollTo({top: 0}); }
 function setTab(t) { U.tab[U.role] = t; U.prop = null; U.amap = null; U.wiz = null; D = null; if (t === 'notes') { setTimeout(() => { S.notes.filter(n => n.to === me()).forEach(n => n.read = true); save(); }, 1200); } render(); window.scrollTo({top: 0}); }
-function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); D = null; U.prop = null; save(); render(); toast('초기화 완료'); }
+function resetAll() { if (!confirm('데이터를 초기 상태로 되돌릴까요?')) return; store.removeItem(KEY); S = seed(); D = null; U.prop = null; U.wiz = null; U.amap = null; U.modal = null; renderModal(); RET = null; Object.assign(LF, {q: '', area: '', all: false}); freshMed(); save(); render(); toast('초기화 완료'); }
 
 function render() {
   const role = U.role, tab = U.tab[role];
@@ -1922,7 +1933,7 @@ function render() {
 function sideNav() {
   const u = USERS[me()], unread = S.notes.filter(n => n.to === me() && !n.read).length;
   const items = me() === 'admin'
-    ? [['over', '개요'], ['maps', '상권 지도'], ['bld', '건물 · 매물'], ['hist', '변경 이력'], ['handover', '이관']]
+    ? [['over', '개요'], ['maps', '상권 지도'], ['bld', '건물 · 매물'], ['hist', '변경 이력'], ['handover', '이관'], ['notes', '알림']]
     : [['mine', '내 매물'], ['shared', '공유 매물'], ['props', '제안서'], ['notes', '알림']];
   return `<div class="me"><b>${u.name}</b><span>${u.title}</span></div><nav class="nav">${items.map(([k, l]) => `<button class="${U.tab[me()] === k && !D && !U.prop ? 'on' : ''}" onclick="setTab('${k}')">${l}${k === 'notes' && unread ? `<span class="ndot">${unread}</span>` : ''}</button>`).join('')}</nav>`;
 }
@@ -1942,7 +1953,7 @@ const STATUS = {active: ['진행', 'ok'], done: ['거래완료', 'dark'], withdr
 const propsWith = lid => visProps().filter(p => p.ownerId === me() && p.groups.some(g => g.items.some(x => x.listingId === lid)));
 function listingCard(L, i, own) {
   const I = bInfo(L), [sl, sc] = STATUS[L.status], left = diffDays(L.mEnd, S.today), a1 = area1F(L.floors);
-  const dd = L.status === 'active' && left <= 30 ? `<span class="chip ${left <= 14 ? 'warn' : ''}">D-${left}</span>` : '';
+  const dd = L.status === 'active' && left <= 30 ? `<span class="chip ${left < 0 ? 'red' : left <= 14 ? 'warn' : ''}">${left < 0 ? `용역 ${-left}일 지남` : `D-${left}`}</span>` : '';
   const vis = `<span class="chip">${L.visibility === 'shared' ? '공유' : '🔒 나만'}</span>`;
   const actions = own
     ? `<button class="btn sm ghost" onclick="editListing('${L.id}')">수정</button>
@@ -1963,6 +1974,7 @@ function listingCard(L, i, own) {
 }
 const LF = {q: '', area: '', all: false}; // listing list filters, shared by 내 매물 and 공유 매물
 function lfPass(L) {
+  if (LF.area && LF.area !== 'none' && !getA(LF.area)) LF.area = '';
   const I = bInfo(L), a = masterOf(L);
   return (!LF.q || `${I.name} ${I.address}`.replace(/\s/g, '').includes(LF.q.replace(/\s/g, ''))) && (!LF.area || (LF.area === 'none' ? !a : a?.id === LF.area));
 }
@@ -2070,7 +2082,7 @@ function importFrom(id) {
   const fs = L.floors.map(f => f.floor); D.range = {from: fmtF(Math.min(...fs)), to: fmtF(Math.max(...fs))};
   delete D.status; delete D.ownerId; delete D.grants; render(); toast('이전 매물 정보 복사', '도면 · 영역 · 사진 포함');
 }
-function seg(opts, cur, fn) { return `<div class="seg sm">${opts.map(([k, l]) => `<button type="button" class="${cur === k ? 'on' : ''}" onclick="${fn}('${k}')">${l}</button>`).join('')}</div>`; }
+function seg(opts, cur, fn) { return `<div class="seg sm">${opts.map(([k, l]) => `<button type="button" class="${cur === k ? 'on' : ''}" onclick="${fn}('${k}')">${esc(l)}</button>`).join('')}</div>`; }
 function priceRow(k, label, opts, isDate) {
   const p = D[k];
   const input = !(p.s === 'v' || (isDate && p.s === 'est')) ? '' : isDate
@@ -2215,6 +2227,7 @@ function picker(a, ls, chosen, crit, fn, onNew) {
 }
 
 function startWiz(lid) {
+  if (me() === 'admin') return toast('제안서는 브로커가 만듭니다');
   U.wiz = {step: 1, name: '', lang: 'ko', cur: 'USD', crit: {rentMax: null, areaMin: null, areaMax: null}, areas: [], picks: {}, tab: null};
   if (lid) { const a = masterOf(getL(lid)), k = a ? a.id : 'etc'; if (a) U.wiz.areas = [a.id]; U.wiz.picks[k] = [lid]; }
   U.modal = null; renderModal(); U.prop = null; D = null; U.tab[me()] = 'props'; render(); window.scrollTo({top: 0});
@@ -2266,8 +2279,10 @@ function groupFromMaster(a, i) { return {...newGroup(a.name, i), photo: a.photo 
 function wizFinish() {
   const w = U.wiz, p = blankProp(w.name.trim(), w.lang, w.cur);
   p.crit = wizCrit();
-  w.areas.forEach(id => { const g = groupFromMaster(getA(id), p.groups.length); (w.picks[id] || []).forEach(lid => g.items.push(newItem(lid))); p.groups.push(g); });
-  if ((w.picks.etc || []).length) { const g = {...newGroup('기타', p.groups.length), areaId: 'none'}; w.picks.etc.forEach(lid => g.items.push(newItem(lid))); p.groups.push(g); }
+  const seen = new Set(), fresh = lid => !!getL(lid) && !seen.has(lid) && !!seen.add(lid); // once per proposal, and only listings that still exist
+  w.areas.forEach(id => { const g = groupFromMaster(getA(id), p.groups.length); (w.picks[id] || []).filter(fresh).forEach(lid => g.items.push(newItem(lid))); p.groups.push(g); });
+  const etc = (w.picks.etc || []).filter(fresh);
+  if (etc.length) { const g = {...newGroup('기타', p.groups.length), areaId: 'none'}; etc.forEach(lid => g.items.push(newItem(lid))); p.groups.push(g); }
   p.groups.forEach(g => g.items.forEach(it => { const L = getL(it.listingId); if (L.ownerId !== me()) note(L.ownerId, `${USERS[me()].name}님이 <b>${esc(bInfo(L).name)} · ${esc(floorLabel(L.floors, L.leaseType))}</b>를 ${esc(p.clientName)} 제안서에 추가했습니다`); }));
   S.proposals.unshift(p); U.wiz = null; save(); openProp(p.id); toast('제안서 생성', `상권 ${p.groups.length} · 매물 ${p.groups.reduce((n, g) => n + g.items.length, 0)}건`);
 }
@@ -2301,7 +2316,7 @@ function propEditor(p) {
   const mode = U.pmode || 'edit', d = deckOf(p);
   const head = `<div class="head"><button class="btn ghost icon" onclick="U.prop=null;render()">←</button><h1>${esc(p.clientName)}</h1><span class="sub">${p.lang === 'en' ? 'English' : '한국어'} · ${p.cur === 'KRW' ? '원화만' : p.cur} · ${d.length}장</span><div class="sp"></div>
     ${seg([['edit', '편집'], ['deck', '미리보기']], mode, "(m=>{U.pmode=m;render();window.scrollTo({top:0})})")}
-    <button class="btn" onclick="openModal({type:'dup',pid:'${p.id}'})">복제</button><button class="btn" onclick="printDeck('${p.id}')">인쇄</button><button class="btn pri" onclick="downloadPpt('${p.id}')">${DL_ICON}PPT 다운로드</button></div>`;
+    <button class="btn ghost danger" onclick="rmProp('${p.id}')">삭제</button><button class="btn" onclick="openModal({type:'dup',pid:'${p.id}'})">복제</button><button class="btn" onclick="printDeck('${p.id}')">인쇄</button><button class="btn pri" onclick="downloadPpt('${p.id}')">${DL_ICON}PPT 다운로드</button></div>`;
   const outline = d.map((s, i) => `<button class="${s.head ? 'og' : ''}" onclick="goSlide(${i})"><b>${pad2(i + 1)}</b><span>${esc(s.label)}</span></button>`).join('');
   if (mode === 'deck') return head + `<div class="pv-wrap"><nav class="outl">${outline}</nav>
     <div class="deck">${d.map((s, i) => `<div class="deck-i"><div class="deck-l"><b>${pad2(i + 1)}</b>${esc(s.label)}</div>${slideBox(s, i)}</div>`).join('')}</div></div>`;
@@ -2310,10 +2325,10 @@ function propEditor(p) {
   const inp = (label, path, ph = '', type = 'text') => `<div class="f"><label>${label}</label><input class="in" type="${type}" value="${val(path)}" placeholder="${ph}" onchange="setPF('${p.id}','${path}',this.value)"></div>`;
   const cover = withDeck(p, () => coverSlide(p));
   const item = (it, gi, ii, g) => {
-    const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId), n = g.items.length;
+    const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId), n = g.items.length, no = ok ? liveItems(p, g).indexOf(it) + 1 : '–';
     const ov = ovPhoto(L, it), lay = PHOTO_LAYOUTS.includes(it.layout) ? it.layout : 2, rest = restPhotos(L, it).length, plans = planSets(L).length;
     return `<div class="gitem ${ok ? '' : 'off'}"><div class="ph" style="background-image:url('${ov || ''}')"></div><div class="gi-b">
-      <div class="row"><b>${ii + 1}. ${esc(I.name)}</b><span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span>${L.ownerId !== me() ? `<span class="chip blue">${USERS[L.ownerId].name}</span>` : ''}<div class="sp"></div>
+      <div class="row"><b>${no}. ${esc(I.name)}</b><span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span>${L.ownerId !== me() ? `<span class="chip blue">${USERS[L.ownerId].name}</span>` : ''}<div class="sp"></div>
         <button class="btn xs ghost" ${ii ? '' : 'disabled'} onclick="moveItem('${p.id}',${gi},${ii},-1)">↑</button><button class="btn xs ghost" ${ii < n - 1 ? '' : 'disabled'} onclick="moveItem('${p.id}',${gi},${ii},1)">↓</button>
         ${p.groups.length > 1 ? `<select class="in mini" onchange="moveTo('${p.id}',${gi},${ii},this.value)"><option value="">상권 이동</option>${p.groups.map((x, j) => j === gi ? '' : `<option value="${j}">${esc(x.name)}</option>`).join('')}</select>` : ''}
         <button class="btn xs ghost danger" onclick="rmItem('${p.id}',${gi},${ii})">✕</button></div>
@@ -2409,6 +2424,10 @@ function blankProp(name, lang, cur) {
     cover: {title: '', region: 'SEOUL', date: S.today.slice(0, 7), photo: COVER_PHOTOS[0]},
     crit: {regions: [], rentMax: null, areaMin: null, areaMax: null}, slides: {summary: true, compare: true}, modules: {...DEFAULT_MODS}, groups: []};
 }
+function rmProp(pid) {
+  const p = getP(pid); if (!confirm(`${p.clientName} 제안서를 지울까요? 되돌릴 수 없습니다.`)) return;
+  S.proposals = S.proposals.filter(x => x.id !== pid); U.prop = null; commit(); toast('제안서 삭제', p.clientName);
+}
 function createDup(form) {
   const src = getP(form.pid.value), name = form.cname.value.trim();
   if (!name) return toast('클라이언트명을 입력하세요');
@@ -2441,6 +2460,7 @@ function adminView() {
   if (t === 'bld') return adminBld();
   if (t === 'handover') return adminHand();
   if (t === 'maps') return adminMaps();
+  if (t === 'notes') return notesView();
   if (t === 'hist') return `<div class="head"><h1>변경 이력</h1><span class="sub">전체 매물 · 누가 언제 무엇을 바꿨는지</span></div><div class="panel">${histList([...(S.hist || [])].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 80), true)}</div>`;
 }
 function adminOver() {
@@ -2449,9 +2469,9 @@ function adminOver() {
   return `<div class="head"><h1>개요</h1></div>
   <div class="stats">${[['진행 매물', act.length], ['공유 비율', Math.round(act.filter(l => l.visibility === 'shared').length / Math.max(act.length, 1) * 100) + '%'], ['제안서', visProps().length], ['제안 매물', visProps().reduce((n, p) => n + p.groups.reduce((m, g) => m + g.items.length, 0), 0)]].map(([l, v], i) => `<div class="stat a" style="--i:${i}"><span>${l}</span><b>${v}</b></div>`).join('')}</div>
   <div class="panel a" style="--i:4"><h3>층 중복 <span class="chip ${cf.length ? 'warn' : 'ok'}">${cf.length}</span></h3>
-    ${cf.map(c => `<div class="conf"><span style="font-size:20px">⚠︎</span><div style="flex:1"><b>${esc(bInfo(c.a).name)}</b> · ${c.ov.join(', ')}F<div class="sub">${USERS[c.a.ownerId].name} (${esc(floorLabel(c.a.floors, c.a.leaseType))}, ${c.a.visibility === 'shared' ? '공유' : '나만'}) ↔ ${USERS[c.b.ownerId].name} (${esc(floorLabel(c.b.floors, c.b.leaseType))}, ${c.b.visibility === 'shared' ? '공유' : '나만'})</div></div><button class="btn sm" onclick="U.tab.admin='bld';U.open['${c.a.buildingId}']=true;render()">보기</button></div>`).join('') || '<div class="sub">중복 없음</div>'}</div>
+    ${cf.map(c => `<div class="conf"><span style="font-size:20px">⚠︎</span><div style="flex:1"><b>${esc(bInfo(c.a).name)}</b> · ${c.ov.map(fmtF).join(', ')}<div class="sub">${USERS[c.a.ownerId].name} (${esc(floorLabel(c.a.floors, c.a.leaseType))}, ${c.a.visibility === 'shared' ? '공유' : '나만'}) ↔ ${USERS[c.b.ownerId].name} (${esc(floorLabel(c.b.floors, c.b.leaseType))}, ${c.b.visibility === 'shared' ? '공유' : '나만'})</div></div><button class="btn sm" onclick="U.tab.admin='bld';U.open['${c.a.buildingId}']=true;render()">보기</button></div>`).join('') || '<div class="sub">중복 없음</div>'}</div>
   <div class="panel a" style="--i:5"><h3>용역 만료 30일 이내 <span class="chip">${soon.length}</span></h3>
-    <table class="tbl"><tbody>${soon.map(L => `<tr><td><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span></td><td>${USERS[L.ownerId].name}</td><td class="num">${fmtDate(L.mEnd)}</td><td class="num"><span class="chip ${diffDays(L.mEnd, S.today) <= 14 ? 'warn' : ''}">D-${diffDays(L.mEnd, S.today)}</span></td></tr>`).join('') || '<tr><td class="sub">없음</td></tr>'}</tbody></table></div>`;
+    <table class="tbl"><tbody>${soon.map(L => `<tr><td><b>${esc(bInfo(L).name)}</b> <span class="sub">${esc(floorLabel(L.floors, L.leaseType))}</span></td><td>${USERS[L.ownerId].name}</td><td class="num">${fmtDate(L.mEnd)}</td><td class="num">${(d => `<span class="chip ${d < 0 ? 'red' : d <= 14 ? 'warn' : ''}">${d < 0 ? `${-d}일 지남` : `D-${d}`}</span>`)(diffDays(L.mEnd, S.today))}</td></tr>`).join('') || '<tr><td class="sub">없음</td></tr>'}</tbody></table></div>`;
 }
 function adminBld() {
   return `<div class="head"><h1>건물 · 매물</h1><span class="sub">${S.buildings.length}개 건물 · PNU 기준 통합</span></div>
@@ -2520,7 +2540,6 @@ function areaBuild(a) {
   if (!us.length || !D) return `<div class="panel"><h3>상권 데이터 구성</h3><div class="sub">상권 데이터에 쓰는 공식 상권이 없습니다. 지도에서 공식 상권을 눌러 추가하세요.</div></div>`;
   const rows = us.map(u => { const sc = storeCount(a, u.o), vis = u.o.data.pop[2][1], sal = u.o.data.sales[u.o.data.sales.length - 1][1];
     return {u, sc, vis, sal, cv: Math.round(vis * u.w), cs: Math.round(sal * u.w), wk: u.o.data.week[1]}; });
-  const tv = rows.reduce((t, r) => t + r.cv, 0), ts = rows.reduce((t, r) => t + r.cs, 0);
   const how = u => { const c = storeCount(a, u.o); return c.inz || overlap(a.zone, u.o.poly) > 0 ? `${c.inz} / ${c.all}곳` : '영역 밖 · 직접 추가'; };
   const own = rows.filter(r => r.u.own).length;
   return `<div class="panel bld-p"><div class="row"><h3 style="margin:0">상권 데이터 구성</h3><span class="sub">${esc(S.sync?.q || '')} · 예시 수치</span><div class="sp"></div>${own ? `<span class="sub">반영 비율 ${own}곳 직접 조정</span><button class="btn xs" onclick="getA('${a.id}').wset={};commit()">모두 기본값으로</button>` : ''}</div>
@@ -2529,7 +2548,7 @@ function areaBuild(a) {
       ${rows.map(r => `<tr class="${r.u.own ? 'bp-own' : ''}"><td><b>${esc(r.u.o.name)}</b></td><td>${OTYPE[r.u.o.type]}</td><td class="num">${how(r.u)}</td>
         <td class="num bp-wc"><div class="ui bp-w"><input class="in" type="number" min="0" max="100" value="${Math.round(r.u.w * 100)}" onchange="setShare('${a.id}','${r.u.o.code}',this.value)"><span>%</span></div>
           ${r.u.own ? `<button class="bp-def" onclick="setShare('${a.id}','${r.u.o.code}',null)" title="점포 비율로 계산한 기본값">기본값 ${Math.round(r.u.def * 100)}%로</button>` : '<small>기본값</small>'}</td><td class="num">${nf(r.vis)}명</td><td class="num">${nf(r.cv)}명</td><td class="num">${nf(r.sal)}억</td><td class="num">${nf(r.cs)}억</td></tr>`).join('')}
-      <tr class="bp-sum"><td colspan="5">${esc(a.name)} 상권 데이터</td><td class="num">${nf(tv)}명</td><td></td><td class="num">${nf(ts)}억</td></tr></tbody></table></div>
+      <tr class="bp-sum"><td colspan="5">${esc(a.name)} 상권 데이터</td><td class="num">${nf(D.pop[2][1])}명</td><td></td><td class="num">${nf(D.sales[D.sales.length - 1][1])}억</td></tr></tbody></table></div>
     <ul class="bp-rules"><li><b>반영 비율</b>: 기본값은 그 공식 상권 점포 중 회사 영역 안에 있는 비율입니다. 숫자를 바꾸면 그 값을 쓰고, "기본값으로"를 누르면 돌아갑니다.</li>
       <li><b>인원 · 매출 · 세대 수</b>: 공식 상권 값 × 반영 비율을 모두 더합니다.</li>
       <li><b>비율 지표</b> (연령 · 시간대 · 주말 매출 비중 · 성별 · 외국인 비중): 반영 비율 × 유동인구로 가중 평균합니다. 예) 주말 매출 비중 ${rows.map(r => `${r.wk}%`).join(' · ')} → <b>${D.week[1]}%</b></li>
@@ -2554,7 +2573,7 @@ function adminMaps() {
   <div class="panel a sync-p" style="--i:0"><div><b>상권 데이터 전체 동기화</b><span class="sub">서울시 상권분석서비스 공식 상권 ${S.sync?.units || 0}곳(예시) · ${S.sync?.q || '–'} 데이터 · 마지막 ${fmtDate(S.sync?.at || '')} · 다음 예정 ${fmtDate(nextSync(S.sync?.at || S.today))} (분기 종료 2개월 뒤)</span></div><div class="sp"></div><button class="btn sm" onclick="syncNow()">지금 동기화</button></div>
   <div class="grid">${S.areas.map((x, i) => `<div class="card hov a" style="--i:${i}" onclick="U.amap='${x.id}';freshMed();render()"><div class="ph map-th">${mapSvg(x, {view: slideView(null, x)})}</div>
     <div class="bd"><div class="t">${esc(x.name)}</div><div class="ad">${areaLinks(x).length ? esc(linkTxt(x)) : '연결된 공식 상권 없음'}</div>
-    <div class="kv"><span>건물<b>${zoneBuildings(x).length - (x.hidden || []).length}</b></span><span>표시<b>${(x.marks || []).length}</b></span><span>쓰는 제안서<b>${visProps().filter(p => p.groups.some(g => groupMaster(g) === x)).length}</b></span></div></div></div>`).join('')}</div>`;
+    <div class="kv"><span>건물<b>${zoneBuildings(x).length - hiddenIn(x)}</b></span><span>표시<b>${(x.marks || []).length}</b></span><span>쓰는 제안서<b>${visProps().filter(p => p.groups.some(g => groupMaster(g) === x)).length}</b></span></div></div></div>`).join('')}</div>`;
 }
 function adminHand() {
   const ls = S.listings.filter(L => L.status === 'expired' || L.status === 'withdrawn');
@@ -2567,7 +2586,7 @@ function adminHand() {
 function grant(lid, u) { const L = getL(lid); L.grants = [...(L.grants || []), u]; logHist(lid, 'admin', '이관 권한 부여', [{label: '복사 권한', from: '–', to: USERS[u].name}]); note(u, `<b>${esc(bInfo(L).name)}</b> 이전 매물 복사 권한을 받았습니다`); save(); render(); toast('이관 권한 부여', USERS[u].name); }
 /* ---------- modals ---------- */
 function openModal(m) { U.modal = m; if (m.type === 'poly') m.pts = clone(D.floors[m.fi].poly || []); renderModal(); }
-function closeModal() { U.modal = null; renderModal(); }
+function closeModal() { const t = U.modal?.type; U.modal = null; renderModal(); if (t === 'pick' || t === 'pickAll' || t === 'gmap') render(); }
 function renderModal() {
   const m = U.modal, root = $('#modal-root');
   if (!m) { root.innerHTML = ''; return; }
@@ -2599,7 +2618,7 @@ function renderModal() {
     h = `<div class="modal wide"><div class="mh"><b>매물 장표 미리보기</b><span class="sub">제안서에 들어가는 모양</span><div class="sp"></div>
       ${seg([['ko', '한국어'], ['en', 'EN']], lang, "(v=>{U.modal.lang=v;renderModal()})")}
       ${propsWith(L.id).map(p => `<button class="btn sm ghost" onclick="closeModal();openProp('${p.id}')">${esc(p.clientName)} 제안서 →</button>`).join('')}
-      ${own ? `<button class="btn sm" onclick="editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
+      ${own ? `<button class="btn sm" onclick="editListing('${L.id}')">수정</button>` : ''}${L.status === 'active' && me() !== 'admin' ? `<button class="btn sm pri" onclick="openModal({type:'toProp',lid:'${L.id}'})">+ 제안서</button>` : ''}<button class="btn sm ghost" onclick="closeModal()">✕</button></div>
       <div class="mb">${thumb(sl)}</div></div>`;
   } else if (m.type === 'gmap' && groupMaster(getP(m.pid).groups[m.gi])) {
     const g = getP(m.pid).groups[m.gi];
