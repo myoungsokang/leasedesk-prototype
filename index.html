@@ -252,8 +252,6 @@ textarea.in{resize:vertical;min-height:64px}
 .stack i{display:block;height:100%}
 .legend{display:flex;gap:14px;font-size:12px;color:var(--ink2)}
 .legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px}
-.stg{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:12px 14px;border-radius:12px;background:var(--accent-soft)}
-.stg b{font-size:16px;color:var(--accent-2)}.stg span{font-size:13px;color:var(--ink2)}
 .xs-h{display:flex;align-items:baseline;gap:10px;margin-bottom:12px}.xs-h h4{margin:0;font-size:17px;letter-spacing:-.02em}
 .xb{display:flex;flex-direction:column;gap:5px;min-width:110px}
 .xb b{font-size:13.5px;font-variant-numeric:tabular-nums}
@@ -638,7 +636,7 @@ const REGISTRY = [
 
 /* mock 상권 data (서울시 상권분석서비스 형태, 예시 값) */
 const AREAS = {
-  seongsu: {change: {stage: '상권확장', run: 62, closed: 41, open: 4.8, close: 3.1}, salesAge: [['10대', 4], ['20대', 31], ['30대', 33], ['40대', 18], ['50대', 9], ['60+', 5]], female: 58, foreign: {daily: 6400, share: 6.5, top: [['중국', 31], ['일본', 24], ['미국', 11]], salesShare: 9}, hinter: {hh: 21400, single: 46, income: 512, spend: 298}, subway: {name: '성수역', daily: 92400, wk: [1.2, 15.8, 6.4, 5.1, 14.9, 4.6], we: [1.6, 6.2, 8.8, 10.4, 12.1, 6.3]}, name: '성수동 카페거리', kind: '발달상권', q: '2026년 2분기',
+  seongsu: {salesAge: [['10대', 4], ['20대', 31], ['30대', 33], ['40대', 18], ['50대', 9], ['60+', 5]], female: 58, foreign: {daily: 6400, share: 6.5, top: [['중국', 31], ['일본', 24], ['미국', 11]], salesShare: 9}, hinter: {hh: 21400, single: 46, income: 512, spend: 298}, subway: {name: '성수역', daily: 92400, wk: [1.2, 15.8, 6.4, 5.1, 14.9, 4.6], we: [1.6, 6.2, 8.8, 10.4, 12.1, 6.3]}, name: '성수동 카페거리', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 18400], ['직장 인구', 52300], ['유동 인구', 98700]],
     hourly: [['00–06', 3], ['06–11', 11], ['11–14', 19], ['14–17', 23], ['17–21', 29], ['21–24', 15]],
     sales: [['25.3Q', 742], ['25.4Q', 768], ['26.1Q', 731], ['26.2Q', 812]],
@@ -646,7 +644,7 @@ const AREAS = {
     age: [['10대', 8], ['20대', 36], ['30대', 29], ['40대', 15], ['50대', 8], ['60+', 4]],
     dow: [['월', 11], ['화', 11], ['수', 12], ['목', 13], ['금', 15], ['토', 20], ['일', 18]],
     week: [56, 44], stores: [['카페·디저트', 31], ['음식점', 24], ['패션·잡화', 18], ['기타', 10], ['뷰티', 9], ['생활서비스', 8]]},
-  sinsa: {change: {stage: '다이나믹', run: 58, closed: 52, open: 5.6, close: 5.9}, salesAge: [['10대', 6], ['20대', 30], ['30대', 30], ['40대', 19], ['50대', 10], ['60+', 5]], female: 62, foreign: {daily: 5200, share: 4.6, top: [['중국', 28], ['일본', 26], ['대만', 12]], salesShare: 11}, hinter: {hh: 9800, single: 38, income: 780, spend: 452}, subway: {name: '신사역', daily: 68400, wk: [0.9, 11.2, 5.8, 4.9, 12.6, 4.1], we: [1.2, 4.1, 7.2, 8.9, 10.2, 5.2]}, name: '가로수길', kind: '발달상권', q: '2026년 2분기',
+  sinsa: {salesAge: [['10대', 6], ['20대', 30], ['30대', 30], ['40대', 19], ['50대', 10], ['60+', 5]], female: 62, foreign: {daily: 5200, share: 4.6, top: [['중국', 28], ['일본', 26], ['대만', 12]], salesShare: 11}, hinter: {hh: 9800, single: 38, income: 780, spend: 452}, subway: {name: '신사역', daily: 68400, wk: [0.9, 11.2, 5.8, 4.9, 12.6, 4.1], we: [1.2, 4.1, 7.2, 8.9, 10.2, 5.2]}, name: '가로수길', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 8200], ['직장 인구', 38500], ['유동 인구', 112000]],
     hourly: [['00–06', 2], ['06–11', 9], ['11–14', 18], ['14–17', 25], ['17–21', 31], ['21–24', 15]],
     sales: [['25.3Q', 486], ['25.4Q', 512], ['26.1Q', 478], ['26.2Q', 534]],
@@ -654,7 +652,7 @@ const AREAS = {
     age: [['10대', 7], ['20대', 34], ['30대', 28], ['40대', 16], ['50대', 9], ['60+', 6]],
     dow: [['월', 11], ['화', 11], ['수', 12], ['목', 13], ['금', 16], ['토', 20], ['일', 17]],
     week: [49, 51], stores: [['패션·잡화', 34], ['카페·디저트', 21], ['음식점', 18], ['뷰티', 14], ['기타', 8], ['생활서비스', 5]]},
-  hannam: {change: {stage: '정체', run: 71, closed: 57, open: 3.9, close: 4.3}, salesAge: [['10대', 3], ['20대', 24], ['30대', 34], ['40대', 22], ['50대', 11], ['60+', 6]], female: 54, foreign: {daily: 11800, share: 18.3, top: [['미국', 22], ['중국', 18], ['일본', 15]], salesShare: 16}, hinter: {hh: 15600, single: 41, income: 640, spend: 380}, subway: {name: '한강진역', daily: 31200, wk: [0.4, 5.1, 2.6, 2.4, 5.8, 2.2], we: [0.6, 2.2, 3.9, 4.8, 5.6, 3.1]}, name: '한남동 이태원로', kind: '발달상권', q: '2026년 2분기',
+  hannam: {salesAge: [['10대', 3], ['20대', 24], ['30대', 34], ['40대', 22], ['50대', 11], ['60+', 6]], female: 54, foreign: {daily: 11800, share: 18.3, top: [['미국', 22], ['중국', 18], ['일본', 15]], salesShare: 16}, hinter: {hh: 15600, single: 41, income: 640, spend: 380}, subway: {name: '한강진역', daily: 31200, wk: [0.4, 5.1, 2.6, 2.4, 5.8, 2.2], we: [0.6, 2.2, 3.9, 4.8, 5.6, 3.1]}, name: '한남동 이태원로', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 14200], ['직장 인구', 21800], ['유동 인구', 64300]],
     hourly: [['00–06', 4], ['06–11', 8], ['11–14', 16], ['14–17', 22], ['17–21', 32], ['21–24', 18]],
     sales: [['25.3Q', 392], ['25.4Q', 418], ['26.1Q', 401], ['26.2Q', 437]],
@@ -662,7 +660,7 @@ const AREAS = {
     age: [['10대', 5], ['20대', 31], ['30대', 32], ['40대', 18], ['50대', 9], ['60+', 5]],
     dow: [['월', 10], ['화', 10], ['수', 11], ['목', 13], ['금', 17], ['토', 21], ['일', 18]],
     week: [47, 53], stores: [['음식점', 33], ['카페·디저트', 22], ['패션·잡화', 19], ['기타', 9], ['갤러리·문화', 9], ['뷰티', 8]]},
-  myeongdong: {change: {stage: '상권확장', run: 66, closed: 44, open: 5.2, close: 3.6}, salesAge: [['10대', 9], ['20대', 33], ['30대', 25], ['40대', 16], ['50대', 11], ['60+', 6]], female: 61, foreign: {daily: 38500, share: 42.1, top: [['중국', 36], ['일본', 21], ['대만', 9]], salesShare: 48}, hinter: {hh: 3900, single: 58, income: 455, spend: 270}, subway: {name: '명동역', daily: 104800, wk: [1.1, 16.4, 9.8, 9.1, 16.2, 6.9], we: [1.4, 7.6, 13.2, 15.8, 15.1, 7.4]}, name: '명동', kind: '관광특구', q: '2026년 2분기',
+  myeongdong: {salesAge: [['10대', 9], ['20대', 33], ['30대', 25], ['40대', 16], ['50대', 11], ['60+', 6]], female: 61, foreign: {daily: 38500, share: 42.1, top: [['중국', 36], ['일본', 21], ['대만', 9]], salesShare: 48}, hinter: {hh: 3900, single: 58, income: 455, spend: 270}, subway: {name: '명동역', daily: 104800, wk: [1.1, 16.4, 9.8, 9.1, 16.2, 6.9], we: [1.4, 7.6, 13.2, 15.8, 15.1, 7.4]}, name: '명동', kind: '관광특구', q: '2026년 2분기',
     pop: [['상주 인구', 3100], ['직장 인구', 67000], ['유동 인구', 241000]],
     hourly: [['00–06', 3], ['06–11', 12], ['11–14', 22], ['14–17', 24], ['17–21', 27], ['21–24', 12]],
     sales: [['25.3Q', 1388], ['25.4Q', 1462], ['26.1Q', 1301], ['26.2Q', 1520]],
@@ -670,7 +668,7 @@ const AREAS = {
     age: [['10대', 12], ['20대', 33], ['30대', 24], ['40대', 15], ['50대', 10], ['60+', 6]],
     dow: [['월', 13], ['화', 13], ['수', 13], ['목', 14], ['금', 16], ['토', 17], ['일', 14]],
     week: [61, 39], stores: [['화장품', 29], ['음식점', 24], ['패션·잡화', 21], ['카페·디저트', 9], ['환전·관광', 9], ['기타', 8]]},
-  gangnam: {change: {stage: '정체', run: 69, closed: 58, open: 4.1, close: 4.5}, salesAge: [['10대', 6], ['20대', 29], ['30대', 31], ['40대', 19], ['50대', 10], ['60+', 5]], female: 51, foreign: {daily: 9200, share: 5.3, top: [['중국', 27], ['일본', 19], ['미국', 14]], salesShare: 7}, hinter: {hh: 12800, single: 52, income: 690, spend: 410}, subway: {name: '강남역', daily: 186500, wk: [2.4, 34.1, 14.2, 12.8, 33.5, 11.9], we: [2.9, 12.4, 18.6, 21.2, 22.8, 12.1]}, name: '강남역', kind: '발달상권', q: '2026년 2분기',
+  gangnam: {salesAge: [['10대', 6], ['20대', 29], ['30대', 31], ['40대', 19], ['50대', 10], ['60+', 5]], female: 51, foreign: {daily: 9200, share: 5.3, top: [['중국', 27], ['일본', 19], ['미국', 14]], salesShare: 7}, hinter: {hh: 12800, single: 52, income: 690, spend: 410}, subway: {name: '강남역', daily: 186500, wk: [2.4, 34.1, 14.2, 12.8, 33.5, 11.9], we: [2.9, 12.4, 18.6, 21.2, 22.8, 12.1]}, name: '강남역', kind: '발달상권', q: '2026년 2분기',
     pop: [['상주 인구', 9800], ['직장 인구', 148000], ['유동 인구', 172000]],
     hourly: [['00–06', 2], ['06–11', 21], ['11–14', 27], ['14–17', 18], ['17–21', 24], ['21–24', 8]],
     sales: [['25.3Q', 1912], ['25.4Q', 2034], ['26.1Q', 1876], ['26.2Q', 1958]],
@@ -678,7 +676,7 @@ const AREAS = {
     age: [['10대', 9], ['20대', 35], ['30대', 27], ['40대', 15], ['50대', 9], ['60+', 5]],
     dow: [['월', 14], ['화', 14], ['수', 15], ['목', 15], ['금', 17], ['토', 14], ['일', 11]],
     week: [78, 22], stores: [['음식점', 38], ['기타', 16], ['카페·디저트', 14], ['병·의원', 12], ['생활서비스', 11], ['학원', 9]]},
-  euljiro: {change: {stage: '다이나믹', run: 74, closed: 49, open: 4.4, close: 4.7}, salesAge: [['10대', 3], ['20대', 26], ['30대', 28], ['40대', 21], ['50대', 14], ['60+', 8]], female: 46, foreign: {daily: 4100, share: 5.1, top: [['중국', 30], ['일본', 22], ['미국', 10]], salesShare: 6}, hinter: {hh: 6100, single: 61, income: 470, spend: 285}, subway: {name: '을지로3가역', daily: 54300, wk: [0.6, 10.2, 5.1, 4.2, 9.8, 3.4], we: [0.5, 2.1, 3.4, 3.9, 4.6, 2.2]}, name: '을지로3가', kind: '골목상권', q: '2026년 2분기',
+  euljiro: {salesAge: [['10대', 3], ['20대', 26], ['30대', 28], ['40대', 21], ['50대', 14], ['60+', 8]], female: 46, foreign: {daily: 4100, share: 5.1, top: [['중국', 30], ['일본', 22], ['미국', 10]], salesShare: 6}, hinter: {hh: 6100, single: 61, income: 470, spend: 285}, subway: {name: '을지로3가역', daily: 54300, wk: [0.6, 10.2, 5.1, 4.2, 9.8, 3.4], we: [0.5, 2.1, 3.4, 3.9, 4.6, 2.2]}, name: '을지로3가', kind: '골목상권', q: '2026년 2분기',
     pop: [['상주 인구', 7400], ['직장 인구', 61000], ['유동 인구', 88000]],
     hourly: [['00–06', 4], ['06–11', 13], ['11–14', 21], ['14–17', 16], ['17–21', 30], ['21–24', 16]],
     sales: [['25.3Q', 604], ['25.4Q', 655], ['26.1Q', 612], ['26.2Q', 671]],
@@ -764,8 +762,7 @@ const EN = {
   '동종 업종 경쟁점': 'Same-category competitors', '소상공인시장진흥공단 상가정보 · 반경 300m': 'SEMAS store data · 300m radius', '500m 내 (추정)': 'Within 500m (est.)', '300m 내 전체 점포': 'All stores within 300m', '비중': 'Share', '브랜드 · 유형별 (곳)': 'By brand / type',
   '상권 분석': 'Trade-area analysis', '상권 유형': 'Area type', '일평균 유동 인구': 'Daily visitors', '인구 구성': 'Population mix', '분기 매출 추이 (억원)': 'Quarterly sales (₩100M)', '시간대별 유동 인구 (%)': 'Visitors by hour (%)', '시간대별 매출 (%)': 'Sales by hour (%)',
   '연령대별 유동 인구 (%)': 'Visitors by age (%)', '요일별 매출 (%)': 'Sales by weekday (%)', '평일 · 주말 매출': 'Weekday vs weekend sales', '점포 구성': 'Store mix',
-  '상권 변화 단계': 'Trade-area stage', '서울시 상권분석서비스': 'Seoul Trade Area Analysis Service', '운영 점포 평균 영업': 'Avg. age of open stores', '폐업 점포 평균 영업': 'Avg. life of closed stores',
-  '신규 진입이 늘고 있는 성장 국면': 'Growing — new entrants increasing', '진입과 폐업이 모두 활발한 변동 국면': 'Volatile — many openings and closures', '진입과 폐업이 모두 적은 안정 국면': 'Stable — few openings or closures', '폐업이 진입보다 많은 위축 국면': 'Shrinking — more closures than openings',
+  '서울시 상권분석서비스': 'Seoul Trade Area Analysis Service',
   '일평균 승하차': 'Daily riders', '평일 피크': 'Weekday peak', '주말 피크': 'Weekend peak', '주말/평일': 'Weekend / weekday', '시간대별 승하차 (천 명)': 'Riders by hour (thousands)',
   '성별 · 연령대별 매출': 'Sales by gender and age', '서울시 상권분석서비스 추정매출': 'Seoul estimated sales data', '연령대별 매출 (%)': 'Sales by age (%)', '성별 매출': 'Sales by gender',
   '외국인 생활인구 · 소비': 'Foreign visitors and spending', '서울 생활인구 · 한국관광공사 데이터랩': 'Seoul living population · KTO DataLab', '외국인 일평균': 'Foreign visitors / day', '생활인구 중 비중': 'Share of population', '외국인 카드 매출 비중': 'Foreign card sales share', '1위 국적': 'Top nationality', '국적별 비중 (상위 3)': 'Top 3 nationalities',
@@ -811,11 +808,10 @@ function tr(h) {
 
 /* ---------- optional data modules (per proposal) ---------- */
 const MODULES = [
-  ['change', '상권 변화 단계 · 개폐업률', '서울시 상권분석서비스', true],
+  ['hinter', '배후 주거 · 소득', '통계청 SGIS', true],
   ['subway', '가까운 역 시간대별 승하차', '서울 열린데이터광장', true],
   ['sales', '성별 · 연령대별 매출', '서울시 상권분석서비스 추정매출', true],
   ['foreign', '외국인 생활인구 · 소비', '서울 생활인구 · 한국관광공사', true],
-  ['hinter', '배후 주거 · 소득', '통계청 SGIS', true],
 ];
 const DEFAULT_MODS = Object.fromEntries(MODULES.map(m => [m[0], m[3]]));
 
@@ -923,7 +919,7 @@ function seed() {
   const st = (font, size, color, pos) => ({font, size, color, pos});
   const G = (id, name, photo, style, items) => ({id, name, photo, style, areaKey: null, items: items.map(([listingId, comment]) => ({listingId, comment}))});
   const props = [{id: 'P1', ownerId: 'brokerA', clientName: '모먼트커피', createdAt: '2026-09-18T17:00:00',
-    lang: 'ko', cur: 'USD', fx: {month: '2026-09', rates: fxFor('2026-09')}, category: '카페·디저트',
+    lang: 'ko', cur: 'USD', fx: {month: '2026-09', rates: fxFor('2026-09')},
     cover: {title: '', region: 'SEOUL', date: '2026-10', photo: PH.cheonggye},
     crit: {regions: ['성수', '가로수길', '한남', '명동'], rentMax: 60000000, areaMin: 250, areaMax: 2300},
     slides: {summary: true, compare: true}, modules: {...DEFAULT_MODS},
@@ -939,7 +935,7 @@ function seed() {
         ['L5', '관광객 유동이 가장 많은 대안\n해외 고객 대상 플래그십으로 검토 권장']]),
     ]}];
   props.push({id: 'P2', hidden: true, ownerId: 'brokerB', clientName: '어반스레드', createdAt: '2026-09-25T10:30:00',
-    lang: 'en', cur: 'CNY', fx: {month: '2026-09', rates: fxFor('2026-09')}, category: '패션·잡화',
+    lang: 'en', cur: 'CNY', fx: {month: '2026-09', rates: fxFor('2026-09')},
     cover: {title: '', region: 'SEOUL', date: '2026-09', photo: PH.seoulStreet},
     crit: {regions: ['가로수길', '한남', '판교'], rentMax: null, areaMin: 240, areaMax: 400},
     slides: {summary: true, compare: true}, modules: {...DEFAULT_MODS, hinter: false},
@@ -1152,7 +1148,7 @@ const stateTxt = s => LG(STATE_KO[s], STATE_EN[s]);
 const CURS = ['USD', 'CNY', 'JPY', 'EUR', 'GBP'];
 const CUR_NAME = {USD: '미국 달러', JPY: '일본 엔', CNY: '중국 위안', EUR: '유로', GBP: '영국 파운드'};
 const DL_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>';
-let FXC = null, CAT = null; // currency and client category of the deck being rendered
+let FXC = null; // currency of the deck being rendered
 
 /* one conversion and one rounding for every slide, so the same KRW amount never shows two USD values */
 function fxAmt(v) { return FXC && FXC.cur !== 'KRW' ? `${FXC.cur} ${nf(Math.round(v / FXC.rate))}` : ''; }
@@ -1207,7 +1203,6 @@ const liveItems = (p, g) => g.items.filter(it => { const L = getL(it.listingId);
 function autoAreaKey(g) { for (const it of g.items) { const L = getL(it.listingId), k = L && getB(L.buildingId).area; if (k && AREAS[k]) return k; } return null; }
 const groupAreaKey = g => g.areaKey === 'none' ? null : g.areaKey || autoAreaKey(g);
 const groupArea = g => { const k = groupAreaKey(g); return k ? AREAS[k] : null; };
-function catOf(a) { return CAT && a.stores.some(st => st[0] === CAT) ? CAT : a.stores[0][0]; }
 
 /* slide chrome */
 const slBrand = '<span class="sl-brand">Lease<i>Desk</i></span>';
@@ -1299,8 +1294,6 @@ function line2(rowsA, rowsB, unit) {
 function modPanel(k, a) {
   const box = (t, src, body) => `<section class="dt-p"><div class="xs-h"><h4>${t}</h4><span class="sub">${src}</span></div>${body}</section>`;
   const tile = (l, v) => `<div class="tile"><span>${l}</span><b>${v}</b></div>`;
-  if (k === 'change' && a.change) { const c = a.change, desc = {'상권확장': '신규 진입이 늘고 있는 성장 국면', '다이나믹': '진입과 폐업이 모두 활발한 변동 국면', '정체': '진입과 폐업이 모두 적은 안정 국면', '상권축소': '폐업이 진입보다 많은 위축 국면'}[c.stage];
-    return box('상권 변화 단계', '서울시 상권분석서비스', `<div class="stg"><b>${c.stage}</b><span>${desc}</span></div><div class="tiles t2">${tile('운영 점포 평균 영업', c.run + '개월')}${tile('폐업 점포 평균 영업', c.closed + '개월')}${tile(LG(`${catOf(a)} 개업률`, `${catOf(a)} opening rate`), c.open + '%')}${tile(LG(`${catOf(a)} 폐업률`, `${catOf(a)} closure rate`), c.close + '%')}</div>`); }
   if (k === 'subway' && a.subway) { const sw = a.subway, sl = a.hourly.map(h => h[0]);
     return box(LG(`${esc(sw.name)} 시간대별 승하차`, `${esc(sw.name)} riders by hour`), '서울 열린데이터광장', `<div class="tiles">${tile('일평균 승하차', nf(sw.daily) + '명')}${tile('평일 피크', sl[sw.wk.indexOf(Math.max(...sw.wk))] + '시')}${tile('주말 피크', sl[sw.we.indexOf(Math.max(...sw.we))] + '시')}${tile('주말/평일', Math.round(sw.we.reduce((x, y) => x + y) / sw.wk.reduce((x, y) => x + y) * 100) + '%')}</div><div class="chart"><h5>시간대별 승하차 (천 명)</h5>${line2(sl.map((k, i) => [k, sw.wk[i]]), sl.map((k, i) => [k, sw.we[i]]), '천 명')}</div>`); }
   if (k === 'sales' && a.salesAge)
@@ -1349,9 +1342,9 @@ function deckSlides(p) {
 }
 function withDeck(p, fn) {
   const prev = U.lang;
-  U.lang = p.lang; CAT = p.category || null;
+  U.lang = p.lang;
   FXC = p.cur === 'KRW' ? {cur: 'KRW'} : {cur: p.cur, rate: p.fx.rates[p.cur], month: p.fx.month};
-  try { return fn(); } finally { U.lang = prev; FXC = null; CAT = null; }
+  try { return fn(); } finally { U.lang = prev; FXC = null; }
 }
 const deckOf = p => withDeck(p, () => deckSlides(p).map((s, i) => ({...s, html: s.html.replace('%PG%', pad2(i + 1))})));
 const slideBox = (s, i) => `<div class="slw" ${i != null ? `id="sl-${i}"` : ''}>${s.html}</div>`;
@@ -1657,7 +1650,6 @@ function propEditor(p) {
 
   const val = path => esc(getPath(p, path) ?? '');
   const inp = (label, path, ph = '', type = 'text') => `<div class="f"><label>${label}</label><input class="in" type="${type}" value="${val(path)}" placeholder="${ph}" onchange="setPF('${p.id}','${path}',this.value)"></div>`;
-  const cats = [...new Set(Object.values(AREAS).flatMap(a => a.stores.map(st => st[0])))].filter(c => c !== '기타');
   const cover = withDeck(p, () => coverSlide(p));
   const item = (it, gi, ii, g) => {
     const L = getL(it.listingId), I = bInfo(L), ok = live(L, p.ownerId), n = g.items.length;
@@ -1689,8 +1681,7 @@ function propEditor(p) {
     <div>
       <div class="panel a" style="--i:0"><h3>표지</h3><div class="pcv"><div class="gcv">${thumb(cover)}
         <div class="ctl"><span>사진</span><label class="btn xs">업로드<input type="file" accept="image/*" hidden onchange="coverPhoto('${p.id}',this)"></label><button class="btn xs ghost" onclick="sampleCoverPhoto('${p.id}')">샘플 바꾸기</button></div></div>
-        <div class="fg" style="grid-template-columns:1fr 1fr;align-content:start">${inp('클라이언트명', 'clientName')}${inp('제목', 'cover.title', p.lang === 'en' ? 'Site Proposal' : '임차 후보지 제안')}${inp('상단 표기', 'cover.region', '예: SEOUL')}${inp('날짜', 'cover.date', '', 'month')}
-          <div class="f"><label>업종</label><select class="in" onchange="setPF('${p.id}','category',this.value||null)"><option value="">지정 안 함</option>${cats.map(k => `<option ${p.category === k ? 'selected' : ''}>${k}</option>`).join('')}</select></div></div></div></div>
+        <div class="fg" style="grid-template-columns:1fr 1fr;align-content:start">${inp('클라이언트명', 'clientName')}${inp('제목', 'cover.title', p.lang === 'en' ? 'Site Proposal' : '임차 후보지 제안')}${inp('상단 표기', 'cover.region', '예: SEOUL')}${inp('날짜', 'cover.date', '', 'month')}</div></div></div>
       <div class="row a" style="--i:1;margin:22px 0 10px"><b>상권 ${p.groups.length}</b><span class="sub">상권마다 표지 → 데이터 → 매물 순서로 들어갑니다</span><div class="sp"></div><button class="btn sm" onclick="addGroup('${p.id}')">+ 상권 추가</button></div>
       ${p.groups.map(group).join('') || '<div class="empty">상권을 추가하세요</div>'}
     </div>
@@ -1748,7 +1739,7 @@ function addItem(pid, gi, lid) {
   commit(); toast('추가됨', `${p.clientName} · ${p.groups[gi].name}`);
 }
 function blankProp(name, lang, cur) {
-  return {id: uid('P'), ownerId: me(), clientName: name, createdAt: stamp(), lang, cur, fx: clone(S.fx), category: null,
+  return {id: uid('P'), ownerId: me(), clientName: name, createdAt: stamp(), lang, cur, fx: clone(S.fx),
     cover: {title: '', region: 'SEOUL', date: S.today.slice(0, 7), photo: COVER_PHOTOS[0]},
     crit: {regions: [], rentMax: null, areaMin: null, areaMax: null}, slides: {summary: true, compare: true}, modules: {...DEFAULT_MODS}, groups: []};
 }
